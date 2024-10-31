@@ -1,11 +1,11 @@
 Package: rlevante
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Download LEVANTE Data
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Michael C. Frank
+Maintainer: Mike Frank <mcfrank@stanford.edu>
+Description: Download data from LEVANTE, a global project for studying child development. 
+License: MIT
 Encoding: UTF-8
 LazyData: true
+URL: https://levante-framework.github.io/rlevante/
