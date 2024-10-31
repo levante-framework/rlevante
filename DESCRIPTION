@@ -9,3 +9,7 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 URL: https://levante-framework.github.io/rlevante/
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
