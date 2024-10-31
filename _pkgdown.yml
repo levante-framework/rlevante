@@ -1,0 +1,5 @@
+url: https://levante-framework.github.io/rlevante/
+template:
+  bootstrap: 5
+  params:
+    bootswatch: spacelab
