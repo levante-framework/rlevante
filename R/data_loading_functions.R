@@ -30,7 +30,7 @@ get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
 
 fix_table_types <- function(table_data) {
   table_data |>
-    dplyr::mutate(across(where(is_character),
+    dplyr::mutate(dplyr::across(dplyr::where(rlang::is_character),
                          \(x) x |> dplyr::na_if("null") |> dplyr::na_if("None"))) |>
     dplyr::mutate(dplyr::across(dplyr::matches("birth_"), as.integer),
                   dplyr::across(dplyr::matches("difficulty"), as.double),
@@ -48,11 +48,11 @@ fix_table_types <- function(table_data) {
 #' @examples
 
 combine_datasets <- function(dataset_tables) {
-  all_table_names <- map(dataset_tables, names) |> unlist() |> unique()
+  all_table_names <- purrr::map(dataset_tables, names) |> unlist() |> unique()
   dataset_tables |>
-    map(\(ds) ds |> map(\(t) fix_table_types(t))) |>
-    list_transpose(template = all_table_names) |>
-    map(list_rbind)
+    purrr::map(\(ds) ds |> purrr::map(\(t) fix_table_types(t))) |>
+    purrr::list_transpose(template = all_table_names) |>
+    purrr::map(purrr::list_rbind)
   # map(\(dt) list_rbind(dt, names_to = "dataset_name"))
 }
 
