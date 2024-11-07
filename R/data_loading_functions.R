@@ -2,11 +2,11 @@
 #'
 #' longer description
 #'
-#' @return A numeric vector giving number of characters (code points) in each
-#'    element of the character vector. Missing string have missing length.
+#' @return A list of one or more datasets from a specific organization in the Redivis repository. In our case that is normally "levante"
 #' @export
 #' @examples
 
+# remember to specify at least one table
 get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
   org <- redivis::organization(org_name)
 
@@ -23,8 +23,7 @@ get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
 #'
 #' longer description
 #'
-#' @return A numeric vector giving number of characters (code points) in each
-#'    element of the character vector. Missing string have missing length.
+#' @return A Levante specific function to clean up some known potential data issues.
 #' @export
 #' @examples
 
@@ -42,8 +41,9 @@ fix_table_types <- function(table_data) {
 #'
 #' longer description
 #'
-#' @return A numeric vector giving number of characters (code points) in each
-#'    element of the character vector. Missing string have missing length.
+#' @return For the case where the data you're using is in multiple tables, this
+#'  function will combine them into one single large table if needed.
+#'
 #' @export
 #' @examples
 
@@ -60,13 +60,17 @@ combine_datasets <- function(dataset_tables) {
 #'
 #' longer description
 #'
-#' @return A numeric vector giving number of characters (code points) in each
-#'    element of the character vector. Missing string have missing length.
+#' @return Assemble & join user data with groups
+#'
 #' @export
 #' @examples
 
 collect_users <- function(dataset_data) {
   dplyr::distinct(dataset_data$users) |>
+    # Using left_join keeps all the data in $user_groups
+    # while connecting them to groups. Using many-to-many
+    # ensures that we can have users in multiple groups,
+    # as well as (of course) many users in a group
     dplyr::left_join(dplyr::distinct(dataset_data$user_groups),
                      by = "user_id", relationship = "many-to-many") |>
     dplyr::left_join(dplyr::distinct(dataset_data$groups),
