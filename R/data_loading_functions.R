@@ -1,12 +1,12 @@
 #' Get redivis datasets
 #'
-#' longer description
+#' Retrieve LEVANTE project datasets from Redivis and prepare them for further analysis.
 #'
 #' @return A list of one or more datasets from a specific organization in the Redivis repository. In our case that is normally "levante"
 #' @export
 #' @examples
 
-# remember to specify at least one table
+# remember to specify at least one table in addition to the dataset name(s)
 get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
   org <- redivis::organization(org_name)
 
@@ -21,7 +21,8 @@ get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
 
 #' Fix some stuff in tables
 #'
-#' longer description
+#' There can be some anomalies in LEVANTE data stored in Redivis. This function
+#' will clean up some of the most common
 #'
 #' @return A Levante specific function to clean up some known potential data issues.
 #' @export
