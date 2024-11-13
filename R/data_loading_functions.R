@@ -52,8 +52,8 @@ combine_datasets <- function(dataset_tables) {
   all_table_names <- purrr::map(dataset_tables, names) |> unlist() |> unique()
   dataset_tables |>
     purrr::map(\(ds) ds |> purrr::map(\(t) fix_table_types(t))) |>
-    purrr::list_transpose(template = all_table_names) |>
-    purrr::map(purrr::list_rbind)
+    purrr::list_transpose(template = all_table_names, simplify = FALSE) |>
+    purrr::map(list_rbind)
   # map(\(dt) list_rbind(dt, names_to = "dataset_name"))
 }
 
