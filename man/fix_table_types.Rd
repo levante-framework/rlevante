@@ -7,9 +7,9 @@
 fix_table_types(table_data)
 }
 \value{
-A numeric vector giving number of characters (code points) in each
-   element of the character vector. Missing string have missing length.
+A Levante specific function to clean up some known potential data issues.
 }
 \description{
-longer description
+There can be some anomalies in LEVANTE data stored in Redivis. This function
+will clean up some of the most common
 }

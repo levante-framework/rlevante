@@ -7,8 +7,8 @@
 combine_datasets(dataset_tables)
 }
 \value{
-A numeric vector giving number of characters (code points) in each
-   element of the character vector. Missing string have missing length.
+For the case where the data you're using is in multiple tables, this
+ function will combine them into one single large table if needed.
 }
 \description{
 longer description

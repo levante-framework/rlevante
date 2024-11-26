@@ -7,9 +7,8 @@
 get_datasets(dataset_names, org_name = "levante", tables = NULL)
 }
 \value{
-A numeric vector giving number of characters (code points) in each
-   element of the character vector. Missing string have missing length.
+A list of one or more datasets from a specific organization in the Redivis repository. In our case that is normally "levante"
 }
 \description{
-longer description
+Retrieve LEVANTE project datasets from Redivis and prepare them for further analysis.
 }

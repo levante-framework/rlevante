@@ -10,13 +10,20 @@
 get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
   org <- redivis::organization(org_name)
 
-  datasets <- dataset_names |> rlang::set_names() |> purrr::map(\(dn) org$dataset(dn))
+  datasets <- dataset_names |> set_names() |> map(\(dn) org$dataset(dn))
 
-  get_table_names <- \(ds) if (!is.null(tables)) tables else ds$list_tables() |> purrr::map(\(t) t$name)
+  get_table_names <- \(ds) {
+    if (!is.null(tables)) tables else ds$list_tables() |> map(\(t) t$name)
+  }
 
-  get_dataset_tables <- \(ds) ds |> get_table_names() |> rlang::set_names() |> purrr::map(\(tn) ds$table(tn)$to_tibble())
+  get_dataset_tables <- \(ds, dn) {
+    ds |> get_table_names() |> set_names() |> map(\(tn) {
+      message(glue::glue("Fetching data for dataset {dn} table {tn}"))
+      ds$table(tn)$to_tibble()
+    })
+  }
 
-  purrr::map(datasets, get_dataset_tables)
+  imap(datasets, get_dataset_tables)
 }
 
 #' Fix some stuff in tables
@@ -30,12 +37,23 @@ get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
 
 fix_table_types <- function(table_data) {
   table_data |>
-    dplyr::mutate(dplyr::across(dplyr::where(rlang::is_character),
-                         \(x) x |> dplyr::na_if("null") |> dplyr::na_if("None"))) |>
-    dplyr::mutate(dplyr::across(dplyr::matches("birth_"), as.integer),
-                  dplyr::across(dplyr::matches("difficulty"), as.double),
-                  dplyr::across(dplyr::matches("rt"), as.character),
-                  dplyr::across(dplyr::matches("email_verified|is_reliable|is_bestrun"), as.logical))
+    mutate(across(where(is_character),
+                  \(x) x |> na_if("null") |> na_if("None"))) #|>
+    # mutate(across(matches("birth_"), as.integer),
+    #        across(matches("difficulty"), as.double),
+    #        across(matches("rt"), as.character),
+    #        across(matches("grade"), as.character),
+    #        across(matches("example"), as.character),
+    #        across(matches("growth_mind"), as.character),
+    #        across(matches("lonely_"), as.character),
+    #        across(matches("math_"), as.character),
+    #        across(matches("learning_"), as.character),
+    #        across(matches("reading_"), as.character),
+    #        across(matches("teacher_"), as.character),
+    #        across(matches("school_"), as.character),
+    #        across(matches("class_"), as.character), # class_friends, class_help ..
+    #        across(matches("time_finished|last_updated|created_at|date_created|date_closed|date_opened"), lubridate::as_datetime),
+    #        across(matches("email_verified|is_reliable|is_bestrun|is_practice_trial"), as.logical))
 }
 
 #' Combine tables into a single megatable
@@ -49,12 +67,13 @@ fix_table_types <- function(table_data) {
 #' @examples
 
 combine_datasets <- function(dataset_tables) {
-  all_table_names <- purrr::map(dataset_tables, names) |> unlist() |> unique()
+  all_table_names <- map(dataset_tables, names) |> unlist() |> unique()
   dataset_tables |>
-    purrr::map(\(ds) ds |> purrr::map(\(t) fix_table_types(t))) |>
-    purrr::list_transpose(template = all_table_names, simplify = FALSE) |>
-    purrr::map(list_rbind)
-  # map(\(dt) list_rbind(dt, names_to = "dataset_name"))
+    # map(\(ds) ds |> map(\(t) fix_table_types(t))) |>
+    list_transpose(template = all_table_names, simplify = FALSE) |>
+    # map(list_rbind) |>
+    map(\(dt) list_rbind(dt, names_to = "dataset")) |>
+    map(\(ds) ds |> select(-matches("validation_err_msg")))
 }
 
 #' Collect user data
@@ -67,13 +86,40 @@ combine_datasets <- function(dataset_tables) {
 #' @examples
 
 collect_users <- function(dataset_data) {
-  dplyr::distinct(dataset_data$users) |>
-    # Using left_join keeps all the data in $user_groups
-    # while connecting them to groups. Using many-to-many
-    # ensures that we can have users in multiple groups,
-    # as well as (of course) many users in a group
-    dplyr::left_join(dplyr::distinct(dataset_data$user_groups),
-                     by = "user_id", relationship = "many-to-many") |>
-    dplyr::left_join(dplyr::distinct(dataset_data$groups),
-                     by = "group_id", suffix = c("_user", "_group"))
+
+  births <- dataset_data$users |>
+    select(user_id, birth_month, birth_year) |>
+    mutate(across(contains("birth"), \(v) na_if(v, 0))) |>
+    filter(!is.na(birth_month), !is.na(birth_year)) |>
+    mutate(dob = ym(paste(birth_year, birth_month, sep = "-")))
+
+  ages <- dataset_data$runs |>
+    select(user_id, run_id, time_started) |>
+    inner_join(births) |>
+    mutate(age = as.numeric(difftime(time_started, dob, units = "days")) / 365.25)
+
+  user_ages <- ages |>
+    select(user_id, run_id, age) |>
+    nest(ages = -user_id)
+
+  user_groups <- distinct(dataset_data$user_groups) |>
+    left_join(distinct(dataset_data$groups), by = "group_id") |>
+    tidyr::nest(groups = -user_id)
+
+  dataset_data$users |>
+    left_join(user_groups, by = "user_id") |>
+    left_join(user_ages, by = "user_id")
 }
+
+#' @export
+remove_practice_trials <- function(trials) {
+  trials |>
+    mutate(practice = is_practice_trial |
+             str_detect(assessment_stage, "practice") |
+             str_detect(assessment_stage, "instructions") |
+             str_detect(corpus_trial_type, "training") |
+             str_detect(corpus_trial_type, "practice")) |>
+    filter(is.na(practice) | !practice) |>
+    select(-practice, -is_practice_trial)
+}
+

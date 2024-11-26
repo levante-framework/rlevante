@@ -7,8 +7,7 @@
 collect_users(dataset_data)
 }
 \value{
-A numeric vector giving number of characters (code points) in each
-   element of the character vector. Missing string have missing length.
+Assemble & join user data with groups
 }
 \description{
 longer description
