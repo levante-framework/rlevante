@@ -102,8 +102,12 @@ collect_users <- function(dataset_data) {
     select(user_id, run_id, age) |>
     nest(ages = -user_id)
 
+  groups <- distinct(dataset_data$groups) |>
+    select(group_id, group_name = name, group_abbreviation = abbreviation)
+
   user_groups <- distinct(dataset_data$user_groups) |>
-    left_join(distinct(dataset_data$groups), by = "group_id") |>
+    select(user_id, group_id) |>
+    left_join(groups, by = "group_id") |>
     tidyr::nest(groups = -user_id)
 
   dataset_data$users |>
