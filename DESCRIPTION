@@ -2,8 +2,11 @@ Package: rlevante
 Type: Package
 Title: Download LEVANTE Data
 Version: 0.1.0
-Author: Michael C. Frank
-Maintainer: Mike Frank <mcfrank@stanford.edu>
+Authors@R: 
+    c(person("Michael", "Frank", , "mcfrank@stanford.edu", role = c("aut"),
+             comment = c(ORCID = "0000-0002-7551-4378")),
+      person("Mika", "Braginsky", , "mika.br@gmail.com", role = c("aut", "cre"),
+             comment = c(ORCID = "0000-0001-9039-3220")))
 Description: Download data from LEVANTE, a global project for studying child development. 
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -11,9 +14,13 @@ LazyData: true
 URL: https://levante-framework.github.io/rlevante/
 Imports:
     dplyr,
+    glue,
+    lubridate,
     purrr, 
     redivis, 
-    rlang
+    rlang,
+    stringr,
+    tidyr
 Suggests: 
     knitr,
     rmarkdown

@@ -2,14 +2,24 @@
 % Please edit documentation in R/data_loading_functions.R
 \name{combine_datasets}
 \alias{combine_datasets}
-\title{Combine tables into a single megatable}
+\title{Combine tables across datasets}
 \usage{
 combine_datasets(dataset_tables)
 }
+\arguments{
+\item{dataset_tables}{List of lists of tibbles as returned by get_datasets().}
+}
 \value{
-For the case where the data you're using is in multiple tables, this
- function will combine them into one single large table if needed.
+List of tibbles.
 }
 \description{
-longer description
+Transforms a nested list of datasets, each of which is a list whose names are
+table names and values are tibbles of data for that dataset + table, into a
+flat list whose names are table names and values are tibbles of data for that
+table, combined across datasets.
+}
+\examples{
+ds <- get_datasets(dataset_names = c("ca_western_pilot", "de_leipzig_pilot"),
+             tables = c("users", "user_groups"), max_results = 5)
+ds_combined <- combine_datasets(ds)
 }

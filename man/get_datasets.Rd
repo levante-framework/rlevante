@@ -2,13 +2,34 @@
 % Please edit documentation in R/data_loading_functions.R
 \name{get_datasets}
 \alias{get_datasets}
-\title{Get redivis datasets}
+\title{Get data from one or more datasets}
 \usage{
-get_datasets(dataset_names, org_name = "levante", tables = NULL)
+get_datasets(
+  dataset_names,
+  org_name = "levante",
+  tables = NULL,
+  max_results = NULL
+)
+}
+\arguments{
+\item{dataset_names}{Character vector of dataset names to fetch.}
+
+\item{org_name}{Redivis organization name (defaults to "levante")}
+
+\item{tables}{Character vector of table names to fetch (default to all
+tables).}
+
+\item{max_results}{Max number of records to load for each table (defaults to
+entire table).}
 }
 \value{
-A list of one or more datasets from a specific organization in the Redivis repository. In our case that is normally "levante"
+Nested list of datasets, each of which is a list whose names are
+  table names and values are tibbles of data for that dataset + table.
 }
 \description{
-Retrieve LEVANTE project datasets from Redivis and prepare them for further analysis.
+Get data from one or more datasets
+}
+\examples{
+get_datasets(dataset_names = "ca_western_pilot", tables = "users",
+             max_results = 5)
 }

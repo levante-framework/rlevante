@@ -6,9 +6,20 @@
 \usage{
 collect_users(dataset_data)
 }
+\arguments{
+\item{dataset_data}{List of tibbles as returned by combine_datasets().}
+}
 \value{
-Assemble & join user data with groups
+Users table from dataset_data, with additional list columns with
+  tibbles of their user groups and their age at each run.
 }
 \description{
-longer description
+Calculate each user's age(s) and collect their user groups.
+}
+\examples{
+ds <- get_datasets(dataset_names = "ca_western_pilot",
+                   tables = c("users", "groups", "user_groups", "runs"),
+                   max_results = 10)
+ds_combined <- combine_datasets(ds)
+ds_users <- collect_users(ds_combined)
 }

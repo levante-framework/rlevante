@@ -1,129 +1,151 @@
-#' Get redivis datasets
+#' Get data from one or more datasets
 #'
-#' Retrieve LEVANTE project datasets from Redivis and prepare them for further analysis.
+#' @param dataset_names Character vector of dataset names to fetch.
+#' @param org_name Redivis organization name (defaults to "levante")
+#' @param tables Character vector of table names to fetch (default to all
+#'   tables).
+#' @param max_results Max number of records to load for each table (defaults to
+#'   entire table).
 #'
-#' @return A list of one or more datasets from a specific organization in the Redivis repository. In our case that is normally "levante"
+#' @return Nested list of datasets, each of which is a list whose names are
+#'   table names and values are tibbles of data for that dataset + table.
 #' @export
+#'
 #' @examples
+#' get_datasets(dataset_names = "ca_western_pilot", tables = "users",
+#'              max_results = 5)
+get_datasets <- function(dataset_names, org_name = "levante", tables = NULL,
+                         max_results = NULL) {
 
-# remember to specify at least one table in addition to the dataset name(s)
-get_datasets <- function(dataset_names, org_name = "levante", tables = NULL) {
+  # get reference to organization
   org <- redivis::organization(org_name)
 
+  # get reference to each dataset in dataset_names
   datasets <- dataset_names |> set_names() |> map(\(dn) org$dataset(dn))
 
+  # fetch each dataset to populate its properties
+  walk(datasets, \(ds) ds$get())
+
+  # get each dataset's canonical reference (name + persistent ID + version)
+  dataset_refs <- datasets |> map(\(ds) ds$scoped_reference)
+
+  # construct list of table names to fetch for a given dataset
+  # use "tables" if provided, otherwise list all tables for dataset
   get_table_names <- \(ds) {
     if (!is.null(tables)) tables else ds$list_tables() |> map(\(t) t$name)
   }
 
+  # get data for a given dataset and its name
   get_dataset_tables <- \(ds, dn) {
     ds |> get_table_names() |> set_names() |> map(\(tn) {
       message(glue::glue("Fetching data for dataset {dn} table {tn}"))
-      ds$table(tn)$to_tibble()
+      ds_table <- ds$table(tn)$to_tibble(max_results = max_results)
+      ds_table |> mutate(dataset = dataset_refs[[dn]],
+                         .before = everything()) # add column with reference
     })
   }
 
+  # get data for each dataset
   imap(datasets, get_dataset_tables)
 }
 
-#' Fix some stuff in tables
+#' Combine tables across datasets
 #'
-#' There can be some anomalies in LEVANTE data stored in Redivis. This function
-#' will clean up some of the most common
+#' Transforms a nested list of datasets, each of which is a list whose names are
+#' table names and values are tibbles of data for that dataset + table, into a
+#' flat list whose names are table names and values are tibbles of data for that
+#' table, combined across datasets.
 #'
-#' @return A Levante specific function to clean up some known potential data issues.
-#' @export
-#' @examples
-
-fix_table_types <- function(table_data) {
-  table_data |>
-    mutate(across(where(is_character),
-                  \(x) x |> na_if("null") |> na_if("None"))) #|>
-    # mutate(across(matches("birth_"), as.integer),
-    #        across(matches("difficulty"), as.double),
-    #        across(matches("rt"), as.character),
-    #        across(matches("grade"), as.character),
-    #        across(matches("example"), as.character),
-    #        across(matches("growth_mind"), as.character),
-    #        across(matches("lonely_"), as.character),
-    #        across(matches("math_"), as.character),
-    #        across(matches("learning_"), as.character),
-    #        across(matches("reading_"), as.character),
-    #        across(matches("teacher_"), as.character),
-    #        across(matches("school_"), as.character),
-    #        across(matches("class_"), as.character), # class_friends, class_help ..
-    #        across(matches("time_finished|last_updated|created_at|date_created|date_closed|date_opened"), lubridate::as_datetime),
-    #        across(matches("email_verified|is_reliable|is_bestrun|is_practice_trial"), as.logical))
-}
-
-#' Combine tables into a single megatable
-#'
-#' longer description
-#'
-#' @return For the case where the data you're using is in multiple tables, this
-#'  function will combine them into one single large table if needed.
+#' @param dataset_tables List of lists of tibbles as returned by get_datasets().
+#' @return List of tibbles.
 #'
 #' @export
 #' @examples
-
+#' ds <- get_datasets(dataset_names = c("ca_western_pilot", "de_leipzig_pilot"),
+#'              tables = c("users", "user_groups"), max_results = 5)
+#' ds_combined <- combine_datasets(ds)
 combine_datasets <- function(dataset_tables) {
+
+  # get list of all table names present in any datasets
   all_table_names <- map(dataset_tables, names) |> unlist() |> unique()
+
   dataset_tables |>
-    # map(\(ds) ds |> map(\(t) fix_table_types(t))) |>
+    # transpose datasets > tables into tables > datasets
     list_transpose(template = all_table_names, simplify = FALSE) |>
-    # map(list_rbind) |>
-    map(\(dt) list_rbind(dt, names_to = "dataset")) |>
+    # combines across datasets
+    map(\(dt) list_rbind(dt)) |> #, names_to = "dataset")) |>
+    # remove error messages
     map(\(ds) ds |> select(-matches("validation_err_msg")))
 }
 
 #' Collect user data
 #'
-#' longer description
+#' Calculate each user's age(s) and collect their user groups.
 #'
-#' @return Assemble & join user data with groups
+#' @param dataset_data List of tibbles as returned by combine_datasets().
+#'
+#' @return Users table from dataset_data, with additional list columns with
+#'   tibbles of their user groups and their age at each run.
 #'
 #' @export
 #' @examples
-
+#' ds <- get_datasets(dataset_names = "ca_western_pilot",
+#'                    tables = c("users", "groups", "user_groups", "runs"),
+#'                    max_results = 10)
+#' ds_combined <- combine_datasets(ds)
+#' ds_users <- collect_users(ds_combined)
 collect_users <- function(dataset_data) {
 
   births <- dataset_data$users |>
-    select(user_id, birth_month, birth_year) |>
+    dplyr::select(.data$user_id, .data$birth_month, .data$birth_year) |>
     mutate(across(contains("birth"), \(v) na_if(v, 0))) |>
-    filter(!is.na(birth_month), !is.na(birth_year)) |>
-    mutate(dob = ym(paste(birth_year, birth_month, sep = "-")))
+    filter(!is.na(.data$birth_month), !is.na(.data$birth_year)) |>
+    mutate(dob = lubridate::ym(paste(.data$birth_year, .data$birth_month, sep = "-")))
 
   ages <- dataset_data$runs |>
-    select(user_id, run_id, time_started) |>
+    select(.data$user_id, .data$run_id, .data$time_started) |>
     inner_join(births) |>
-    mutate(age = as.numeric(difftime(time_started, dob, units = "days")) / 365.25)
+    mutate(age = as.numeric(
+      difftime(.data$time_started, .data$dob, units = "days")) / 365.25
+    )
 
   user_ages <- ages |>
-    select(user_id, run_id, age) |>
-    nest(ages = -user_id)
+    select(.data$user_id, .data$run_id, .data$age) |>
+    nest(ages = -.data$user_id)
 
   groups <- distinct(dataset_data$groups) |>
-    select(group_id, group_name = name, group_abbreviation = abbreviation)
+    select(.data$group_id, group_name = .data$name,
+           group_abbreviation = .data$abbreviation)
 
   user_groups <- distinct(dataset_data$user_groups) |>
-    select(user_id, group_id) |>
+    select(.data$user_id, .data$group_id) |>
     left_join(groups, by = "group_id") |>
-    tidyr::nest(groups = -user_id)
+    tidyr::nest(groups = -.data$user_id)
 
   dataset_data$users |>
     left_join(user_groups, by = "user_id") |>
     left_join(user_ages, by = "user_id")
 }
 
+#' Remove practice trials from trial data
+#'
+#' @param trials Tibble of trial data as returned by combine_datasets().
+#'
+#' @return Trials tibble with any non-test trials removed (instructions,
+#'   practice, training).
 #' @export
+#'
+#' @examples
+#' ds <- get_datasets("ca_western_pilot", tables = "trials", max_results = 5)
+#' ds_combined <- combine_datasets(ds)
+#' ds_trials <- remove_practice_trials(ds_combined$trials)
 remove_practice_trials <- function(trials) {
   trials |>
-    mutate(practice = is_practice_trial |
-             str_detect(assessment_stage, "practice") |
-             str_detect(assessment_stage, "instructions") |
-             str_detect(corpus_trial_type, "training") |
-             str_detect(corpus_trial_type, "practice")) |>
-    filter(is.na(practice) | !practice) |>
-    select(-practice, -is_practice_trial)
+    mutate(practice = .data$is_practice_trial |
+             str_detect(.data$assessment_stage, "practice") |
+             str_detect(.data$assessment_stage, "instructions") |
+             str_detect(.data$corpus_trial_type, "training") |
+             str_detect(.data$corpus_trial_type, "practice")) |>
+    filter(is.na(.data$practice) | !.data$practice) |>
+    select(-.data$practice, -.data$is_practice_trial)
 }
-
