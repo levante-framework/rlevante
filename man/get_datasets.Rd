@@ -30,6 +30,6 @@ Nested list of datasets, each of which is a list whose names are
 Get data from one or more datasets
 }
 \examples{
-get_datasets(dataset_names = "ca_western_pilot", tables = "users",
-             max_results = 5)
+dataset_names <- list(list(name = "ca_western_pilot:97mt", version = "v3_1"))
+get_datasets(dataset_names, tables = "users", max_results = 5)
 }

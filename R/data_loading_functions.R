@@ -12,16 +12,19 @@
 #' @export
 #'
 #' @examples
-#' get_datasets(dataset_names = "ca_western_pilot", tables = "users",
-#'              max_results = 5)
+#' dataset_names <- list(list(name = "ca_western_pilot:97mt", version = "v3_1"))
+#' get_datasets(dataset_names, tables = "users", max_results = 5)
 get_datasets <- function(dataset_names, org_name = "levante", tables = NULL,
                          max_results = NULL) {
 
   # get reference to organization
   org <- redivis::organization(org_name)
 
+  # TODO: make robust to flat list (i.e. only one dataset)
   # get reference to each dataset in dataset_names
-  datasets <- dataset_names |> set_names() |> map(\(dn) org$dataset(dn))
+  datasets <- dataset_names |>
+    set_names(map_chr(dataset_names, \(dn) dn[["name"]])) |>
+    map(\(dn) org$dataset(name = dn$name, version = dn$version))
 
   # fetch each dataset to populate its properties
   walk(datasets, \(ds) ds$get())
@@ -95,6 +98,9 @@ combine_datasets <- function(dataset_tables) {
 #' ds_combined <- combine_datasets(ds)
 #' ds_users <- collect_users(ds_combined)
 collect_users <- function(dataset_data) {
+
+  # TODO: check that all needed tables are in data (users, groups, user_groups, runs)
+  # TODO: don't error if all birth years/months are missing
 
   births <- dataset_data$users |>
     dplyr::select(.data$user_id, .data$birth_month, .data$birth_year) |>
