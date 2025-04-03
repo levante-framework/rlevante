@@ -14,7 +14,9 @@ LazyData: true
 URL: https://levante-framework.github.io/rlevante/
 Imports:
     dplyr,
+    forcats,
     glue,
+    jsonlite,
     lubridate,
     purrr, 
     redivis, 
