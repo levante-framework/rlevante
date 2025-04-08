@@ -8,6 +8,6 @@ compute_age <- function(birth_month, birth_year, test_date) {
 #' @export
 notebook_dataset <- function(redivis) {
   source_table <- redivis$table("_source_")$get()
-  source_dataset <- source$properties$container$scopedReference
+  source_dataset <- source_table$properties$container$scopedReference
   dataset_spec <- list(list(name = source_dataset, version = "current"))
 }
