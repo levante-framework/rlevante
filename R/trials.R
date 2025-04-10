@@ -35,3 +35,17 @@ add_trial_items <- function(trials) {
 convert_rts <- function(trials) {
   trials |> mutate(rt_numeric = suppressWarnings(as.numeric(rt)), .after = rt)
 }
+
+code_numberline <- function(trials, threshold = 0.15) {
+  slider_trials <- trials |>
+    filter(item_group == "slider") |>
+    tidyr::separate_wider_delim(item, "_", names = c("answer", "max_value"),
+                                cols_remove = FALSE) |>
+    mutate(answer = answer |> str_replace("^0", "0."),
+           across(c(answer, max_value), as.numeric),
+           correct = (abs(as.numeric(response) - answer) / max_value < threshold)) |>
+    select(-answer, -max_value)
+  trials |>
+    filter(item_group != "slider") |>
+    bind_rows(slider_trials)
+}

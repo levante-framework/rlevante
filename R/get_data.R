@@ -138,14 +138,17 @@ get_trials <- function(dataset_spec,
   trials |>
     remove_practice_trials() |>
     select(dataset, task_id, user_id, run_id, trial_id,
-           item_id_original = item_id, correct, rt, server_timestamp) |>
+           # item_id_original = item_id, item_original = item,
+           response, correct, rt, server_timestamp) |>
     # mutate(has_item_info = !is.na(item_id) | item != "" | str_length(answer) > 0) |>
     convert_rts() |>
     add_trial_items() |>
     add_trial_numbers() |>
+    code_numberline() |>
     arrange(dataset, task_id, user_id, run_id, trial_number) |>
     select(dataset, task_id, user_id, run_id, trial_id, trial_number,
-           item_uid, item_group, item, correct, rt, rt_numeric,
+           item_uid, item_group, item, #item_id_original,
+           correct, rt, rt_numeric,
            timestamp = server_timestamp)
 }
 
@@ -181,7 +184,10 @@ get_surveys <- function(dataset_spec,
 
 get_metadata_table <- function(table_name) {
   metadata <- redivis::redivis$organization("levante")$dataset("metadata")
-  metadata$table(table_name)$to_tibble()
+  message(glue::glue("Fetching item metadata for {table_name}"))
+  suppressWarnings(
+    metadata$table(table_name)$to_tibble()
+  )
 }
 
 #' @export

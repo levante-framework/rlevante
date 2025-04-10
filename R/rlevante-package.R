@@ -8,7 +8,7 @@
 #' @importFrom glue glue
 #' @importFrom purrr imap map map_chr map2_dbl list_rbind list_transpose walk
 #' @importFrom rlang is_character set_names
-#' @importFrom stringr str_detect str_remove str_split str_trim
+#' @importFrom stringr str_detect str_remove str_replace str_split str_trim
 #' @importFrom tidyr nest unnest
 ## usethis namespace: end
 NULL
