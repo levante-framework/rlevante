@@ -2,7 +2,7 @@
 # returns data from the given table in that dataset
 table_getter <- function(table_name, max_results = NULL) {
   \(dataset) {
-    message(glue("--Fetching table {table_name}"))
+    # message(glue("--Fetching table {table_name}"))
     suppressWarnings(
       dataset$table(table_name)$to_tibble(max_results = max_results)
     )
@@ -12,7 +12,7 @@ table_getter <- function(table_name, max_results = NULL) {
 # given a sql query, return a function that takes a dataset reference and
 # returns data from executing that sql query in that dataset
 query_getter <- function(query_str, max_results = NULL) {
-  message(glue("--Executing SQL query"))
+  # message(glue("--Executing SQL query"))
   \(dataset) {
     suppressWarnings(
       dataset$query(query_str)$to_tibble(max_results = max_results)
@@ -58,7 +58,7 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 get_participants <- function(dataset_spec, max_results = NULL) {
 
   # get data for the tables with needed user data
-  user_tables <- c("groups", "runs", "users", "user_groups")
+  user_tables <- c("groups", "users", "user_groups")
   user_data <- user_tables |> rlang::set_names() |>
     map(\(table_name) get_datasets_data(dataset_spec,
                                         table_getter(table_name, max_results)))
@@ -66,23 +66,8 @@ get_participants <- function(dataset_spec, max_results = NULL) {
   # filter users to only children and replace invalid birth months/years with NA
   users <- user_data$users |>
     filter(.data$user_type %in% c("guest", "student")) |>
-    mutate(across(contains("birth"), \(v) v |> na_if(0) |> na_if(10000)))
-
-  # extract non-missing birth month + year
-  births <- users |>
-    select("user_id", "birth_month", "birth_year") |>
-    filter(!is.na(.data$birth_month), !is.na(.data$birth_year))
-
-  # combine runs (which have date of test) with births and compute age
-  ages <- user_data$runs |>
-    select("user_id", "run_id", "time_started") |>
-    inner_join(births, by = "user_id") |>
-    mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$time_started))
-
-  # collapse run ages for each user
-  user_ages <- ages |>
-    select("user_id", "run_id", "age") |>
-    nest(ages = -.data$user_id)
+    mutate(birth_month = validate_birth_month(.data$birth_month),
+           birth_year = validate_birth_year(.data$birth_year))
 
   # groups
   groups <- user_data$group |> distinct() |>
@@ -98,9 +83,8 @@ get_participants <- function(dataset_spec, max_results = NULL) {
   # add ages and groups back into users, keep only needed columns
   users |>
     left_join(user_groups, by = "user_id") |>
-    left_join(user_ages, by = "user_id") |>
     select("dataset", "user_id", "birth_month", "birth_year", "sex", "grade",
-           matches("_id"), "groups", "ages")
+           matches("_id"), "groups")
 }
 
 # construct SQL WHERE clause out of a variable name and vector of allowed values
@@ -177,15 +161,30 @@ get_trials <- function(dataset_spec,
 #'
 #' @export
 get_runs <- function(dataset_spec,
-                     remove_incomplete_runs = TRUE, remove_invalid_runs = TRUE,
+                     remove_incomplete_runs = TRUE,
+                     remove_invalid_runs = TRUE,
                      max_results = NULL) {
 
-  runs <- get_datasets_data(dataset_spec, table_getter("runs", max_results))
+  run_vars <- c("run_id", "runs.user_id", "task_id", "completed", "valid_run",
+                "test_comp_theta_estimate", "test_comp_theta_se",
+                "time_started")
+  user_vars <- c("birth_month", "birth_year")
+  query_str <- glue("SELECT {paste(c(run_vars, user_vars), collapse = ', ')}
+                    FROM runs
+                    LEFT JOIN users ON runs.user_id = users.user_id")
+
+  # runs <- get_datasets_data(dataset_spec, table_getter("runs", max_results))
+  runs <- get_datasets_data(dataset_spec, query_getter(query_str, max_results))
 
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
-  runs |> select("user_id", "run_id")
+  runs |>
+    mutate(birth_month = validate_birth_month(.data$birth_month),
+           birth_year = validate_birth_year(.data$birth_year),
+           age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
+    select(-c("birth_month", "birth_year")) |>
+    arrange(.data$time_started)
 }
 
 #' Get survey data
