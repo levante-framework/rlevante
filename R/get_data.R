@@ -30,7 +30,7 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 
   # get reference to each dataset in dataset_spec
   datasets <- dataset_spec |>
-    set_names(map_chr(dataset_spec, \(dn) dn[["name"]])) |>
+    rlang::set_names(map_chr(dataset_spec, \(dn) dn[["name"]])) |>
     map(\(dn) org$dataset(name = dn$name, version = dn$version))
 
   # fetch each dataset to populate its properties
@@ -59,7 +59,7 @@ get_participants <- function(dataset_spec, max_results = NULL) {
 
   # get data for the tables with needed user data
   user_tables <- c("groups", "runs", "users", "user_groups")
-  user_data <- user_tables |> set_names() |>
+  user_data <- user_tables |> rlang::set_names() |>
     map(\(table_name) get_datasets_data(dataset_spec,
                                         table_getter(table_name, max_results)))
 

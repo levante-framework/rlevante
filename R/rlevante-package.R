@@ -7,7 +7,6 @@
 #'   na_if relocate rename select semi_join ungroup where
 #' @importFrom glue glue
 #' @importFrom purrr imap map map_chr map2_dbl list_rbind list_transpose walk
-#' @importFrom rlang is_character set_names
 #' @importFrom tidyr nest unnest
 ## usethis namespace: end
 NULL
