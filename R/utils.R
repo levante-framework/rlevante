@@ -5,6 +5,10 @@ compute_age <- function(birth_month, birth_year, test_date) {
   age_days / 365.25
 }
 
+#' Determine dataset of current notebook on Redivis
+#'
+#' @param redivis Redivis reference object.
+#'
 #' @export
 notebook_dataset <- function(redivis) {
   source_table <- redivis$table("_source_")$get()
