@@ -1,0 +1,76 @@
+---
+title: "LEVANTE EF data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rlevante) # from https://github.com/levante-framework/rlevante
+library(dplyr)
+library(stringr)
+library(tidyr)
+```
+
+```{r runs}
+dataset_spec <- list(list(name = "co_bogota_pilot:3j4z", version = "current"),
+                     list(name = "co_rural_pilot:66d2", version = "current"))
+
+runs <- get_runs(dataset_spec)
+ages <- runs |> select(dataset, run_id, age)
+```
+
+```{r trials}
+ef_tasks <- c("hearts-and-flowers", "memory-game", "same-different-selection")
+trials <- get_trials(dataset_spec, tasks = ef_tasks)
+
+trial_data <- trials |>
+  left_join(ages) |>
+  # special for SDS, code too fast/slow RTs as incorrect
+  mutate(response_fast = rt_numeric < 200, response_slow = rt_numeric > 2000,
+         correct = if_else(task_id == "same-different-selection",
+                           correct & !response_fast & !response_slow,
+                           correct)) |>
+  select(-response_fast, -response_slow)
+
+trial_data
+```
+
+```{r surveys}
+surveys <- get_surveys(dataset_spec, survey_types = "caregiver")
+participants <- get_participants(dataset_spec)
+
+ef_variable_pattern <- "SDQ|CBQ|EFQ"
+survey_data <- surveys |>
+  link_surveys(participants) |>
+  filter(str_detect(variable, ef_variable_pattern))
+
+survey_data
+```
+
+```{r trials_surveys}
+trials_surveys_combined <- full_join(
+  trial_data |> nest(trial_data = -c(dataset, user_id)),
+  survey_data |> nest(survey_data = -c(dataset, child_id)),
+  by = join_by(dataset, user_id == child_id))
+```
+
+```{r plot, fig.width=7, fig.height=3}
+library(ggplot2)
+
+trial_summary <- trial_data |>
+  group_by(dataset, task_id, user_id, age) |>
+  summarise(mean_correct = mean(correct))
+
+ggplot(trial_summary, aes(x = age, y = mean_correct)) +
+  facet_wrap(vars(task_id)) +
+  geom_point() +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "re")) +
+  theme_classic()
+```

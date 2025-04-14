@@ -24,6 +24,7 @@ Imports:
     stringr,
     tidyr
 Suggests: 
+    ggplot2,
     knitr,
     rmarkdown
 Remotes:
