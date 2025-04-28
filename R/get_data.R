@@ -213,7 +213,7 @@ get_surveys <- function(dataset_spec,
 }
 
 get_metadata_table <- function(table_name) {
-  metadata <- redivis::redivis$organization("levante")$dataset("metadata")
+  metadata <- redivis::redivis$organization("levante")$dataset("item_metadata")
   message(glue::glue("Fetching item metadata for {table_name}"))
   suppressWarnings(
     metadata$table(table_name)$to_tibble()
@@ -231,5 +231,5 @@ get_trial_items <- function() {
 #'
 #' @export
 get_survey_items <- function() {
-  get_metadata_table("survey_items")
+  get_metadata_table("survey_items") |> arrange(survey_type, variable_order)
 }
