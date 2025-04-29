@@ -144,9 +144,8 @@ get_trials <- function(dataset_spec,
     code_numberline() |>
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
     select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
-           "item_uid", "item_group", "item", #item_id_original,
-           "correct", "rt", "rt_numeric",
-           timestamp = "server_timestamp")
+           "item_uid", "item_group", "item", "chance", #item_id_original,
+           "correct", "rt", "rt_numeric", timestamp = "server_timestamp")
 }
 
 #' Get run data
