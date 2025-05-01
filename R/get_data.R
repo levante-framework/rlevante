@@ -127,17 +127,19 @@ get_trials <- function(dataset_spec,
     runs <- get_runs(dataset_spec,
                      remove_incomplete_runs = remove_incomplete_runs,
                      remove_invalid_runs = remove_invalid_runs)
-    trials |> semi_join(runs, by = c("run_id"))
+    trials <- trials |> semi_join(runs, by = c("run_id"))
   }
 
   # filter to valid trials
   if (remove_invalid_trials) trials <- trials |> filter(.data$valid_trial)
 
   trials |>
+    filter(trial_id != "schema_row") |>
     remove_practice_trials() |>
     select("dataset", "task_id", "user_id", "run_id", "trial_id",
-           # item_id_original = item_id, item_original = item,
-           "response", "correct", "rt", "server_timestamp") |>
+           "item_id", "answer", # item_original = "item",
+           "response", "correct", "rt", "server_timestamp",
+           "valid_trial", "validation_msg_trial") |>
     convert_rts() |>
     add_trial_items() |>
     add_trial_numbers() |>
@@ -145,7 +147,8 @@ get_trials <- function(dataset_spec,
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
     select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
            "item_uid", "item_group", "item", "chance", #item_id_original,
-           "correct", "rt", "rt_numeric", timestamp = "server_timestamp")
+           "correct", "rt", "rt_numeric", timestamp = "server_timestamp",
+           "valid_trial", "validation_msg_trial")
 }
 
 #' Get run data
@@ -164,9 +167,9 @@ get_runs <- function(dataset_spec,
                      remove_invalid_runs = TRUE,
                      max_results = NULL) {
 
-  run_vars <- c("run_id", "runs.user_id", "task_id", "completed", "valid_run",
+  run_vars <- c("run_id", "runs.user_id", "task_id",
                 "test_comp_theta_estimate", "test_comp_theta_se",
-                "time_started")
+                "time_finished", "completed", "valid_run", "validation_msg_run")
   user_vars <- c("birth_month", "birth_year")
   query_str <- glue("SELECT {paste(c(run_vars, user_vars), collapse = ', ')}
                     FROM runs
@@ -175,15 +178,16 @@ get_runs <- function(dataset_spec,
   # runs <- get_datasets_data(dataset_spec, table_getter("runs", max_results))
   runs <- get_datasets_data(dataset_spec, query_getter(query_str, max_results))
 
+  runs <- runs |> filter(!(.data$task_id %in% c("intro", "schema_row")))
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
   runs |>
     mutate(birth_month = validate_birth_month(.data$birth_month),
            birth_year = validate_birth_year(.data$birth_year),
-           age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
+           age = compute_age(.data$birth_month, .data$birth_year, .data$time_finished)) |>
     select(-c("birth_month", "birth_year")) |>
-    arrange(.data$time_started)
+    arrange(.data$time_finished)
 }
 
 #' Get survey data

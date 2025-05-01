@@ -24,11 +24,23 @@ add_trial_numbers <- function(trials) {
 add_trial_items <- function(trials) {
   trial_items <- get_trial_items()
   trial_id_map <- trial_items |>
-    mutate(trials = trials |> stringr::str_split(",")) |>
+    mutate(trials = map(trials, jsonlite::fromJSON)) |>
     unnest(trials) |>
-    rename(trial_id = "trials", item_group = "group", item = "entry") |>
-    mutate(trial_id = stringr::str_trim(.data$trial_id))
-  trials |> inner_join(trial_id_map, by = "trial_id")
+    rename(trial_id = "trials", item_group = "group", item = "entry")
+
+  trials |>
+    # sre | pa -> item_id, swr -> answer
+    mutate(roar_item_id = case_when(
+      str_detect(task_id, "^pa(-|$)") ~ glue("pa_{item_id}"),
+      str_detect(task_id, "^sre(-|$)") ~ glue("sre_{item_id}"),
+      str_detect(task_id, "^swr(-|$)") ~ glue("swr_{answer}"),
+    )) |>
+    left_join(trial_id_map, by = "trial_id") |>
+    mutate(item_uid = if_else(!is.na(roar_item_id), roar_item_id, item_uid),
+           item_group = replace_na(item_group, ""),
+           item = replace_na(item, "")) |>
+    filter(!is.na(item_uid)) |>
+    select(-roar_item_id, -item_id, -answer)
 }
 
 # add numeric RTs
