@@ -169,7 +169,7 @@ get_runs <- function(dataset_spec,
 
   run_vars <- c("run_id", "runs.user_id", "task_id",
                 "test_comp_theta_estimate", "test_comp_theta_se",
-                "time_finished", "completed", "valid_run", "validation_msg_run")
+                "time_started", "completed", "valid_run", "validation_msg_run")
   user_vars <- c("birth_month", "birth_year")
   query_str <- glue("SELECT {paste(c(run_vars, user_vars), collapse = ', ')}
                     FROM runs
@@ -185,9 +185,9 @@ get_runs <- function(dataset_spec,
   runs |>
     mutate(birth_month = validate_birth_month(.data$birth_month),
            birth_year = validate_birth_year(.data$birth_year),
-           age = compute_age(.data$birth_month, .data$birth_year, .data$time_finished)) |>
+           age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
     select(-c("birth_month", "birth_year")) |>
-    arrange(.data$time_finished)
+    arrange(.data$time_started)
 }
 
 #' Get survey data
