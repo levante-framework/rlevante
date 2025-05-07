@@ -1,8 +1,9 @@
 # given a table name, return a function that takes a dataset reference and
 # returns data from the given table in that dataset
 table_getter <- function(table_name, max_results = NULL) {
-  \(dataset) {
+  \(dataset, dataset_table_names) {
     # message(glue("--Fetching table {table_name}"))
+    if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
       dataset$table(table_name)$to_tibble(max_results = max_results)
     )
@@ -11,9 +12,10 @@ table_getter <- function(table_name, max_results = NULL) {
 
 # given a sql query, return a function that takes a dataset reference and
 # returns data from executing that sql query in that dataset
-query_getter <- function(query_str, max_results = NULL) {
+query_getter <- function(table_name, query_str, max_results = NULL) {
   # message(glue("--Executing SQL query"))
-  \(dataset) {
+  \(dataset, dataset_table_names) {
+    if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
       dataset$query(query_str)$to_tibble(max_results = max_results)
     )
@@ -42,7 +44,8 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
   # apply dataset_fun to each dataset
   dataset_data <- imap(datasets, \(dataset, dataset_name) {
     message(glue::glue("Fetching data for {dataset_name}"))
-    dataset_fun(dataset) |>
+    dataset_table_names <- dataset$list_tables() |> map_chr(\(tbl) tbl$name)
+    dataset_fun(dataset, dataset_table_names) |>
       mutate(dataset = dataset_refs[[dataset_name]], .before = everything())
   })
 
@@ -115,7 +118,8 @@ get_trials <- function(dataset_spec,
   where_str <- build_filter("task_id", tasks)
   query_str <- glue("SELECT * FROM trials {where_str}") |> stringr::str_trim()
 
-  trials <- get_datasets_data(dataset_spec, query_getter(query_str, max_results))
+  trials <- get_datasets_data(dataset_spec,
+                              query_getter("trials", query_str, max_results))
 
   # if participants supplied, filter to trials for only those participants
   if (!is.null(participants)) {
@@ -143,12 +147,18 @@ get_trials <- function(dataset_spec,
     convert_rts() |>
     add_trial_items() |>
     add_trial_numbers() |>
-    code_numberline() |>
+    mutate(response = response |> na_if("nan")) |>
+    # code_numberline() |>
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
     select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
-           "item_uid", "item_group", "item", "chance", #item_id_original,
-           "correct", "rt", "rt_numeric", timestamp = "server_timestamp",
+           "item_uid", "item_task", "item_group", "item", "chance", #item_id_original,
+           "correct", "rt", "rt_numeric", "response", timestamp = "server_timestamp",
            "valid_trial", "validation_msg_trial")
+}
+
+#' @export
+get_trials_raw <- function(dataset_spec) {
+  get_datasets_data(dataset_spec, table_getter("trials"))
 }
 
 #' Get run data
@@ -176,7 +186,8 @@ get_runs <- function(dataset_spec,
                     LEFT JOIN users ON runs.user_id = users.user_id")
 
   # runs <- get_datasets_data(dataset_spec, table_getter("runs", max_results))
-  runs <- get_datasets_data(dataset_spec, query_getter(query_str, max_results))
+  runs <- get_datasets_data(dataset_spec,
+                            query_getter("runs", query_str, max_results))
 
   runs <- runs |> filter(!(.data$task_id %in% c("intro", "schema_row")))
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
@@ -207,7 +218,10 @@ get_surveys <- function(dataset_spec,
   where_str <- build_filter("survey_id", survey_types)
   query_str <- glue("SELECT * FROM survey_responses {where_str}") |> stringr::str_trim()
 
-  surveys <- get_datasets_data(dataset_spec, query_getter(query_str, max_results))
+  surveys <- get_datasets_data(dataset_spec,
+                               query_getter("survey_responses", query_str, max_results))
+  if (nrow(surveys) == 0) return()
+
   if (remove_incomplete_surveys) surveys <- surveys |> filter(.data$is_complete)
 
   surveys |>

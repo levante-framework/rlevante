@@ -34,9 +34,10 @@ add_trial_items <- function(trials) {
       stringr::str_detect(task_id, "^pa(-|$)") ~ glue("pa_{item_id}"),
       stringr::str_detect(task_id, "^sre(-|$)") ~ glue("sre_{item_id}"),
       stringr::str_detect(task_id, "^swr(-|$)") ~ glue("swr_{answer}"),
-    )) |>
+    ) |> as.character()) |>
     left_join(trial_id_map, by = "trial_id") |>
     mutate(item_uid = if_else(!is.na(roar_item_id), roar_item_id, item_uid),
+           item_task = if_else(is.na(item_task), task_id, item_task),
            item_group = replace_na(item_group, ""),
            item = replace_na(item, "")) |>
     filter(!is.na(item_uid)) |>
