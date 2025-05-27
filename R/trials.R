@@ -41,7 +41,7 @@ add_trial_items <- function(trials) {
            item_group = replace_na(item_group, ""),
            item = replace_na(item, "")) |>
     filter(!is.na(item_uid)) |>
-    select(-roar_item_id, -item_id, -answer)
+    select(-roar_item_id, -item_id)
 }
 
 # add numeric RTs
