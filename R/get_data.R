@@ -141,7 +141,7 @@ get_trials <- function(dataset_spec,
     filter(trial_id != "schema_row") |>
     remove_practice_trials() |>
     select("dataset", "task_id", "user_id", "run_id", "trial_id",
-           "item_id", "answer", # item_original = "item",
+           "item_id", "item_uid", "answer", # item_original = "item",
            "response", "correct", "rt", "server_timestamp",
            "valid_trial", "validation_msg_trial") |>
     convert_rts() |>
