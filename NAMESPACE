@@ -2,6 +2,7 @@
 
 export(get_participants)
 export(get_runs)
+export(get_scores)
 export(get_survey_items)
 export(get_surveys)
 export(get_trial_items)

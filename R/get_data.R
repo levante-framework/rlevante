@@ -250,3 +250,10 @@ get_trial_items <- function() {
 get_survey_items <- function() {
   get_metadata_table("survey_items") |> arrange(survey_type, variable_order)
 }
+
+#' Get score data
+#'
+#' @export
+get_scores <- function(dataset_spec) {
+  scores <- get_datasets_data(dataset_spec, table_getter("scores"))
+}
