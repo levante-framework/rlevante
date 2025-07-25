@@ -98,22 +98,16 @@ build_filter <- function(var, vals) {
 
 #' Get trial data
 #'
-#' @inheritParams get_runs
-#' @param remove_invalid_trials Boolean indicating whether to drop trials that
-#'   were marked as invalid (defaults to FALSE).
-#' @param tasks Character vector of tasks to include.
-#' @param participants (Optional) Data frame that includes the columns "dataset"
-#'   and "user_id", if supplied trial data will be filtered to only those user
-#'   IDs.
+#' @inheritParams get_trials
 #'
 #' @export
-get_trials <- function(dataset_spec,
-                       remove_incomplete_runs = TRUE,
-                       remove_invalid_runs = TRUE,
-                       remove_invalid_trials = FALSE,
-                       tasks = NULL, # all tasks if null
-                       participants = NULL, # all participants if null
-                       max_results = NULL) {
+get_trials_prelim <- function(dataset_spec,
+                              remove_incomplete_runs = TRUE,
+                              remove_invalid_runs = TRUE,
+                              remove_invalid_trials = FALSE,
+                              tasks = NULL, # all tasks if null
+                              participants = NULL, # all participants if null
+                              max_results = NULL) {
 
   where_str <- build_filter("task_id", tasks)
   query_str <- glue("SELECT * FROM trials {where_str}") |> stringr::str_trim()
@@ -140,22 +134,62 @@ get_trials <- function(dataset_spec,
   trials |>
     filter(trial_id != "schema_row") |>
     remove_practice_trials() |>
-    select("dataset", "task_id", "user_id", "run_id", "trial_id",
-           "item_id", "item_uid", "answer", # item_original = "item",
-           "response", "correct", "rt", "server_timestamp",
-           "valid_trial", "validation_msg_trial") |>
+    # select("dataset", "task_id", "user_id", "run_id", "trial_id",
+    #        "item_id", "item_uid", "answer", # item_original = "item",
+    #        "response", "correct", "rt", "server_timestamp",
+    #        "valid_trial", "validation_msg_trial") |>
     convert_rts() |>
-    add_trial_items() |>
+    mutate(response = response |> na_if("nan"))
+  # add_trial_items() |>
+    # add_trial_numbers() |>
+    # arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number)
+    # select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
+    #        "item_uid", "item_task", "item_group", "item", "chance", #item_id_original,
+    #        "correct", "rt", "rt_numeric", "response", "answer",
+    #        timestamp = "server_timestamp", "valid_trial", "validation_msg_trial")
+}
+
+#' Get trial data
+#'
+#' @inheritParams get_runs
+#' @param remove_invalid_trials Boolean indicating whether to drop trials that
+#'   were marked as invalid (defaults to FALSE).
+#' @param tasks Character vector of tasks to include.
+#' @param participants (Optional) Data frame that includes the columns "dataset"
+#'   and "user_id", if supplied trial data will be filtered to only those user
+#'   IDs.
+#'
+#' @export
+get_trials <- function(dataset_spec,
+                       remove_incomplete_runs = TRUE,
+                       remove_invalid_runs = TRUE,
+                       remove_invalid_trials = FALSE,
+                       tasks = NULL, # all tasks if null
+                       participants = NULL, # all participants if null
+                       max_results = NULL) {
+
+  trials <- get_trials_prelim(dataset_spec = dataset_spec,
+                              remove_incomplete_runs = remove_incomplete_runs,
+                              remove_invalid_runs = remove_invalid_runs,
+                              remove_invalid_trials = remove_invalid_trials,
+                              tasks = tasks,
+                              participants = participants,
+                              max_results = max_results)
+  trials |>
+    add_item_ids() |>
+    add_item_metadata() |>
     add_trial_numbers() |>
-    mutate(response = response |> na_if("nan")) |>
-    # code_numberline() |>
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
     select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
-           "item_uid", "item_task", "item_group", "item", "chance", #item_id_original,
+           "item_uid", "item_task", "item_group", "item", "chance",
            "correct", "rt", "rt_numeric", "response", "answer",
            timestamp = "server_timestamp", "valid_trial", "validation_msg_trial")
 }
 
+#' Get raw trial data
+#'
+#' @inheritParams get_trials
+#'
 #' @export
 get_trials_raw <- function(dataset_spec) {
   get_datasets_data(dataset_spec, table_getter("trials"))
@@ -225,6 +259,7 @@ get_surveys <- function(dataset_spec,
   if (remove_incomplete_surveys) surveys <- surveys |> filter(.data$is_complete)
 
   surveys |>
+    # mutate(survey_part = if_else(is.na(survey_part), survey_type, survey_part)) |>
     add_survey_items() |>
     code_survey_data()
 }
@@ -244,6 +279,20 @@ get_trial_items <- function() {
   get_metadata_table("trial_items")
 }
 
+#' Get metadata for mapping items
+#'
+#' @export
+get_mapping_items <- function() {
+  get_metadata_table("mapping_items")
+}
+
+#' Get metadata for corpus items
+#'
+#' @export
+get_corpus_items <- function() {
+  get_metadata_table("corpus_items")
+}
+
 #' Get metadata for survey items
 #'
 #' @export
@@ -252,6 +301,8 @@ get_survey_items <- function() {
 }
 
 #' Get score data
+#'
+#' @inheritParams get_runs
 #'
 #' @export
 get_scores <- function(dataset_spec) {
