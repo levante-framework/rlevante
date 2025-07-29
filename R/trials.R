@@ -36,7 +36,7 @@ add_item_ids <- function(trials) {
     mutate(across(c(corpus_trial_type, item, answer, distractors),
                   \(s) replace_na(s, ""))) |>
     mutate(item_key = paste(corpus_trial_type, item, answer, distractors) |>
-             str_trim()) |>
+             stringr::str_trim()) |>
     select(item_uid_mapping = item_uid, item_key) |>
     distinct()
 
