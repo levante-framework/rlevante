@@ -212,14 +212,16 @@ get_runs <- function(dataset_spec,
                      max_results = NULL) {
 
   run_vars <- c("run_id", "runs.user_id", "runs.task_id", "runs.variant_id",
-                "variants.language", "variants.name",
+                "variants.name AS variant_name", "variants.language",
+                "runs.administration_id", "administrations.public_name AS administration_name",
                 "test_comp_theta_estimate", "test_comp_theta_se",
                 "time_started", "completed", "valid_run", "validation_msg_run")
   user_vars <- c("birth_month", "birth_year")
   query_str <- glue("SELECT {paste(c(run_vars, user_vars), collapse = ', ')}
                     FROM runs
                     LEFT JOIN users ON runs.user_id = users.user_id
-                    LEFT JOIN variants ON runs.variant_id = variants.variant_id")
+                    LEFT JOIN variants ON runs.variant_id = variants.variant_id
+                    LEFT JOIN administrations ON runs.administration_id = administrations.administration_id")
 
   # runs <- get_datasets_data(dataset_spec, table_getter("runs", max_results))
   runs <- get_datasets_data(dataset_spec,
@@ -230,9 +232,9 @@ get_runs <- function(dataset_spec,
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
   runs |>
-    mutate(adaptive = name |> str_to_lower() |> str_detect("adaptive"),
-           .after = name) |>
-    select(-name) |>
+    mutate(adaptive = variant_name |> stringr::str_to_lower() |> stringr::str_detect("adaptive"),
+           .after = variant_name) |>
+    # select(-name) |>
     mutate(birth_month = validate_birth_month(.data$birth_month),
            birth_year = validate_birth_year(.data$birth_year),
            age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
