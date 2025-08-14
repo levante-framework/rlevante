@@ -109,7 +109,7 @@ add_item_ids <- function(trials) {
   trials_prepped |>
     select(-item_uid) |>
     left_join(trials_mapped, by = c("task_id", "trial_id")) |>
-    filter(item_key != "")
+    filter(!is.na(item_uid) | item_key != "")
 }
 
 add_item_metadata <- function(trials) {
@@ -123,6 +123,8 @@ add_item_metadata <- function(trials) {
       str_extract(task_id, "^[A-z]*"),
       item_task
     )) |>
+    mutate(group = replace_na(group, ""),
+           entry = replace_na(entry, "")) |>
     rename(item_original = item, item_group = group, item = entry)
 }
 
