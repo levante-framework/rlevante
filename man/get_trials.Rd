@@ -38,3 +38,7 @@ entire table).}
 \description{
 Get trial data
 }
+\examples{
+dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+trials <- get_trials(dataset_spec)
+}

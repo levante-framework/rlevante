@@ -9,3 +9,6 @@ get_corpus_items()
 \description{
 Get metadata for corpus items
 }
+\examples{
+corpus_items <- get_corpus_items()
+}

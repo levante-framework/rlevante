@@ -26,3 +26,7 @@ entire table).}
 \description{
 Get survey data
 }
+\examples{
+dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+surveys <- get_surveys(dataset_spec)
+}

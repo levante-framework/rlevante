@@ -9,3 +9,6 @@ get_mapping_items()
 \description{
 Get metadata for mapping items
 }
+\examples{
+mapping_items <- get_mapping_items()
+}

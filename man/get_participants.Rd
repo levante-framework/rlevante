@@ -15,3 +15,7 @@ entire table).}
 \description{
 Get participants
 }
+\examples{
+dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+participants <- get_participants(dataset_spec)
+}

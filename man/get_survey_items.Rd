@@ -9,3 +9,6 @@ get_survey_items()
 \description{
 Get metadata for survey items
 }
+\examples{
+survey_items <- get_survey_items()
+}

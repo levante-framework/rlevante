@@ -26,3 +26,7 @@ entire table).}
 \description{
 Get run data
 }
+\examples{
+dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+runs <- get_runs(dataset_spec)
+}

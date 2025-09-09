@@ -40,6 +40,12 @@ code_survey_data <- function(surveys) {
 #' @param participants Participant data as returned by `get_participants()`.
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' surveys <- get_surveys(dataset_spec)
+#' participants <- get_participants(dataset_spec)
+#' survey_data <- surveys |>
+#'   link_surveys(participants)
 link_surveys <- function(surveys, participants) {
 
   user_survey_data <- surveys |>

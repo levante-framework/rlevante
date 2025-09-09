@@ -9,3 +9,6 @@ get_trial_items()
 \description{
 Get metadata for trial items
 }
+\examples{
+trial_items <- get_trial_items()
+}

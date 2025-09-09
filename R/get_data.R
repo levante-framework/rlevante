@@ -2,7 +2,7 @@
 # returns data from the given table in that dataset
 table_getter <- function(table_name, max_results = NULL) {
   \(dataset, dataset_table_names) {
-    # message(glue("--Fetching table {table_name}"))
+    message(glue("--Fetching table {table_name}"))
     if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
       dataset$table(table_name)$to_tibble(max_results = max_results)
@@ -13,7 +13,7 @@ table_getter <- function(table_name, max_results = NULL) {
 # given a sql query, return a function that takes a dataset reference and
 # returns data from executing that sql query in that dataset
 query_getter <- function(table_name, query_str, max_results = NULL) {
-  # message(glue("--Executing SQL query"))
+  message(glue("--Executing SQL query"))
   \(dataset, dataset_table_names) {
     if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
@@ -58,6 +58,9 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 #' @inheritParams get_runs
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' participants <- get_participants(dataset_spec)
 get_participants <- function(dataset_spec, max_results = NULL) {
 
   # get data for the tables with needed user data
@@ -101,6 +104,9 @@ build_filter <- function(var, vals) {
 #' @inheritParams get_trials
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' trials_prelim <- get_trials_prelim(dataset_spec)
 get_trials_prelim <- function(dataset_spec,
                               remove_incomplete_runs = TRUE,
                               remove_invalid_runs = TRUE,
@@ -160,6 +166,9 @@ get_trials_prelim <- function(dataset_spec,
 #'   IDs.
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' trials <- get_trials(dataset_spec)
 get_trials <- function(dataset_spec,
                        remove_incomplete_runs = TRUE,
                        remove_invalid_runs = TRUE,
@@ -191,6 +200,9 @@ get_trials <- function(dataset_spec,
 #' @inheritParams get_trials
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' trials_raw <- get_trials_raw(dataset_spec)
 get_trials_raw <- function(dataset_spec) {
   get_datasets_data(dataset_spec, table_getter("trials"))
 }
@@ -206,6 +218,9 @@ get_trials_raw <- function(dataset_spec) {
 #'   entire table).
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' runs <- get_runs(dataset_spec)
 get_runs <- function(dataset_spec,
                      remove_incomplete_runs = TRUE,
                      remove_invalid_runs = TRUE,
@@ -252,6 +267,9 @@ get_runs <- function(dataset_spec,
 #'   that were marked as incomplete (defaults to FALSE).
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' surveys <- get_surveys(dataset_spec)
 get_surveys <- function(dataset_spec,
                         survey_types = c("caregiver", "student", "teacher"),
                         remove_incomplete_surveys = FALSE,
@@ -283,6 +301,8 @@ get_metadata_table <- function(table_name) {
 #' Get metadata for trial items
 #'
 #' @export
+#' @examples
+#' trial_items <- get_trial_items()
 get_trial_items <- function() {
   get_metadata_table("trial_items")
 }
@@ -290,6 +310,8 @@ get_trial_items <- function() {
 #' Get metadata for mapping items
 #'
 #' @export
+#' @examples
+#' mapping_items <- get_mapping_items()
 get_mapping_items <- function() {
   get_metadata_table("mapping_items")
 }
@@ -297,6 +319,8 @@ get_mapping_items <- function() {
 #' Get metadata for corpus items
 #'
 #' @export
+#' @examples
+#' corpus_items <- get_corpus_items()
 get_corpus_items <- function() {
   get_metadata_table("corpus_items")
 }
@@ -304,6 +328,8 @@ get_corpus_items <- function() {
 #' Get metadata for survey items
 #'
 #' @export
+#' @examples
+#' survey_items <- get_survey_items()
 get_survey_items <- function() {
   get_metadata_table("survey_items") |>
     arrange(.data$survey_type, .data$variable_order)
@@ -314,6 +340,9 @@ get_survey_items <- function() {
 #' @inheritParams get_runs
 #'
 #' @export
+#' @examples
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' scores <- get_scores(dataset_spec)
 get_scores <- function(dataset_spec) {
   scores <- get_datasets_data(dataset_spec, table_getter("scores"))
 }
