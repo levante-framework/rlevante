@@ -132,14 +132,14 @@ get_trials_prelim <- function(dataset_spec,
   if (remove_invalid_trials) trials <- trials |> filter(.data$valid_trial)
 
   trials |>
-    filter(trial_id != "schema_row") |>
+    filter(.data$trial_id != "schema_row") |>
     remove_practice_trials() |>
     # select("dataset", "task_id", "user_id", "run_id", "trial_id",
     #        "item_id", "item_uid", "answer", # item_original = "item",
     #        "response", "correct", "rt", "server_timestamp",
     #        "valid_trial", "validation_msg_trial") |>
     convert_rts() |>
-    mutate(response = response |> na_if("nan"))
+    mutate(response = .data$response |> na_if("nan"))
   # add_trial_items() |>
     # add_trial_numbers() |>
     # arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number)
@@ -232,8 +232,9 @@ get_runs <- function(dataset_spec,
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
   runs |>
-    mutate(adaptive = variant_name |> stringr::str_to_lower() |> stringr::str_detect("adaptive"),
-           .after = variant_name) |>
+    mutate(adaptive = .data$variant_name |>
+             stringr::str_to_lower() |> stringr::str_detect("adaptive"),
+           .after = .data$variant_name) |>
     # select(-name) |>
     mutate(birth_month = validate_birth_month(.data$birth_month),
            birth_year = validate_birth_year(.data$birth_year),
@@ -304,7 +305,8 @@ get_corpus_items <- function() {
 #'
 #' @export
 get_survey_items <- function() {
-  get_metadata_table("survey_items") |> arrange(survey_type, variable_order)
+  get_metadata_table("survey_items") |>
+    arrange(.data$survey_type, .data$variable_order)
 }
 
 #' Get score data

@@ -28,16 +28,17 @@ add_item_ids <- function(trials) {
   trial_map <- trial_items |>
     mutate(trials = trials |> map(jsonlite::fromJSON) |> map(unlist)) |>
     unnest(trials) |>
-    select(item_uid_trial = item_uid, trial_id = trials)
+    select(item_uid_trial = "item_uid", trial_id = "trials")
 
   # get item IDs coded by item (corpus_trial_type, item, answer, distractors)
   mapping_items <- get_mapping_items()
   item_map <- mapping_items |>
-    mutate(across(c(corpus_trial_type, item, answer, distractors),
+    mutate(across(c("corpus_trial_type", "item", "answer", "distractors"),
                   \(s) replace_na(s, ""))) |>
-    mutate(item_key = paste(corpus_trial_type, item, answer, distractors) |>
+    mutate(item_key = paste(.data$corpus_trial_type, .data$item,
+                            .data$answer, .data$distractors) |>
              stringr::str_trim()) |>
-    select(item_uid_mapping = item_uid, item_key) |>
+    select(item_uid_mapping = "item_uid", "item_key") |>
     distinct()
 
   # fixes for wrong item UIDs in item banks
@@ -65,25 +66,27 @@ add_item_ids <- function(trials) {
       stringr::str_detect(task_id, "^swr(-|$)") ~ glue("swr_{answer}"),
     ) |> as.character()) |>
     # fix wrong item IDs in item banks
-    mutate(item_uid = item_uid |>
+    mutate(item_uid = .data$item_uid |>
              stringr::str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
              stringr::str_replace("^tom_ha_", "ha_") |>
              stringr::str_replace("^vocab__", "vocab_word_") |>
              forcats::fct_recode(!!!itembank_recodes)) |>
     # remove stray SDS instruction items
-    filter(is.na(item_uid) | !stringr::str_detect(item_uid, "-instr")) |>
+    filter(is.na(.data$item_uid) | !stringr::str_detect(.data$item_uid, "-instr")) |>
     # recode memory-game answers
-    mutate(answer = if_else(task_id == "memory-game", as.character(str_count(answer, ":")), answer)) |>
+    mutate(answer = if_else(.data$task_id == "memory-game",
+                            as.character(stringr::str_count(.data$answer, ":")),
+                            .data$answer)) |>
     # create item key for joining with item map
-    mutate(across(c(corpus_trial_type, item, answer, distractors),
+    mutate(across(c(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors),
                   \(s) replace_na(s, ""))) |>
-    mutate(item_key = paste(corpus_trial_type, item, answer, distractors) |>
-             str_trim()) |>
+    mutate(item_key = paste(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors) |>
+             stringr::str_trim()) |>
     # remove trials with no item information
-    filter(!is.na(item_uid) | !is.na(item_key))
+    filter(!is.na(.data$item_uid) | !is.na(.data$item_key))
 
   trials_joined <- trials_prepped |>
-    select(trial_id, task_id, item_key, item_uid, item_uid_roar) |>
+    select("trial_id", "task_id", "item_key", "item_uid", "item_uid_roar") |>
     # join in trial item ID map
     left_join(trial_map, by = "trial_id") |>
     # join in item mapping item ID map
@@ -94,38 +97,38 @@ add_item_ids <- function(trials) {
     tidyr::pivot_longer(contains("item_uid"),
                         names_to = "item_uid_source", values_to = "item_uid") |>
     # filter to each trial's present item IDs
-    group_by(trial_id, task_id) |>
-    filter(!is.na(item_uid)) |>
+    group_by(.data$trial_id, .data$task_id) |>
+    filter(!is.na(.data$item_uid)) |>
     # collapse item ID sources
-    group_by(trial_id, task_id, item_uid) |>
-    summarise(item_uid_source = list(item_uid_source)) |>
+    group_by(.data$trial_id, .data$task_id, .data$item_uid) |>
+    summarise(item_uid_source = list(.data$item_uid_source)) |>
     ungroup()
 
   # check that no trials have multiple conflicted item IDs
-  conflicts <- trials_mapped |> group_by(trial_id) |> filter(n() > 1)
+  conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1)
   assertthat::assert_that(nrow(conflicts) == 0)
 
   # join mapped trials back into overall trials
   trials_prepped |>
-    select(-item_uid) |>
+    select(-"item_uid") |>
     left_join(trials_mapped, by = c("task_id", "trial_id")) |>
-    filter(!is.na(item_uid) | item_key != "")
+    filter(!is.na(.data$item_uid) | .data$item_key != "")
 }
 
 add_item_metadata <- function(trials) {
   corpus_items <- get_corpus_items() |> distinct()
   trials |>
-    filter(!is.na(item_uid)) |>
+    filter(!is.na(.data$item_uid)) |>
     left_join(corpus_items, by = "item_uid") |>
     # code item_task for roar tasks
     mutate(item_task = if_else(
-      item_uid_source == "item_uid_roar",
-      str_extract(task_id, "^[A-z]*"),
-      item_task
+      .data$item_uid_source == "item_uid_roar",
+      stringr::str_extract(.data$task_id, "^[A-z]*"),
+      .data$item_task
     )) |>
-    mutate(group = replace_na(group, ""),
-           entry = replace_na(entry, "")) |>
-    rename(item_original = item, item_group = group, item = entry)
+    mutate(group = replace_na(.data$group, ""),
+           entry = replace_na(.data$entry, "")) |>
+    rename(item_original = "item", item_group = "group", item = "entry")
 }
 
 # add numeric RTs

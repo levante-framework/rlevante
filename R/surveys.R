@@ -43,16 +43,16 @@ code_survey_data <- function(surveys) {
 link_surveys <- function(surveys, participants) {
 
   user_survey_data <- surveys |>
-    mutate(survey_group = survey_part) |>
-    nest(survey_data = -c("dataset", "survey_type", "survey_response_id", "timestamp",
-                          "survey_group", "user_id", "child_id"))
+    mutate(survey_group = .data$survey_part) |>
+    nest(survey_data = -c("dataset", "survey_type", "survey_response_id",
+                          "timestamp", "survey_group", "user_id", "child_id"))
 
   children <- participants |> rename(child_id = "user_id")
 
   # student survey -- user_id is child
   survey_student <- user_survey_data |>
     filter(.data$survey_type == "student") |>
-    mutate(child_id = user_id)
+    mutate(child_id = .data$user_id)
 
   # teacher survey -- user_id is teacher
   teachers <- children |>
@@ -62,25 +62,25 @@ link_surveys <- function(surveys, participants) {
 
   survey_teacher <- user_survey_data |>
     filter(.data$survey_type == "teacher") |>
-    select(-child_id) |>
+    select(-"child_id") |>
     left_join(teachers, by = c("dataset", "user_id" = "teacher_id")) |>
-    unnest(children) |>
-    select(-children)
+    unnest(.data$children) |>
+    select(-"children")
 
   survey_household <- user_survey_data |>
-    filter(.data$survey_type == "caregiver", str_detect(survey_group, "caregiver")) |>
-    rename(survey_household = survey_data) |>
-    select(-survey_group)
+    filter(.data$survey_type == "caregiver", stringr::str_detect(.data$survey_group, "caregiver")) |>
+    rename(survey_household = "survey_data") |>
+    select(-"survey_group")
 
   survey_child <- user_survey_data |>
-    filter(.data$survey_type == "caregiver", survey_group == "child_specific") |>
-    rename(survey_child = survey_data) |>
-    select(-survey_group)
+    filter(.data$survey_type == "caregiver", .data$survey_group == "child_specific") |>
+    rename(survey_child = "survey_data") |>
+    select(-"survey_group")
 
   survey_caregiver <- survey_child |>
     left_join(survey_household) |>
-    mutate(survey_data = map2(survey_child, survey_household, bind_rows)) |>
-    select(-survey_child, -survey_household)
+    mutate(survey_data = map2(.data$survey_child, .data$survey_household, bind_rows)) |>
+    select(-"survey_child", -"survey_household")
 
   # recombine separated out survey types
   survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |> #, survey_linked) |>
@@ -88,7 +88,7 @@ link_surveys <- function(surveys, participants) {
               by = c("dataset", "child_id")) |>
     mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$timestamp)) |>
     select(-contains("birth_"), -"survey_group") |>
-    rename(survey_timestamp = timestamp) |>
+    rename(survey_timestamp = "timestamp") |>
     relocate(.data$survey_data, .after = everything())
 
   survey_combined |> unnest(.data$survey_data)
