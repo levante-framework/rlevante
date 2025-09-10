@@ -10,5 +10,7 @@ get_mapping_items()
 Get metadata for mapping items
 }
 \examples{
+\dontrun{
 mapping_items <- get_mapping_items()
+}
 }

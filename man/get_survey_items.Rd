@@ -10,5 +10,7 @@ get_survey_items()
 Get metadata for survey items
 }
 \examples{
+\dontrun{
 survey_items <- get_survey_items()
+}
 }

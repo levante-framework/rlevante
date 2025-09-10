@@ -10,5 +10,7 @@ get_corpus_items()
 Get metadata for corpus items
 }
 \examples{
+\dontrun{
 corpus_items <- get_corpus_items()
+}
 }

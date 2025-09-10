@@ -59,8 +59,10 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' participants <- get_participants(dataset_spec)
+#' }
 get_participants <- function(dataset_spec, max_results = NULL) {
 
   # get data for the tables with needed user data
@@ -105,8 +107,10 @@ build_filter <- function(var, vals) {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' trials_prelim <- get_trials_prelim(dataset_spec)
+#' }
 get_trials_prelim <- function(dataset_spec,
                               remove_incomplete_runs = TRUE,
                               remove_invalid_runs = TRUE,
@@ -167,8 +171,10 @@ get_trials_prelim <- function(dataset_spec,
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' trials <- get_trials(dataset_spec)
+#' }
 get_trials <- function(dataset_spec,
                        remove_incomplete_runs = TRUE,
                        remove_invalid_runs = TRUE,
@@ -201,8 +207,10 @@ get_trials <- function(dataset_spec,
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' trials_raw <- get_trials_raw(dataset_spec)
+#' }
 get_trials_raw <- function(dataset_spec) {
   get_datasets_data(dataset_spec, table_getter("trials"))
 }
@@ -219,8 +227,10 @@ get_trials_raw <- function(dataset_spec) {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' runs <- get_runs(dataset_spec)
+#' }
 get_runs <- function(dataset_spec,
                      remove_incomplete_runs = TRUE,
                      remove_invalid_runs = TRUE,
@@ -268,8 +278,10 @@ get_runs <- function(dataset_spec,
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' surveys <- get_surveys(dataset_spec)
+#' }
 get_surveys <- function(dataset_spec,
                         survey_types = c("caregiver", "student", "teacher"),
                         remove_incomplete_surveys = FALSE,
@@ -302,7 +314,9 @@ get_metadata_table <- function(table_name) {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' trial_items <- get_trial_items()
+#' }
 get_trial_items <- function() {
   get_metadata_table("trial_items")
 }
@@ -311,7 +325,9 @@ get_trial_items <- function() {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' mapping_items <- get_mapping_items()
+#' }
 get_mapping_items <- function() {
   get_metadata_table("mapping_items")
 }
@@ -320,7 +336,9 @@ get_mapping_items <- function() {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' corpus_items <- get_corpus_items()
+#' }
 get_corpus_items <- function() {
   get_metadata_table("corpus_items")
 }
@@ -329,7 +347,9 @@ get_corpus_items <- function() {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' survey_items <- get_survey_items()
+#' }
 get_survey_items <- function() {
   get_metadata_table("survey_items") |>
     arrange(.data$survey_type, .data$variable_order)
@@ -341,8 +361,10 @@ get_survey_items <- function() {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' scores <- get_scores(dataset_spec)
+#' }
 get_scores <- function(dataset_spec) {
   scores <- get_datasets_data(dataset_spec, table_getter("scores"))
 }

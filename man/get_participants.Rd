@@ -16,6 +16,8 @@ entire table).}
 Get participants
 }
 \examples{
+\dontrun{
 dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 participants <- get_participants(dataset_spec)
+}
 }

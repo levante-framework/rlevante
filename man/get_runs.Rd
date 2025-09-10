@@ -27,6 +27,8 @@ entire table).}
 Get run data
 }
 \examples{
+\dontrun{
 dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 runs <- get_runs(dataset_spec)
+}
 }

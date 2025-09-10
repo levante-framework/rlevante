@@ -13,6 +13,8 @@ get_scores(dataset_spec)
 Get score data
 }
 \examples{
+\dontrun{
 dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 scores <- get_scores(dataset_spec)
+}
 }

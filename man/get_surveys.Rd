@@ -27,6 +27,8 @@ entire table).}
 Get survey data
 }
 \examples{
+\dontrun{
 dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 surveys <- get_surveys(dataset_spec)
+}
 }

@@ -15,9 +15,11 @@ link_surveys(surveys, participants)
 Link survey data to participant data
 }
 \examples{
+\dontrun{
 dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 surveys <- get_surveys(dataset_spec)
 participants <- get_participants(dataset_spec)
 survey_data <- surveys |>
   link_surveys(participants)
+}
 }

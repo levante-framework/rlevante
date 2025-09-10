@@ -13,6 +13,8 @@ get_trials_raw(dataset_spec)
 Get raw trial data
 }
 \examples{
+\dontrun{
 dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 trials_raw <- get_trials_raw(dataset_spec)
+}
 }

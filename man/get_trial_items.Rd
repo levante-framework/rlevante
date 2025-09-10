@@ -10,5 +10,7 @@ get_trial_items()
 Get metadata for trial items
 }
 \examples{
+\dontrun{
 trial_items <- get_trial_items()
+}
 }
