@@ -195,10 +195,11 @@ get_trials <- function(dataset_spec,
     add_item_metadata() |>
     add_trial_numbers() |>
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
-    select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
-           "item_uid", "item_task", "item_group", "item", "chance",
-           "correct", "rt", "rt_numeric", "response", "answer",
-           timestamp = "server_timestamp", "valid_trial", "validation_msg_trial")
+    select("dataset", "task_id", "task_version", "user_id", "run_id", "trial_id",
+           "trial_number", "item_uid", "item_task", "item_group", "item",
+           "chance", "correct", "rt", "rt_numeric", "response", "item_original",
+           "answer", "distractors", timestamp = "server_timestamp",
+           "valid_trial", "validation_msg_trial")
 }
 
 #' Get raw trial data
@@ -236,8 +237,9 @@ get_runs <- function(dataset_spec,
                      remove_invalid_runs = TRUE,
                      max_results = NULL) {
 
-  run_vars <- c("run_id", "runs.user_id", "runs.task_id", "runs.variant_id",
-                "variants.name AS variant_name", "variants.language",
+  run_vars <- c("run_id", "runs.user_id", "runs.task_id", "runs.task_version",
+                "runs.variant_id", "variants.name AS variant_name",
+                "variants.language",
                 "runs.administration_id", "administrations.public_name AS administration_name",
                 "test_comp_theta_estimate", "test_comp_theta_se",
                 "time_started", "completed", "valid_run", "validation_msg_run")
