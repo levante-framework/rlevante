@@ -195,7 +195,7 @@ get_trials <- function(dataset_spec,
     add_item_metadata() |>
     add_trial_numbers() |>
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
-    select("dataset", "task_id", "task_version", "user_id", "run_id", "trial_id",
+    select("dataset", "task_id", "user_id", "run_id", "trial_id",
            "trial_number", "item_uid", "item_task", "item_group", "item",
            "chance", "correct", "rt", "rt_numeric", "response", "item_original",
            "answer", "distractors", timestamp = "server_timestamp",

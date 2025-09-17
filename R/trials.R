@@ -43,19 +43,20 @@ add_item_ids <- function(trials) {
 
   # fixes for wrong item UIDs in item banks
   itembank_recodes <- c(
-    "sds_same_same"          = "sds_same_"            ,
-    "math_compare_65_67"     = "math_compare_67_65"   ,
-    "math_compare_27_36"     = "math_compare_36_27"   ,
-    "math_compare_390_435"   = "math_compare_435_390" ,
-    "math_compare_69_82"     = "math_compare_82_69"   ,
-    "math_compare_823_861"   = "math_compare_861_823" ,
-    "math_fraction_12_14_34" = "math_fraction_12_14"  ,
-    "math_fraction_18_48_58" = "math_fraction_18_48"  ,
-    "math_fraction_32_14_74" = "math_fraction_32_14"  ,
-    "math_fraction_16_13_12" = "math_fraction_16_13"  ,
-    "math_subtract_17_12"    = "math_subtract_17_!2"  ,
-    "ha_knock_action"        = "tom_knock_papers_action",
-    "ha_knock_attribution"   = "tom_knock_papers_attribution"
+    "sds_same_same"              = "sds_same_"               ,
+    "math_compare_65_67"         = "math_compare_67_65"      ,
+    "math_compare_27_36"         = "math_compare_36_27"      ,
+    "math_compare_390_435"       = "math_compare_435_390"    ,
+    "math_compare_69_82"         = "math_compare_82_69"      ,
+    "math_compare_823_861"       = "math_compare_861_823"    ,
+    "math_fraction_12_14_34"     = "math_fraction_12_14"     ,
+    "math_fraction_18_48_58"     = "math_fraction_18_48"     ,
+    "math_fraction_32_14_74"     = "math_fraction_32_14"     ,
+    "math_fraction_16_13_12"     = "math_fraction_16_13"     ,
+    "math_subtract_17_12"        = "math_subtract_17_!2"     ,
+    "math_missing_x_300_400_500" = "math_missing_300_400_500",
+    "ha_knock_action"            = "tom_knock_papers_action" ,
+    "ha_knock_attribution"       = "tom_knock_papers_attribution"
   )
 
   trials_prepped <- trials |>
@@ -68,6 +69,10 @@ add_item_ids <- function(trials) {
     # fix wrong item IDs in item banks
     mutate(item_uid = .data$item_uid |>
              stringr::str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
+             stringr::str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
+             stringr::str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
+             stringr::str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
+             stringr::str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
              stringr::str_replace("^tom_ha_", "ha_") |>
              stringr::str_replace("^vocab__", "vocab_word_") |>
              forcats::fct_recode(!!!itembank_recodes)) |>
