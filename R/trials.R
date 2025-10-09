@@ -20,7 +20,6 @@ add_trial_numbers <- function(trials) {
     ungroup()
 }
 
-# get item metadata and join with trials
 add_item_ids <- function(trials) {
 
   # get item IDs coded by trial
@@ -50,10 +49,19 @@ add_item_ids <- function(trials) {
     "math_compare_69_82"         = "math_compare_82_69"      ,
     "math_compare_823_861"       = "math_compare_861_823"    ,
     "math_fraction_12_14_34"     = "math_fraction_12_14"     ,
+    "math_fraction_14_24_34"     = "math_fraction_14_24"     ,
     "math_fraction_18_48_58"     = "math_fraction_18_48"     ,
-    "math_fraction_32_14_74"     = "math_fraction_32_14"     ,
+    "math_fraction_13_17_421"    = "math_fraction_13_17"     ,
+    "math_fraction_13_23_1"      = "math_fraction_13_23"     ,
     "math_fraction_16_13_12"     = "math_fraction_16_13"     ,
+    "math_fraction_17_314_514"   = "math_fraction_17_314"    ,
+    "math_fraction_19_110_190"   = "math_fraction_19_110"    ,
+    "math_fraction_32_14_74"     = "math_fraction_32_14"     ,
+    "math_fraction_39_13_23"     = "math_fraction_39_13"     ,
+    "math_fraction_48_18_38"     = "math_fraction_48_18"     ,
+    "math_fraction_710_25_310"   = "math_fraction_710_25"    ,
     "math_subtract_17_12"        = "math_subtract_17_!2"     ,
+    "math_line_639_1000"         = "math_line_649_1000"      ,
     "math_missing_x_300_400_500" = "math_missing_300_400_500",
     "ha_knock_action"            = "tom_knock_papers_action" ,
     "ha_knock_attribution"       = "tom_knock_papers_attribution"
@@ -75,7 +83,9 @@ add_item_ids <- function(trials) {
              stringr::str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
              stringr::str_replace("^tom_ha_", "ha_") |>
              stringr::str_replace("^vocab__", "vocab_word_") |>
-             forcats::fct_recode(!!!itembank_recodes)) |>
+             forcats::fct_recode(!!!itembank_recodes) |>
+             na_if("math_fraction_512_16") |>
+             na_if("mg_forward_3grid_len2")) |>
     # remove stray SDS instruction items
     filter(is.na(.data$item_uid) | !stringr::str_detect(.data$item_uid, "-instr")) |>
     # recode memory-game answers
@@ -110,7 +120,7 @@ add_item_ids <- function(trials) {
     ungroup()
 
   # check that no trials have multiple conflicted item IDs
-  conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1)
+  conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1) |> ungroup()
   assertthat::assert_that(nrow(conflicts) == 0)
 
   # join mapped trials back into overall trials
@@ -119,6 +129,7 @@ add_item_ids <- function(trials) {
     left_join(trials_mapped, by = c("task_id", "trial_id")) |>
     filter(!is.na(.data$item_uid) | .data$item_key != "")
 }
+
 
 add_item_metadata <- function(trials) {
   corpus_items <- get_corpus_items() |> distinct()
