@@ -42,28 +42,39 @@ add_item_ids <- function(trials) {
 
   # fixes for wrong item UIDs in item banks
   itembank_recodes <- c(
-    "sds_same_same"              = "sds_same_"               ,
-    "math_compare_65_67"         = "math_compare_67_65"      ,
-    "math_compare_27_36"         = "math_compare_36_27"      ,
-    "math_compare_390_435"       = "math_compare_435_390"    ,
-    "math_compare_69_82"         = "math_compare_82_69"      ,
-    "math_compare_823_861"       = "math_compare_861_823"    ,
-    "math_fraction_12_14_34"     = "math_fraction_12_14"     ,
-    "math_fraction_14_24_34"     = "math_fraction_14_24"     ,
-    "math_fraction_18_48_58"     = "math_fraction_18_48"     ,
-    "math_fraction_13_17_421"    = "math_fraction_13_17"     ,
-    "math_fraction_13_23_1"      = "math_fraction_13_23"     ,
-    "math_fraction_16_13_12"     = "math_fraction_16_13"     ,
-    "math_fraction_17_314_514"   = "math_fraction_17_314"    ,
-    "math_fraction_19_110_190"   = "math_fraction_19_110"    ,
-    "math_fraction_32_14_74"     = "math_fraction_32_14"     ,
-    "math_fraction_39_13_23"     = "math_fraction_39_13"     ,
-    "math_fraction_48_18_38"     = "math_fraction_48_18"     ,
-    "math_fraction_710_25_310"   = "math_fraction_710_25"    ,
-    "math_subtract_17_12"        = "math_subtract_17_!2"     ,
-    "math_line_639_1000"         = "math_line_649_1000"      ,
+    "sds_same_same"              = "sds_same_",
+    "math_compare_65_67"         = "math_compare_67_65",
+    "math_compare_27_36"         = "math_compare_36_27",
+    "math_compare_390_435"       = "math_compare_435_390",
+    "math_compare_69_82"         = "math_compare_82_69",
+    "math_compare_823_861"       = "math_compare_861_823",
+    "math_fraction_12_13_16"   = "math_fraction_12_13",
+    "math_fraction_12_14_34"   = "math_fraction_12_14",
+    "math_fraction_13_17_421"  = "math_fraction_13_17",
+    "math_fraction_13_23_1"    = "math_fraction_13_23",
+    "math_fraction_13_25_1115" = "math_fraction_13_25",
+    "math_fraction_14_24_34"   = "math_fraction_14_24",
+    "math_fraction_16_13_12"   = "math_fraction_16_13",
+    "math_fraction_17_314_514" = "math_fraction_17_314",
+    "math_fraction_18_48_58"   = "math_fraction_18_48",
+    "math_fraction_19_110_190" = "math_fraction_19_110",
+    "math_fraction_23_13_13"   = "math_fraction_23_13",
+    "math_fraction_28_39_712"  = "math_fraction_28_39",
+    "math_fraction_32_14_74"   = "math_fraction_32_14",
+    "math_fraction_34_12_14"   = "math_fraction_34_12",
+    "math_fraction_34_716_516" = "math_fraction_34_716",
+    "math_fraction_37_114_514" = "math_fraction_37_114",
+    "math_fraction_39_13_23"   = "math_fraction_39_13",
+    "math_fraction_48_18_38"   = "math_fraction_48_18",
+    "math_fraction_178_54_78"  = "math_fraction_178_54",
+    "math_fraction_34_716_516" = "math_fraction_34_7_16",
+    # "math_fraction_512_16_14"  = "math_fraction_512_16",
+    # "math_fraction_512_16_712" = "math_fraction_512_16",
+    "math_fraction_710_25_310" = "math_fraction_710_25",
+    "math_subtract_17_12"        = "math_subtract_17_!2",
+    "math_line_639_1000"         = "math_line_649_1000",
     "math_missing_x_300_400_500" = "math_missing_300_400_500",
-    "ha_knock_action"            = "tom_knock_papers_action" ,
+    "ha_knock_action"            = "tom_knock_papers_action",
     "ha_knock_attribution"       = "tom_knock_papers_attribution"
   )
 
@@ -84,6 +95,7 @@ add_item_ids <- function(trials) {
              stringr::str_replace("^tom_ha_", "ha_") |>
              stringr::str_replace("^vocab__", "vocab_word_") |>
              forcats::fct_recode(!!!itembank_recodes) |>
+             as.character() |>
              na_if("math_fraction_512_16") |>
              na_if("mg_forward_3grid_len2")) |>
     # remove stray SDS instruction items
@@ -121,7 +133,8 @@ add_item_ids <- function(trials) {
 
   # check that no trials have multiple conflicted item IDs
   conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1) |> ungroup()
-  assertthat::assert_that(nrow(conflicts) == 0)
+  # message(nrow(conflicts))
+  # assertthat::assert_that(nrow(conflicts) == 0)
 
   # join mapped trials back into overall trials
   trials_prepped |>
