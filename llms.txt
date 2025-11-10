@@ -1,0 +1,39 @@
+# rlevante
+
+LEVANTE R package
+
+## Installation
+
+`devtools::install_git(url="https://github.com/levante-framework/rlevante")`
+
+# Package index
+
+## All functions
+
+- [`get_corpus_items()`](https://levante-framework.github.io/rlevante/reference/get_corpus_items.md)
+  : Get metadata for corpus items
+- [`get_mapping_items()`](https://levante-framework.github.io/rlevante/reference/get_mapping_items.md)
+  : Get metadata for mapping items
+- [`get_participants()`](https://levante-framework.github.io/rlevante/reference/get_participants.md)
+  : Get participants
+- [`get_runs()`](https://levante-framework.github.io/rlevante/reference/get_runs.md)
+  : Get run data
+- [`get_scores()`](https://levante-framework.github.io/rlevante/reference/get_scores.md)
+  : Get score data
+- [`get_survey_items()`](https://levante-framework.github.io/rlevante/reference/get_survey_items.md)
+  : Get metadata for survey items
+- [`get_surveys()`](https://levante-framework.github.io/rlevante/reference/get_surveys.md)
+  : Get survey data
+- [`get_trial_items()`](https://levante-framework.github.io/rlevante/reference/get_trial_items.md)
+  : Get metadata for trial items
+- [`get_trials()`](https://levante-framework.github.io/rlevante/reference/get_trials.md)
+  : Get trial data
+- [`get_trials_prelim()`](https://levante-framework.github.io/rlevante/reference/get_trials_prelim.md)
+  : Get trial data
+- [`get_trials_raw()`](https://levante-framework.github.io/rlevante/reference/get_trials_raw.md)
+  : Get raw trial data
+- [`link_surveys()`](https://levante-framework.github.io/rlevante/reference/link_surveys.md)
+  : Link survey data to participant data
+- [`notebook_dataset()`](https://levante-framework.github.io/rlevante/reference/notebook_dataset.md)
+  : Determine dataset of current notebook on Redivis
+
