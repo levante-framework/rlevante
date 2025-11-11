@@ -27,7 +27,8 @@ Imports:
 Suggests: 
     ggplot2,
     knitr,
+    mirt,
     rmarkdown
 Remotes:
     redivis=redivis/redivis-r
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
