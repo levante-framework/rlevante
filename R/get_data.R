@@ -194,8 +194,10 @@ get_trials <- function(dataset_spec,
     add_item_ids() |>
     add_item_metadata() |>
     add_trial_numbers() |>
+    tidyr::separate_wider_delim(cols = "dataset", delim = ":",
+                                names = c("dataset", "ref", "version")) |>
     arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
-    select("dataset", "task_id", "user_id", "run_id", "trial_id",
+    select("dataset", "ref", "version", "task_id", "user_id", "run_id", "trial_id",
            "trial_number", "item_uid", "item_task", "item_group", "item",
            "chance", "correct", "rt", "rt_numeric", "response", "item_original",
            "answer", "distractors", timestamp = "server_timestamp",
@@ -267,7 +269,9 @@ get_runs <- function(dataset_spec,
            birth_year = validate_birth_year(.data$birth_year),
            age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
     select(-c("birth_month", "birth_year")) |>
-    arrange(.data$time_started)
+    arrange(.data$time_started) |>
+    tidyr::separate_wider_delim(cols = "dataset", delim = ":",
+                                names = c("dataset", "ref", "version"))
 }
 
 #' Get survey data
