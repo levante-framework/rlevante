@@ -260,11 +260,27 @@ get_runs <- function(dataset_spec,
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
+  missing_langs <- tribble(
+    ~variant_id,            ~lang,
+    "OYKVpWxFYhA9Qh9w58Qy", "es",
+    "zlOE3yc4n4JimAhGtQ6r", "de",
+    "KNaxHVqdpe2CtS9NLoX8", "de",
+    "rq7PRMzgtkw52HMfxvNW", "en",
+    "8NLzzprrkwJPeY18iRRH", "en"
+  )
+
   runs |>
+    # code whether run is adaptive
     mutate(adaptive = .data$variant_name |>
              str_to_lower() |> str_detect("adaptive"),
            .after = .data$variant_name) |>
-    # select(-name) |>
+    # code run language
+    mutate(language = if_else(!is.na(.data$language), .data$language,
+                              str_extract(.data$variant_name, "^[a-z][a-z]"))) |>
+    left_join(missing_langs) |>
+    mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
+    select(-"lang") |>
+    # validate birth month/year and compute age
     mutate(birth_month = validate_birth_month(.data$birth_month),
            birth_year = validate_birth_year(.data$birth_year),
            age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
