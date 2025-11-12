@@ -19,7 +19,7 @@ get_scoring_table <- \() {
 #'
 #' @export
 get_model_spec <- \(scoring_table, score_task, score_dataset) {
-  mod_spec <- scoring_table |> filter("item_task" == score_task, "dataset" == score_dataset)
+  mod_spec <- scoring_table |> filter(.data$item_task == score_task, .data$dataset == score_dataset)
   if (nrow(mod_spec) == 0) stop(glue('No scoring model specified for task "{score_task}" and dataset "{score_dataset}"'))
   if (nrow(mod_spec) > 1) stop(glue('Multiple scoring models specified for task "{score_task}" and dataset "{score_dataset}"'))
   mod_spec |> as.list()
