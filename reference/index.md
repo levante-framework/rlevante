@@ -61,6 +61,8 @@
   : recode correctness for slider
 - [`recode_tom()`](https://levante-framework.github.io/rlevante/reference/recode_tom.md)
   : recode items for ToM
+- [`recode_trials()`](https://levante-framework.github.io/rlevante/reference/recode_trials.md)
+  : recode correctness and/or items for several tasks
 - [`recode_wrong_items()`](https://levante-framework.github.io/rlevante/reference/recode_wrong_items.md)
   : recode correctness for items with wrong answers
 - [`remove_no_var_items()`](https://levante-framework.github.io/rlevante/reference/remove_no_var_items.md)
