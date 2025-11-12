@@ -6,6 +6,11 @@
 \usage{
 recode_slider(df, threshold)
 }
+\arguments{
+\item{df}{trial data}
+
+\item{threshold}{max normalized distance from slider target}
+}
 \description{
 recode correctness for slider
 }

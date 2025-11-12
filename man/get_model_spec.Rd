@@ -6,6 +6,16 @@
 \usage{
 get_model_spec(scoring_table, score_task, score_dataset)
 }
+\arguments{
+\item{scoring_table}{tibble returned by get_scoring_table()}
+
+\item{score_task}{string indicating task}
+
+\item{score_dataset}{string indicating dataset}
+}
+\value{
+list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance
+}
 \description{
 get the scoring specification in scoring_table for a given task + dataset
 }

@@ -120,7 +120,7 @@ get_trials_prelim <- function(dataset_spec,
                               max_results = NULL) {
 
   where_str <- build_filter("task_id", tasks)
-  query_str <- glue("SELECT * FROM trials {where_str}") |> stringr::str_trim()
+  query_str <- glue("SELECT * FROM trials {where_str}") |> str_trim()
 
   trials <- get_datasets_data(dataset_spec,
                               query_getter("trials", query_str, max_results))
@@ -260,7 +260,7 @@ get_runs <- function(dataset_spec,
 
   runs |>
     mutate(adaptive = .data$variant_name |>
-             stringr::str_to_lower() |> stringr::str_detect("adaptive"),
+             str_to_lower() |> str_detect("adaptive"),
            .after = .data$variant_name) |>
     # select(-name) |>
     mutate(birth_month = validate_birth_month(.data$birth_month),
@@ -290,7 +290,7 @@ get_surveys <- function(dataset_spec,
                         max_results = NULL) {
 
   where_str <- build_filter("survey_id", survey_types)
-  query_str <- glue("SELECT * FROM survey_responses {where_str}") |> stringr::str_trim()
+  query_str <- glue("SELECT * FROM survey_responses {where_str}") |> str_trim()
 
   surveys <- get_datasets_data(dataset_spec,
                                query_getter("survey_responses", query_str, max_results))

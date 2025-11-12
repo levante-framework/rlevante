@@ -6,6 +6,9 @@
 \usage{
 to_mirt_shape_grouped(df)
 }
+\arguments{
+\item{df}{trial data}
+}
 \description{
 format data for mirt
 }

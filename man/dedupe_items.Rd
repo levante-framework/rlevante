@@ -6,6 +6,11 @@
 \usage{
 dedupe_items(df, item_sep = "-")
 }
+\arguments{
+\item{df}{trial data}
+
+\item{item_sep}{string to put in between item_uid and instance index (defaults to "-")}
+}
 \description{
 add identifiers for each instance of each item
 }

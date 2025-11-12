@@ -6,6 +6,11 @@
 \usage{
 recode_wrong_items(df, wrong_items)
 }
+\arguments{
+\item{df}{trial data}
+
+\item{wrong_items}{tibble with columns item_uid and answer_fixed}
+}
 \description{
 recode correctness for items with wrong answers
 }

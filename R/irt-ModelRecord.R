@@ -1,4 +1,5 @@
 #' ModelRecord class definition
+#'
 #' @export
 ModelRecord <- setClass(
   "ModelRecord",
@@ -21,64 +22,90 @@ ModelRecord <- setClass(
   )
 )
 
-# constructor helper
+#' constructor helper
+#'
+#' @param mod mirt model object
+#' @param row_ids character vector
+#'
+#' @rdname ModelRecord
+#' @importFrom methods new
 #' @export
 modelrecord <- \(mod, row_ids) {
   new("ModelRecord",
       model_class = as.character(class(mod)),
-      model_vals = as.data.frame(mod2values(mod)), # actually mirt_df but S4 doesn't like that
-      itemtype = unique(extract.mirt(mod, "itemtype")),
-      # model = extract.mirt(mod, "model"),
-      method = unique(extract.mirt(mod, "method")),
-      data = extract.mirt(mod, "data"),
-      factors = extract.mirt(mod, "factorNames"),
-      nfact = extract.mirt(mod, "nfact"),
-      invariance = extract.mirt(mod, "invariance"),
-      items = extract.mirt(mod, "itemnames"),
+      model_vals = as.data.frame(mirt::mod2values(mod)), # actually mirt_df but S4 doesn't like that
+      itemtype = unique(mirt::extract.mirt(mod, "itemtype")),
+      # model = mirt::extract.mirt(mod, "model"),
+      method = unique(mirt::extract.mirt(mod, "method")),
+      data = mirt::extract.mirt(mod, "data"),
+      factors = mirt::extract.mirt(mod, "factorNames"),
+      nfact = mirt::extract.mirt(mod, "nfact"),
+      invariance = mirt::extract.mirt(mod, "invariance"),
+      items = mirt::extract.mirt(mod, "itemnames"),
       runs = row_ids,
-      group_names = extract.mirt(mod, "groupNames"),
-      groups = as.character(extract.mirt(mod, "group")),
+      group_names = mirt::extract.mirt(mod, "groupNames"),
+      groups = as.character(mirt::extract.mirt(mod, "group")),
       scores = extract_scores(mod, row_ids),
       fit = mod@Fit
   )
 }
 
-# helper to extract and tidy scores
+#' helper to extract and tidy scores
+#' @rdname ModelRecord
 #' @export
 extract_scores <- \(mod, row_ids) {
-  fscores(mod, method = "EAP", full.scores.SE = TRUE) |>
+  mirt::fscores(mod, method = "EAP", full.scores.SE = TRUE) |>
     as_tibble() |>
-    rename(ability = F1, se = SE_F1) |>
+    rename(ability = "F1", se = "SE_F1") |>
     mutate(run_id = row_ids, .before = everything())
 }
 
-# method for show generic
-#' @export
+#' method for show generic
+#' @rdname ModelRecord
 setMethod("show", "ModelRecord", \(object) {
   cat(glue("{is(object)[[1]]} of a {object@model_class} model ({object@nfact} factor {object@itemtype})"))
 })
 
-# method for AIC generic
+#' method for AIC generic
+#' @rdname ModelRecord
 #' @export
 setMethod("AIC", "ModelRecord", \(object) {
   object@fit$AIC
 })
 
-# method for BIC generic
+#' method for BIC generic
+#' @rdname ModelRecord
 #' @export
 setMethod("BIC", "ModelRecord", \(object) {
   object@fit$BIC
 })
 
-# method for logLik generic
+#' method for logLik generic
+#' @rdname ModelRecord
 #' @export
 setMethod("logLik", "ModelRecord", \(object) {
   object@fit$logLik
 })
 
 # accessor functions for slots
+
+#' @rdname ModelRecord
+#' @param object ModelRecord object
+#' @export
 model_class <- \(object) object@model_class
+
+#' @rdname ModelRecord
+#' @export
 model_vals <- \(object) object@model_vals
+
+#' @rdname ModelRecord
+#' @export
 items <- \(object) object@items
+
+#' @rdname ModelRecord
+#' @export
 scores <- \(object) object@scores
+
+#' @rdname ModelRecord
+#' @export
 tabdata <- \(object) object@tabdata

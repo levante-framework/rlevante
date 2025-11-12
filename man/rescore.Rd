@@ -6,6 +6,16 @@
 \usage{
 rescore(trial_data_task, mod_spec, mod_rec)
 }
+\arguments{
+\item{trial_data_task}{trial data from one task and one dataset}
+
+\item{mod_spec}{list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance}
+
+\item{mod_rec}{ModelRecord object}
+}
+\value{
+tibble with scores
+}
 \description{
 given trial data and model record, score data from corresponding model
 }

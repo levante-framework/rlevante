@@ -19,10 +19,13 @@ Imports:
     glue,
     jsonlite,
     lubridate,
+    methods,
     purrr, 
+    readr,
     redivis, 
     rlang,
     stringr,
+    tibble,
     tidyr
 Suggests: 
     ggplot2,

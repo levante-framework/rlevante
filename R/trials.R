@@ -3,10 +3,10 @@
 remove_practice_trials <- function(trials) {
   trials |>
     mutate(practice = .data$is_practice_trial |
-             stringr::str_detect(.data$assessment_stage, "practice") |
-             stringr::str_detect(.data$assessment_stage, "instructions") |
-             stringr::str_detect(.data$corpus_trial_type, "training") |
-             stringr::str_detect(.data$corpus_trial_type, "practice")) |>
+             str_detect(.data$assessment_stage, "practice") |
+             str_detect(.data$assessment_stage, "instructions") |
+             str_detect(.data$corpus_trial_type, "training") |
+             str_detect(.data$corpus_trial_type, "practice")) |>
     filter(is.na(.data$practice) | !.data$practice) |>
     select(-c("practice", "is_practice_trial"))
 }
@@ -36,7 +36,7 @@ add_item_ids <- function(trials) {
                   \(s) replace_na(s, ""))) |>
     mutate(item_key = paste(.data$corpus_trial_type, .data$item,
                             .data$answer, .data$distractors) |>
-             stringr::str_trim()) |>
+             str_trim()) |>
     select(item_uid_mapping = "item_uid", "item_key") |>
     distinct()
 
@@ -81,34 +81,34 @@ add_item_ids <- function(trials) {
   trials_prepped <- trials |>
     # create item IDs for ROAR tasks (sre | pa -> item_id, swr -> answer)
     mutate(item_uid_roar = case_when(
-      stringr::str_detect(task_id, "^pa(-|$)") ~ glue("pa_{item_id}"),
-      stringr::str_detect(task_id, "^sre(-|$)") ~ glue("sre_{item_id}"),
-      stringr::str_detect(task_id, "^swr(-|$)") ~ glue("swr_{answer}"),
+      str_detect(task_id, "^pa(-|$)") ~ glue("pa_{item_id}"),
+      str_detect(task_id, "^sre(-|$)") ~ glue("sre_{item_id}"),
+      str_detect(task_id, "^swr(-|$)") ~ glue("swr_{answer}"),
     ) |> as.character()) |>
     # fix wrong item IDs in item banks
     mutate(item_uid = .data$item_uid |>
-             stringr::str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
-             stringr::str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
-             stringr::str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
-             stringr::str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
-             stringr::str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
-             stringr::str_replace("^tom_ha_", "ha_") |>
-             stringr::str_replace("^vocab__", "vocab_word_") |>
+             str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
+             str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
+             str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
+             str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
+             str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
+             str_replace("^tom_ha_", "ha_") |>
+             str_replace("^vocab__", "vocab_word_") |>
              forcats::fct_recode(!!!itembank_recodes) |>
              as.character() |>
              na_if("math_fraction_512_16") |>
              na_if("mg_forward_3grid_len2")) |>
     # remove stray SDS instruction items
-    filter(is.na(.data$item_uid) | !stringr::str_detect(.data$item_uid, "-instr")) |>
+    filter(is.na(.data$item_uid) | !str_detect(.data$item_uid, "-instr")) |>
     # recode memory-game answers
     mutate(answer = if_else(.data$task_id == "memory-game",
-                            as.character(stringr::str_count(.data$answer, ":")),
+                            as.character(str_count(.data$answer, ":")),
                             .data$answer)) |>
     # create item key for joining with item map
     mutate(across(c(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors),
                   \(s) replace_na(s, ""))) |>
     mutate(item_key = paste(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors) |>
-             stringr::str_trim()) |>
+             str_trim()) |>
     # remove trials with no item information
     filter(!is.na(.data$item_uid) | !is.na(.data$item_key))
 
@@ -152,7 +152,7 @@ add_item_metadata <- function(trials) {
     # code item_task for roar tasks
     mutate(item_task = if_else(
       .data$item_uid_source == "item_uid_roar",
-      stringr::str_extract(.data$task_id, "^[A-z]*"),
+      str_extract(.data$task_id, "^[A-z]*"),
       .data$item_task
     )) |>
     mutate(group = replace_na(.data$group, ""),
@@ -172,7 +172,7 @@ code_numberline <- function(trials, threshold = 0.15) {
     tidyr::separate_wider_delim(.data$item, "_",
                                 names = c("answer", "max_value"),
                                 cols_remove = FALSE) |>
-    mutate(answer = .data$answer |> stringr::str_replace("^0", "0."),
+    mutate(answer = .data$answer |> str_replace("^0", "0."),
            across(c(.data$answer, .data$max_value), as.numeric),
            correct = (abs(as.numeric(.data$response) - .data$answer) / .data$max_value < threshold)) |>
     select(-c("answer", "max_value"))
