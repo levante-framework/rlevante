@@ -1,25 +1,50 @@
-#' recode correctness + reclassify items for HF
+#' recode correctness and/or items for several tasks
 #'
 #' @param df trial data
+#' @param slider_threshold max normalized distance from slider target
 #'
 #' @export
-recode_hf <- function(df) {
+recode_trials <- \(df, slider_threshold = 0.15) {
+  item_fixes <- tribble(
+    ~item_uid,             ~answer_fixed,
+    "math_subtract_37_24", "13"
+  )
+
+  # recode correctness for HF, SDS, math slider items, and items with wrong answers
+  df |>
+    mutate(original_correct = correct, .after = correct) |>
+    recode_hf() |>
+    # recode_sds() |>
+    recode_wrong_items(item_fixes) |>
+    recode_slider(slider_threshold) |>
+    recode_tom() |>
+    # set chance values for slider items accordingly
+    mutate(chance = if_else(item_group == "slider", 1 / slider_threshold / 100, chance),
+           chance = chance |> replace_na(0))
+}
+
+#' recode correctness + reclassify items for HF
+#'
+#' @inheritParams recode_trials
+#'
+#' @export
+recode_hf <- \(df) {
   hf_trials <- df |>
-    filter("item_task" == "hf") |>
+    filter(.data$item_task == "hf") |>
     # code too fast/slow RTs as incorrect
-    mutate(response_fast = "rt_numeric" < 200, response_slow = "rt_numeric" > 2000,
-           correct = "correct" & !"response_fast" & !"response_slow") |>
+    mutate(response_fast = .data$rt_numeric < 200, response_slow = .data$rt_numeric > 2000,
+           correct = .data$correct & !.data$response_fast & !.data$response_slow) |>
     select(-"response_fast", -"response_slow") |>
     # recode items based on whether they're same as previous item
-    group_by("run_id", "item_group") |>
-    arrange("trial_number") |>
+    group_by(.data$run_id, .data$item_group) |>
+    arrange(.data$trial_number) |>
     mutate(hf_type = case_when(
-      is.na(lag("item")) ~ "start",
-      "item" == lag("item") ~ "stay",
-      "item" != lag("item") ~ "switch")) |>
+      is.na(lag(.data$item)) ~ "start",
+      .data$item == lag(.data$item) ~ "stay",
+      .data$item != lag(.data$item) ~ "switch")) |>
     ungroup() |>
-    mutate(item = paste("item", "hf_type", sep = "_"),
-           item_uid = paste("item_group", "item", sep = "_")) |>
+    mutate(item = paste(.data$item, .data$hf_type, sep = "_"),
+           item_uid = paste(.data$item_group, .data$item, sep = "_")) |>
     # filter(hf_type != "start") |>
     select(-"hf_type")
 
@@ -30,39 +55,38 @@ recode_hf <- function(df) {
 
 #' recode correctness for slider
 #'
-#' @inheritParams recode_hf
-#' @param threshold max normalized distance from slider target
+#' @inheritParams recode_trials
 #'
 #' @export
-recode_slider <- function(df, threshold) {
+recode_slider <- \(df, slider_threshold) {
   slider_trials <- df |>
-    filter("item_group" == "slider") |>
+    filter(.data$item_group == "slider") |>
     # get target and max values out of item
-    tidyr::separate_wider_delim("item", "_",
+    tidyr::separate_wider_delim(cols = "item", "_",
                                 names = c("target", "max_value"),
                                 cols_remove = FALSE) |>
     # convert target and max values to numeric and compute if within threshold
-    mutate(target = "target" |> stringr::str_replace("^0", "0."),
-           across(c("target", "max_value"), as.numeric),
-           correct = (abs(as.numeric("response") - "target") / "max_value" < "threshold")) |>
+    mutate(target = .data$target |> stringr::str_replace("^0", "0."),
+           across(c(.data$target, .data$max_value), as.numeric),
+           correct = (abs(as.numeric(.data$response) - .data$target) / .data$max_value < slider_threshold)) |>
     # remove trials where response greater than max value (must be from a bug)
-    filter(as.numeric("response") <= "max_value") |>
+    filter(as.numeric(.data$response) <= .data$max_value) |>
     select(-c("target", "max_value"))
   df |>
-    filter("item_group" != "slider") |>
+    filter(.data$item_group != "slider") |>
     bind_rows(slider_trials)
 }
 
 #' recode correctness for items with wrong answers
 #'
-#' @inheritParams recode_hf
+#' @inheritParams recode_trials
 #' @param wrong_items tibble with columns item_uid and answer_fixed
 #'
 #' @export
-recode_wrong_items <- function(df, wrong_items) {
+recode_wrong_items <- \(df, wrong_items) {
   wrong_trials <- df |>
     right_join(wrong_items) |>
-    mutate(correct = !is.na("response") & "response" == "answer_fixed")
+    mutate(correct = !is.na(.data$response) & .data$response == .data$answer_fixed)
   df |>
     anti_join(wrong_items) |>
     bind_rows(wrong_trials)
@@ -70,20 +94,20 @@ recode_wrong_items <- function(df, wrong_items) {
 
 #' recode items for ToM
 #'
-#' @inheritParams recode_hf
+#' @inheritParams recode_trials
 #' @export
 recode_tom <- \(df) {
-  tom <- df |> filter("item_task" == "tom")
+  tom <- df |> filter(.data$item_task == "tom")
   tom_disagg <- tom |>
-    mutate(story = stringr::str_extract("item_original", "^[0-9]+"),
+    mutate(story = stringr::str_extract(.data$item_original, "^[0-9]+"),
            item_uid = glue("{item_task}_story{story}_{item_group}_{item}"))
   df |>
-    filter("item_task" != "tom") |>
+    filter(.data$item_task != "tom") |>
     bind_rows(tom_disagg)
 }
 
 # source("rescore_sds.R")
-# recode_sds <- function(df) {
+# recode_sds <- \(df) {
 #   sds <- df |>
 #     filter(item_task == "sds") |> #, site != "us_pilot", item_group!="3unique") |>
 #     filter(!str_detect(response, "mittel|rote|gelb|blau|grün")) |>
@@ -129,7 +153,7 @@ recode_tom <- \(df) {
 #   # Score each row based on accumulating previous selections
 #   sds_rescored <- sds_nested |>
 #     ungroup() |>
-#     mutate(trial_correct = map2(data, trial_type, function(df, type) {
+#     mutate(trial_correct = map2(data, trial_type, \(df, type) {
 #       ignore_dims <- case_when(
 #         type == "same" ~ list(c("number", "bgcolor")),
 #         type == "2match" ~ list(c("number", "bgcolor")),
@@ -138,7 +162,7 @@ recode_tom <- \(df) {
 #       )[[1]]
 #
 #       previous <- list()
-#       map_lgl(df$selection, function(sel) {
+#       map_lgl(df$selection, \(sel) {
 #         result <- compare_selections(sel, previous, ignore_dims)
 #         previous <<- append(previous, list(sel))
 #         result

@@ -28,7 +28,7 @@ rescore <- \(trial_data_task, mod_spec, mod_rec) {
   # get model parameter values
   mod_vals <- model_vals(mod_rec) |> select(-"parnum")
   if (mod_spec$invariance == "scalar") {
-    mod_vals <- mod_vals |> filter("class" != "GroupPars") |> select(-"group") |> distinct()
+    mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> select(-"group") |> distinct()
   }
 
   # get data parameter structure
@@ -41,10 +41,10 @@ rescore <- \(trial_data_task, mod_spec, mod_rec) {
   # replace data parameter values with model values
   # TODO: is dropping item from the model that are not in the data problematic?
   data_vals <- data_pars |>
-    filter("class" != "GroupPars") |>
+    filter(.data$class != "GroupPars") |>
     select("group", "item", "class", "name", "parnum") |>
     left_join(mod_vals) |>
-    bind_rows(data_pars |> filter("class" == "GroupPars"))
+    bind_rows(data_pars |> filter(.data$class == "GroupPars"))
   assertthat::assert_that(nrow(data_vals) == nrow(data_pars))
 
   # set up mirt model for data using constructed parameter values

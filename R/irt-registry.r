@@ -38,7 +38,7 @@ get_model_record <- \(spec, registry_table) {
   mod_filename <- glue("{spec$item_task}/{spec$model_set}/{spec$subset}/{spec$item_task}_{spec$itemtype}_{spec$nfact}_{spec$invariance}.rds")
 
   # get file_id corresponding to filename
-  mod_file <- registry_table |> filter("file_name" == mod_filename) |> pull("file_id")
+  mod_file <- registry_table |> filter(.data$file_name == mod_filename) |> pull("file_id")
 
   # download file
   mod_path <- redivis::redivis$file(mod_file)$download(overwrite = TRUE)
