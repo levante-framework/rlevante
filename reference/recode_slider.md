@@ -7,3 +7,13 @@ recode correctness for slider
 ``` r
 recode_slider(df, threshold)
 ```
+
+## Arguments
+
+- df:
+
+  trial data
+
+- threshold:
+
+  max normalized distance from slider target

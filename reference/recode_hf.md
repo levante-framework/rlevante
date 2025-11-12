@@ -7,3 +7,9 @@ recode correctness + reclassify items for HF
 ``` r
 recode_hf(df)
 ```
+
+## Arguments
+
+- df:
+
+  trial data

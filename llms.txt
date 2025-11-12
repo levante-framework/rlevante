@@ -13,6 +13,18 @@ LEVANTE R package
 - [`ModelRecord-class`](https://levante-framework.github.io/rlevante/reference/ModelRecord-class.md)
   [`ModelRecord`](https://levante-framework.github.io/rlevante/reference/ModelRecord-class.md)
   : ModelRecord class definition
+- [`modelrecord()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`extract_scores()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`show(`*`<ModelRecord>`*`)`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`AIC(`*`<ModelRecord>`*`)`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`BIC(`*`<ModelRecord>`*`)`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`logLik(`*`<ModelRecord>`*`)`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`model_class()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`model_vals()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`items()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`scores()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  [`tabdata()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
+  : constructor helper
 - [`dedupe_items()`](https://levante-framework.github.io/rlevante/reference/dedupe_items.md)
   : add identifiers for each instance of each item
 - [`get_corpus_items()`](https://levante-framework.github.io/rlevante/reference/get_corpus_items.md)
@@ -27,10 +39,14 @@ LEVANTE R package
   dataset
 - [`get_participants()`](https://levante-framework.github.io/rlevante/reference/get_participants.md)
   : Get participants
+- [`get_registry_table()`](https://levante-framework.github.io/rlevante/reference/get_registry_table.md)
+  : Get model registry file index table
 - [`get_runs()`](https://levante-framework.github.io/rlevante/reference/get_runs.md)
   : Get run data
 - [`get_scores()`](https://levante-framework.github.io/rlevante/reference/get_scores.md)
   : Get score data
+- [`get_scoring_table()`](https://levante-framework.github.io/rlevante/reference/get_scoring_table.md)
+  : Get scoring specification table
 - [`get_survey_items()`](https://levante-framework.github.io/rlevante/reference/get_survey_items.md)
   : Get metadata for survey items
 - [`get_surveys()`](https://levante-framework.github.io/rlevante/reference/get_surveys.md)
@@ -51,6 +67,8 @@ LEVANTE R package
   : recode correctness + reclassify items for HF
 - [`recode_slider()`](https://levante-framework.github.io/rlevante/reference/recode_slider.md)
   : recode correctness for slider
+- [`recode_tom()`](https://levante-framework.github.io/rlevante/reference/recode_tom.md)
+  : recode items for ToM
 - [`recode_wrong_items()`](https://levante-framework.github.io/rlevante/reference/recode_wrong_items.md)
   : recode correctness for items with wrong answers
 - [`remove_no_var_items()`](https://levante-framework.github.io/rlevante/reference/remove_no_var_items.md)

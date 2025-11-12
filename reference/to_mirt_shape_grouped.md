@@ -7,3 +7,9 @@ format data for mirt
 ``` r
 to_mirt_shape_grouped(df)
 ```
+
+## Arguments
+
+- df:
+
+  trial data

@@ -5,14 +5,17 @@
 <url><loc>https://levante-framework.github.io/rlevante/authors.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/index.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/ModelRecord-class.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/ModelRecord.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/dedupe_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_corpus_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_mapping_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_model_record.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_model_spec.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_participants.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/get_registry_table.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_runs.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_scores.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/get_scoring_table.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_survey_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_surveys.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_trial_items.html</loc></url>
@@ -24,6 +27,7 @@
 <url><loc>https://levante-framework.github.io/rlevante/reference/notebook_dataset.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/recode_hf.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/recode_slider.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/recode_tom.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/recode_wrong_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/remove_no_var_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/rescore.html</loc></url>
