@@ -61,7 +61,8 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   scores |>
     as_tibble() |>
     rename(score = "F1", score_se = "SE_F1") |>
-    mutate(run_id = rownames(data_prepped), .before = everything())
+    mutate(run_id = rownames(data_prepped), .before = everything()) |>
+    mutate(score_type = "ability", scoring_model = mod_spec_str(mod_spec))
 }
 
 #' scores from CAT
@@ -158,8 +159,7 @@ score <- \(task, dataset, trials, runs, scoring_table, registry_table) {
   if (task %in% irt_tasks) {
     mod_spec <- get_model_spec(task, dataset, scoring_table)
     mod_rec <- get_model_record(mod_spec, registry_table)
-    scores <- score_irt(trials, mod_spec, mod_rec) |>
-      mutate(score_type = "ability", scoring_model = mod_spec_str(mod_spec))
+    scores <- score_irt(trials, mod_spec, mod_rec)
   } else if (task %in% cat_tasks) {
     scores <- score_cat(runs)
   } else if (task %in% names(custom_tasks)) {

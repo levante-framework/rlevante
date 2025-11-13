@@ -89,7 +89,8 @@ recode_wrong_items <- \(df, wrong_items) {
     mutate(correct = !is.na(.data$response) & .data$response == .data$answer_fixed)
   df |>
     anti_join(wrong_items) |>
-    bind_rows(wrong_trials)
+    bind_rows(wrong_trials) |>
+    select(-"answer_fixed")
 }
 
 #' recode items for ToM
@@ -100,7 +101,8 @@ recode_tom <- \(df) {
   tom <- df |> filter(.data$item_task == "tom")
   tom_disagg <- tom |>
     mutate(story = stringr::str_extract(.data$item_original, "^[0-9]+"),
-           item_uid = glue("{item_task}_story{story}_{item_group}_{item}"))
+           item_uid = glue("{item_task}_story{story}_{item_group}_{item}")) |>
+    select(-"story")
   df |>
     filter(.data$item_task != "tom") |>
     bind_rows(tom_disagg)
