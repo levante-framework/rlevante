@@ -167,6 +167,7 @@ score <- \(task, dataset, trials, runs, scoring_table, registry_table) {
     scores <- exec(scoring_fun, trials, dataset)
   } else {
     message(glue('--No scoring method found'))
+    scores <- NULL
   }
 
   scores
