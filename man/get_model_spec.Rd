@@ -4,14 +4,14 @@
 \alias{get_model_spec}
 \title{get the scoring specification in scoring_table for a given task + dataset}
 \usage{
-get_model_spec(scoring_table, score_task, score_dataset)
+get_model_spec(score_task, score_dataset, scoring_table)
 }
 \arguments{
-\item{scoring_table}{tibble returned by get_scoring_table()}
-
 \item{score_task}{string indicating task}
 
 \item{score_dataset}{string indicating dataset}
+
+\item{scoring_table}{tibble returned by get_scoring_table()}
 }
 \value{
 list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance

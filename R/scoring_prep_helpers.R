@@ -12,15 +12,15 @@ recode_trials <- \(df, slider_threshold = 0.15) {
 
   # recode correctness for HF, SDS, math slider items, and items with wrong answers
   df |>
-    mutate(original_correct = correct, .after = correct) |>
+    mutate(original_correct = .data$correct, .after = .data$correct) |>
     recode_hf() |>
     # recode_sds() |>
     recode_wrong_items(item_fixes) |>
     recode_slider(slider_threshold) |>
     recode_tom() |>
     # set chance values for slider items accordingly
-    mutate(chance = if_else(item_group == "slider", 1 / slider_threshold / 100, chance),
-           chance = chance |> replace_na(0))
+    mutate(chance = if_else(.data$item_group == "slider", 1 / slider_threshold / 100, .data$chance),
+           chance = .data$chance |> replace_na(0))
 }
 
 #' recode correctness + reclassify items for HF

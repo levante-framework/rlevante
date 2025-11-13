@@ -18,7 +18,7 @@ get_scoring_table <- \() {
 #' @return list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance
 #'
 #' @export
-get_model_spec <- \(scoring_table, score_task, score_dataset) {
+get_model_spec <- \(score_task, score_dataset, scoring_table) {
   mod_spec <- scoring_table |> filter(.data$item_task == score_task, .data$dataset == score_dataset)
   if (nrow(mod_spec) == 0) stop(glue('No scoring model specified for task "{score_task}" and dataset "{score_dataset}"'))
   if (nrow(mod_spec) > 1) stop(glue('Multiple scoring models specified for task "{score_task}" and dataset "{score_dataset}"'))
@@ -35,7 +35,8 @@ get_model_spec <- \(scoring_table, score_task, score_dataset) {
 get_model_record <- \(spec, registry_table) {
 
   # construct filename from specification
-  mod_filename <- glue("{spec$item_task}/{spec$model_set}/{spec$subset}/{spec$item_task}_{spec$itemtype}_{spec$nfact}_{spec$invariance}.rds")
+  mod_basename <- spec[c("item_task", "itemtype", "nfact", "invariance")] |> discard(is.na) |> paste(collapse = "_")
+  mod_filename <- glue("{spec$item_task}/{spec$model_set}/{spec$subset}/{mod_basename}.rds")
 
   # get file_id corresponding to filename
   mod_file <- registry_table |> filter(.data$file_name == mod_filename) |> pull("file_id")
