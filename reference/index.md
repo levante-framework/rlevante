@@ -67,8 +67,16 @@
   : recode correctness for items with wrong answers
 - [`remove_no_var_items()`](https://levante-framework.github.io/rlevante/reference/remove_no_var_items.md)
   : remove items with no variance
-- [`rescore()`](https://levante-framework.github.io/rlevante/reference/rescore.md)
+- [`score()`](https://levante-framework.github.io/rlevante/reference/score.md)
+  : score
+- [`score_cat()`](https://levante-framework.github.io/rlevante/reference/score_cat.md)
+  : scores from CAT
+- [`score_irt()`](https://levante-framework.github.io/rlevante/reference/score_irt.md)
   : given trial data and model record, score data from corresponding
   model
+- [`score_pa()`](https://levante-framework.github.io/rlevante/reference/score_pa.md)
+  : scores for PA
+- [`score_sre()`](https://levante-framework.github.io/rlevante/reference/score_sre.md)
+  : scores for SRE
 - [`to_mirt_shape_grouped()`](https://levante-framework.github.io/rlevante/reference/to_mirt_shape_grouped.md)
   : format data for mirt

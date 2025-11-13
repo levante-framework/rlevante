@@ -6,14 +6,10 @@ dataset
 ## Usage
 
 ``` r
-get_model_spec(scoring_table, score_task, score_dataset)
+get_model_spec(score_task, score_dataset, scoring_table)
 ```
 
 ## Arguments
-
-- scoring_table:
-
-  tibble returned by get_scoring_table()
 
 - score_task:
 
@@ -22,6 +18,10 @@ get_model_spec(scoring_table, score_task, score_dataset)
 - score_dataset:
 
   string indicating dataset
+
+- scoring_table:
+
+  tibble returned by get_scoring_table()
 
 ## Value
 
