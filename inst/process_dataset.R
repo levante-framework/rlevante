@@ -12,6 +12,7 @@ get_raw_datasets <- \() {
 }
 
 update_workflow_source <- \(wf, raw_dataset) {
+  message(glue("Updating workflow raw dataset to {raw_dataset$name}"))
   # get reference to workflow datasource that aren't metadata
   wf_raw_datasource <- wf$list_datasources() |>
     discard(\(ds) str_detect(ds$properties$sourceDataset$name, "metadata")) |>
@@ -23,7 +24,8 @@ update_workflow_source <- \(wf, raw_dataset) {
 }
 
 update_workflow_metadata <- \(wf) {
-  # get reference to workflow datasource that are metadata
+  message("Updating workflow metadata datasets")
+  # get reference to workflow datasources that are metadata
   wf_metadata <- wf$list_datasources() |>
     keep(\(ds) str_detect(ds$properties$sourceDataset$name, "metadata"))
 
@@ -33,6 +35,7 @@ update_workflow_metadata <- \(wf) {
 }
 
 run_workflow_nodes <- \(wf) {
+  message("Running workflow")
   # get list of summary workflow transforms
   transforms <- wf$list_transforms()
   transform_list <- set_names(transforms, map(transforms, \(tr) tr$scoped_reference))
@@ -50,7 +53,10 @@ run_workflow_nodes <- \(wf) {
                    transform_list$`runs_scored:zbhg`,
                    notebook_list$`outputs:b0wn`)
   # run nodes
-  walk(wf_nodes, \(node) node$run())
+  walk(wf_nodes, \(node) {
+    message(glue("Running workflow node {node$name}"))
+    node$run()
+  })
   return(wf)
 }
 
@@ -65,5 +71,28 @@ process_raw_dataset <- \(wf, raw_dataset) {
 wf <- redivis$organization("levante")$workflow("process_dataset:zr0v")
 
 raw_datasets <- get_raw_datasets()
-process_raw_dataset(wf, raw_datasets[[3]])
+# process_raw_dataset(wf, raw_datasets[[3]])
 # walk(raw_datasets, \(ds) process_raw_dataset(wf, ds))
+
+# scoring_table <- get_scoring_table()
+#
+# get_dataset_tasks <- \(ds) {
+#   ds$table("tasks")$to_tibble() |> filter(task_id != "schema_row") |> mutate(dataset = ds$name, .before = everything())
+# }
+#
+# dataset_tasks <- raw_datasets |> map(get_dataset_tasks) |> list_rbind()
+#
+# irt_tasks <- c("memory-game",
+#                "same-different-selection",
+#                "egma-math",
+#                "hearts-and-flowers",
+#                "trog",
+#                "theory-of-mind",
+#                "vocab",
+#                "matrix-reasoning",
+#                "mental-rotation")
+#
+# dataset_tasks |>
+#   filter(task_id %in% irt_tasks) |>
+#   mutate(dataset = dataset |> str_replace_all("-", "_")) |>
+#   anti_join(scoring_table)
