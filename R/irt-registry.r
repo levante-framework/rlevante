@@ -1,13 +1,13 @@
 #' Get model registry file index table
 #' @export
 get_registry_table <- \() {
-  redivis::redivis$organization("levante")$dataset("scoring:e97h")$table("model_registry:rqwv")$to_tibble()
+  redivis::redivis$organization("levante")$dataset("levante_metadata_scoring:e97h")$table("model_registry:rqwv")$to_tibble()
 }
 
 #' Get scoring specification table
 #' @export
 get_scoring_table <- \() {
-  redivis::redivis$organization("levante")$dataset("scoring:e97h")$table("scoring_models:t416")$to_tibble()
+  redivis::redivis$organization("levante")$dataset("levante_metadata_scoring:e97h")$table("scoring_models:t416")$to_tibble()
 }
 
 #' get the scoring specification in scoring_table for a given task + dataset

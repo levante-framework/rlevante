@@ -325,7 +325,7 @@ get_surveys <- function(dataset_spec,
 }
 
 get_metadata_table <- function(table_name) {
-  metadata <- redivis::redivis$organization("levante")$dataset("item_metadata")
+  metadata <- redivis::redivis$organization("levante")$dataset("levante_metadata_items:czjv")
   message(glue::glue("Fetching item metadata for {table_name}"))
   suppressWarnings(
     metadata$table(table_name)$to_tibble()
@@ -340,7 +340,7 @@ get_metadata_table <- function(table_name) {
 #' trial_items <- get_trial_items()
 #' }
 get_trial_items <- function() {
-  get_metadata_table("trial_items")
+  get_metadata_table("trial_items:hjas")
 }
 
 #' Get metadata for mapping items
@@ -351,7 +351,7 @@ get_trial_items <- function() {
 #' mapping_items <- get_mapping_items()
 #' }
 get_mapping_items <- function() {
-  get_metadata_table("mapping_items")
+  get_metadata_table("mapping_items:6v86")
 }
 
 #' Get metadata for corpus items
@@ -362,7 +362,7 @@ get_mapping_items <- function() {
 #' corpus_items <- get_corpus_items()
 #' }
 get_corpus_items <- function() {
-  get_metadata_table("corpus_items")
+  get_metadata_table("corpus_items:ezfc")
 }
 
 #' Get metadata for survey items
@@ -373,7 +373,7 @@ get_corpus_items <- function() {
 #' survey_items <- get_survey_items()
 #' }
 get_survey_items <- function() {
-  get_metadata_table("survey_items") |>
+  get_metadata_table("survey_items:tfw0") |>
     arrange(.data$survey_type, .data$variable_order)
 }
 
