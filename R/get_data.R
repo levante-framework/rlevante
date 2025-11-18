@@ -240,11 +240,14 @@ get_runs <- function(dataset_spec,
                      max_results = NULL) {
 
   run_vars <- c("run_id", "runs.user_id", "runs.task_id", "runs.task_version",
-                "runs.variant_id", "variants.name AS variant_name",
-                "variants.language",
-                "runs.administration_id", "administrations.public_name AS administration_name",
+                "runs.administration_id", #"administrations.public_name AS administration_name",
+                "variants.language", "time_started", "time_finished",
+                "num_attempted", "num_correct",
                 "test_comp_theta_estimate", "test_comp_theta_se",
-                "time_started", "completed", "valid_run", "validation_msg_run")
+                "completed", "valid_run", "validation_msg_run",
+                "runs.variant_id", "variants.name AS variant_name",
+                "variants.max_incorrect", "variants.max_time",
+                "variants.sequential_stimulus", "variants.corpus")
   user_vars <- c("birth_month", "birth_year")
   query_str <- glue("SELECT {paste(c(run_vars, user_vars), collapse = ', ')}
                     FROM runs
@@ -273,17 +276,18 @@ get_runs <- function(dataset_spec,
     # code whether run is adaptive
     mutate(adaptive = .data$variant_name |>
              str_to_lower() |> str_detect("adaptive"),
-           .after = .data$variant_name) |>
+           .after = "language") |>
     # code run language
     mutate(language = if_else(!is.na(.data$language), .data$language,
                               str_extract(.data$variant_name, "^[a-z][a-z]"))) |>
-    left_join(missing_langs) |>
+    left_join(missing_langs, by = "variant_id") |>
     mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
     select(-"lang") |>
     # validate birth month/year and compute age
     mutate(birth_month = validate_birth_month(.data$birth_month),
            birth_year = validate_birth_year(.data$birth_year),
-           age = compute_age(.data$birth_month, .data$birth_year, .data$time_started)) |>
+           age = compute_age(.data$birth_month, .data$birth_year, .data$time_started),
+           .after = "administration_id") |>
     select(-c("birth_month", "birth_year")) |>
     arrange(.data$time_started) |>
     tidyr::separate_wider_delim(cols = "dataset", delim = ":",
