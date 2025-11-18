@@ -12,7 +12,7 @@ recode_trials <- \(df, slider_threshold = 0.15) {
 
   # recode correctness for HF, SDS, math slider items, and items with wrong answers
   df |>
-    mutate(original_correct = .data$correct, .after = .data$correct) |>
+    mutate(original_correct = .data$correct, .after = "correct") |>
     recode_hf() |>
     # recode_sds() |>
     recode_wrong_items(item_fixes) |>
@@ -49,7 +49,7 @@ recode_hf <- \(df) {
     select(-"hf_type")
 
   df |>
-    filter("item_task" != "hf") |>
+    filter(.data$item_task != "hf") |>
     bind_rows(hf_trials)
 }
 
