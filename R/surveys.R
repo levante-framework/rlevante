@@ -55,8 +55,8 @@ link_surveys <- function(surveys, participants) {
     mutate(survey_group = .data$survey_part) |>
     nest(survey_data = -c("survey_type", "survey_response_id",
                           "timestamp", "survey_group", "user_id", "child_id")) |>
-    mutate(n_responses = map_int(survey_data, nrow)) |>
-    filter(n_responses > 1)
+    mutate(n_responses = map_int(.data$survey_data, nrow)) |>
+    filter(.data$n_responses > 1)
 
   children <- participants |> rename(child_id = "user_id")
 
@@ -100,9 +100,10 @@ link_surveys <- function(surveys, participants) {
 
   # caregiver survey combined
   survey_caregiver <- bind_rows(survey_household, survey_child) |>
-    group_by(survey_response_id, survey_type, user_id, child_id, timestamp) |>
-    summarise(survey_data = list(list_rbind(survey_data)),
-              n_responses = sum(n_responses))
+    group_by(.data$survey_response_id, .data$survey_type, .data$user_id,
+             .data$child_id, .data$timestamp) |>
+    summarise(survey_data = list(list_rbind(.data$survey_data)),
+              n_responses = sum(.data$n_responses))
 
   # survey_caregiver <- survey_child |>
   #   full_join(survey_household,
@@ -116,7 +117,7 @@ link_surveys <- function(surveys, participants) {
               by = c("child_id")) |>
     mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$timestamp)) |>
     select(-contains("birth_")) |>
-    rename(respondent_id = user_id, survey_timestamp = "timestamp") |>
+    rename(respondent_id = "user_id", survey_timestamp = "timestamp") |>
     mutate(survey_type = .data$survey_type |> str_replace("student", "child")) |>
     relocate("survey_data", .after = everything())
 

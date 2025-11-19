@@ -14,7 +14,7 @@ recode_trials <- \(df, slider_threshold = 0.15) {
   df |>
     mutate(original_correct = .data$correct, .after = "correct") |>
     recode_hf() |>
-    # recode_sds() |>
+    recode_sds() |>
     recode_wrong_items(item_fixes) |>
     recode_slider(slider_threshold) |>
     recode_tom() |>
@@ -108,82 +108,74 @@ recode_tom <- \(df) {
     bind_rows(tom_disagg)
 }
 
-# source("rescore_sds.R")
-# recode_sds <- \(df) {
-#   sds <- df |>
-#     filter(item_task == "sds") |> #, site != "us_pilot", item_group!="3unique") |>
-#     filter(!str_detect(response, "mittel|rote|gelb|blau|grün")) |>
-#     filter(!(site == "pilot_western_ca" & timestamp < "2025-02-21"))
-#
-#   # ToDo: apply per user and run to 3-match and 4-match (maybe test on 2-match? shouldn't influence outcome)
-#   dimension_indices <- c(size = 1, color = 2, shape = 3, number = 4, bgcolor = 5)
-#
-#   sds_parsed <- sds |>
-#     filter(!item_group %in% c("dimensions", "same")) |>
-#     mutate(selection = map(response, parse_response)) |>
-#     select(site, run_id, trial_id, trial_type = item_group, item, response,
-#            selection, correct, timestamp)
-#
-#   # Order by user, run, and timestamp (or trial_number)
-#   sds_trials <- sds_parsed |>
-#     group_by(run_id, item_group) |>
-#     arrange(timestamp, .by_group = TRUE) |>
-#     mutate(trial_index = NA_integer_) |>
-#     mutate(trial_index = if_else(item == "choice1", 1L, NA_integer_)) |>
-#     mutate(trial_index = cumsum(!is.na(trial_index))) |>
-#     ungroup() |>
-#     filter(trial_index != 0)
-#
-#   sds_disambig <- sds_trials %>%
-#     group_by(run_id, trial_type, trial_index) %>%
-#     mutate(
-#       item = case_when(
-#         trial_type %in% c("3match", "4match") ~ paste0("choice", row_number()),
-#         TRUE ~ item
-#       )
-#     ) %>%
-#     ungroup()
-#
-#   # Nest by trial
-#   sds_nested <- sds_disambig |>
-#     select(run_id, trial_type, trial_index, item, response, selection, correct, trial_id) |>
-#     group_by(run_id, trial_type, trial_index) |>
-#     arrange(item) |>
-#     nest(data = c(item, response, selection, correct, trial_id)) |>
-#     ungroup()
-#
-#   # Score each row based on accumulating previous selections
-#   sds_rescored <- sds_nested |>
-#     ungroup() |>
-#     mutate(trial_correct = map2(data, trial_type, \(df, type) {
-#       ignore_dims <- case_when(
-#         type == "same" ~ list(c("number", "bgcolor")),
-#         type == "2match" ~ list(c("number", "bgcolor")),
-#         type %in% c("3match", "4match") ~ list(c("size")),
-#         TRUE ~ list(character(0))
-#       )[[1]]
-#
-#       previous <- list()
-#       map_lgl(df$selection, \(sel) {
-#         result <- compare_selections(sel, previous, ignore_dims)
-#         previous <<- append(previous, list(sel))
-#         result
-#       })
-#     })) |>
-#     unnest(c(data, trial_correct))
-#
-#   sds_trials <- sds |>
-#     select(-item_uid) |>
-#     left_join(sds_rescored |> select(trial_id, trial_correct, trial_item = item, trial_index)) |>
-#     mutate(#original_correct = correct,
-#       correct = if_else(!is.na(trial_correct), trial_correct, correct),
-#       item = if_else(!is.na(trial_item), trial_item, item),
-#       item_uid = paste(item_task, item_group, item, sep = "_")) |>
-#     # original_item = item,
-#     # ) |>
-#     select(-trial_correct, -trial_item)
-#
-#   df |>
-#     filter(item_task != "sds") |>
-#     bind_rows(sds_trials)
-# }
+#' recode correctness for SDS
+#'
+#' @inheritParams recode_trials
+#' @export
+recode_sds <- function(df) {
+
+  sds_data <- df |>
+    filter(.data$item_task == "sds" & str_detect(.data$item_group, "match")) |>
+    filter(!str_detect(.data$response, "mittel|rote|gelb|blau|gr\u00FCn")) |>
+    filter(!(.data$dataset == "pilot_western_ca_main" & .data$timestamp < "2025-02-21"))
+
+  sds_indexed <- sds_data |>
+    mutate(different = str_detect(.data$item_original, "different")) |>
+    group_by(.data$run_id, .data$item_group) |>
+    arrange(.data$timestamp, .by_group = TRUE) |>
+    # use positions of "choice1" to infer a trial index grouping choices together
+    mutate(trial_index = if_else(.data$item == "choice1", 1, 0)) |>
+    mutate(trial_index = cumsum(.data$trial_index)) |>
+    # use positions of "different" prompt to infer trial index
+    mutate(trial_index_s = as.numeric(!.data$different)) |>
+    mutate(trial_index_s = cumsum(.data$trial_index_s)) |>
+    ungroup()
+
+  sds_match <- sds_indexed |>
+    # remove blocks that have any mis-indexed trials
+    group_by(.data$run_id, .data$item_group) |>
+    filter(all(.data$trial_index == .data$trial_index_s)) |>
+    # remove trials if they have fewer (or too many) rows than they should
+    # e.g. only 2 rows for 3match
+    mutate(match_k = str_extract(.data$item_group, "^.") |> as.numeric()) |>
+    group_by(.data$run_id, .data$item_group, .data$trial_index) |>
+    filter(n() == unique(.data$match_k)) |>
+    # remove trials that don't have consistent response options for every response
+    filter(n_distinct(.data$distractors) == 1) |>
+    ungroup() |>
+    # remove rows with any response that isn't two cards
+    # filter(str_count(response, ":") == 2) |>
+    select("run_id", "trial_index", "item_group", "match_k", "trial_id",
+           "item", resp = "response", opts = "distractors", "correct", "original_correct")
+
+  # parse response and options strings into vectors of stimuli
+  sds_opts <- sds_match |>
+    mutate(resp_parsed = .data$resp |> map(parse_response) |> map(sort),
+           opts_parsed = .data$opts |> map(parse_response) |> map(sort))
+
+  sds_coded <- sds_opts |>
+    # code dimension values for each stimulus in response and options
+    mutate(resp_coded = map2(.data$resp_parsed, .data$item_group, code_dims),
+           opts_coded = map2(.data$opts_parsed, .data$item_group, code_dims))
+
+  sds_dims <- sds_coded |>
+    mutate(opts_dims = map(.data$opts_coded, match_opts_dims),
+           resp_dims = map2(.data$resp_coded, .data$opts_dims, match_resp_dims)) |>
+    mutate(n_matches = map_int(.data$opts_dims, sum))
+
+  sds_correct <- sds_dims |>
+    mutate(subtrial_match = map_int(.data$resp_dims, length) > 0) |>
+    select("run_id", "item_group", "trial_index", "trial_id", "resp", "subtrial_match") |>
+    nest(trials = c("trial_id", "resp", "subtrial_match")) |>
+    mutate(new = map(.data$trials, \(tr) map_lgl(1:nrow(tr), \(i) i == 1 | !(tr$resp[i] %in% tr$resp[1:(i-1)]))),
+           correct = map2(.data$trials, .data$new, \(tr, ne) tr |> mutate(new = ne, correct = .data$subtrial_match & new))) |>
+    select(-"new", -"trials") |>
+    unnest("correct") |>
+    select("run_id", "trial_id", "correct")
+
+  sds_trials <- sds_data |> select(-"correct") |> inner_join(sds_correct)
+
+  df |>
+    filter(!(.data$item_task == "sds" & str_detect(.data$item_group, "match"))) |>
+    bind_rows(sds_trials)
+}
