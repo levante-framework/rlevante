@@ -30,7 +30,9 @@ code_survey_data <- function(surveys) {
                            .data$value)) |>
     select("dataset", "survey_response_id", "survey_type", "survey_part",
            "user_id", "child_id", contains("construct"), "question_type",
-           "variable", "variable_order", "value", timestamp = "created_at")
+           "variable", "variable_order", "value", "boolean_response",
+           "string_response", "numeric_response", "is_complete",
+           timestamp = "created_at")
 }
 
 
@@ -119,6 +121,7 @@ link_surveys <- function(surveys, participants) {
     relocate("survey_data", .after = everything())
 
   survey_combined |> unnest("survey_data") |>
+    mutate(survey_part = .data$survey_part |> str_replace("student", "child")) |>
     select(-"n_responses") |>
     relocate(c("dataset", "ref", "version"), .before = everything())
 }
