@@ -325,7 +325,9 @@ get_surveys <- function(dataset_spec,
   surveys |>
     # mutate(survey_part = if_else(is.na(survey_part), survey_type, survey_part)) |>
     add_survey_items() |>
-    code_survey_data()
+    code_survey_data() |>
+    tidyr::separate_wider_delim(cols = "dataset", delim = ":",
+                                names = c("dataset", "ref", "version"))
 }
 
 get_metadata_table <- function(table_name) {

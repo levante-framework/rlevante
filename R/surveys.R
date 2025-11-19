@@ -45,59 +45,80 @@ code_survey_data <- function(surveys) {
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' surveys <- get_surveys(dataset_spec)
 #' participants <- get_participants(dataset_spec)
-#' survey_data <- surveys |>
-#'   link_surveys(participants)
+#' survey_data <- surveys |> link_surveys(participants)
 #' }
 link_surveys <- function(surveys, participants) {
 
   user_survey_data <- surveys |>
     mutate(survey_group = .data$survey_part) |>
-    nest(survey_data = -c("dataset", "survey_type", "survey_response_id",
-                          "timestamp", "survey_group", "user_id", "child_id"))
+    nest(survey_data = -c("survey_type", "survey_response_id",
+                          "timestamp", "survey_group", "user_id", "child_id")) |>
+    mutate(n_responses = map_int(survey_data, nrow)) |>
+    filter(n_responses > 1)
 
   children <- participants |> rename(child_id = "user_id")
 
   # student survey -- user_id is child
   survey_student <- user_survey_data |>
     filter(.data$survey_type == "student") |>
-    mutate(child_id = .data$user_id)
+    mutate(child_id = .data$user_id) |>
+    select(-"survey_group")
 
   # teacher survey -- user_id is teacher
   teachers <- children |>
     filter(.data$teacher_id != "") |>
-    select("dataset", "child_id", "teacher_id") |>
-    nest(children = -c("dataset", "teacher_id"))
+    select("child_id", "teacher_id") |>
+    nest(children = -c("teacher_id"))
 
   survey_teacher <- user_survey_data |>
     filter(.data$survey_type == "teacher") |>
     select(-"child_id") |>
-    left_join(teachers, by = c("dataset", "user_id" = "teacher_id")) |>
-    unnest(.data$children) |>
-    select(-"children")
+    left_join(teachers, by = c("user_id" = "teacher_id")) |>
+    unnest("children") |>
+    select(-"survey_group")
 
+  parents <- children |>
+    select("child_id", "parent1_id", "parent2_id") |>
+    tidyr::pivot_longer(cols = c("parent1_id", "parent2_id"), names_to = NULL, values_to = "parent_id") |>
+    filter(!is.na(.data$parent_id))
+
+  # caregiver survey, household (across children) section
   survey_household <- user_survey_data |>
     filter(.data$survey_type == "caregiver", stringr::str_detect(.data$survey_group, "caregiver")) |>
-    rename(survey_household = "survey_data") |>
-    select(-"survey_group")
+    # rename(survey_household = "survey_data") |>
+    select(-"survey_group", -"child_id") |>
+    inner_join(parents, by = c("user_id" = "parent_id"), relationship = "many-to-many") |>
+    relocate("child_id", .after = "user_id")
 
+  # caregiver survey, child-specific section
   survey_child <- user_survey_data |>
     filter(.data$survey_type == "caregiver", .data$survey_group == "child_specific") |>
-    rename(survey_child = "survey_data") |>
+    # rename(survey_child = "survey_data") |>
     select(-"survey_group")
 
-  survey_caregiver <- survey_child |>
-    left_join(survey_household) |>
-    mutate(survey_data = map2(.data$survey_child, .data$survey_household, bind_rows)) |>
-    select(-"survey_child", -"survey_household")
+  # caregiver survey combined
+  survey_caregiver <- bind_rows(survey_household, survey_child) |>
+    group_by(survey_response_id, survey_type, user_id, child_id, timestamp) |>
+    summarise(survey_data = list(list_rbind(survey_data)),
+              n_responses = sum(n_responses))
+
+  # survey_caregiver <- survey_child |>
+  #   full_join(survey_household,
+  #             by = join_by(survey_response_id, survey_type, user_id, timestamp)) |>
+  #   mutate(survey_data = map2(.data$survey_child, .data$survey_household, bind_rows)) |>
+  #   select(-"survey_child", -"survey_household")
 
   # recombine separated out survey types
   survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |> #, survey_linked) |>
-    left_join(children |> select("dataset", "child_id", "sex", "birth_month", "birth_year"),
-              by = c("dataset", "child_id")) |>
+    left_join(children |> select("child_id", "birth_month", "birth_year"),
+              by = c("child_id")) |>
     mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$timestamp)) |>
-    select(-contains("birth_"), -"survey_group") |>
-    rename(survey_timestamp = "timestamp") |>
-    relocate(.data$survey_data, .after = everything())
+    select(-contains("birth_")) |>
+    rename(respondent_id = user_id, survey_timestamp = "timestamp") |>
+    mutate(survey_type = .data$survey_type |> str_replace("student", "child")) |>
+    relocate("survey_data", .after = everything())
 
-  survey_combined |> unnest(.data$survey_data)
+  survey_combined |> unnest("survey_data") |>
+    select(-"n_responses") |>
+    relocate(c("dataset", "ref", "version"), .before = everything())
 }
