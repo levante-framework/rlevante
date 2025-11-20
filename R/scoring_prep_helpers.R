@@ -118,6 +118,7 @@ recode_sds <- function(df) {
     filter(.data$item_task == "sds" & str_detect(.data$item_group, "match")) |>
     filter(!str_detect(.data$response, "mittel|rote|gelb|blau|gr\u00FCn")) |>
     filter(!(.data$dataset == "pilot_western_ca_main" & .data$timestamp < "2025-02-21"))
+  if (nrow(sds_data) == 0) return(df)
 
   sds_indexed <- sds_data |>
     mutate(different = str_detect(.data$item_original, "different")) |>
