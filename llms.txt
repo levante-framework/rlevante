@@ -65,6 +65,8 @@ LEVANTE R package
   : Determine dataset of current notebook on Redivis
 - [`recode_hf()`](https://levante-framework.github.io/rlevante/reference/recode_hf.md)
   : recode correctness + reclassify items for HF
+- [`recode_sds()`](https://levante-framework.github.io/rlevante/reference/recode_sds.md)
+  : recode correctness for SDS
 - [`recode_slider()`](https://levante-framework.github.io/rlevante/reference/recode_slider.md)
   : recode correctness for slider
 - [`recode_tom()`](https://levante-framework.github.io/rlevante/reference/recode_tom.md)
