@@ -69,6 +69,10 @@
   : recode correctness for items with wrong answers
 - [`remove_no_var_items()`](https://levante-framework.github.io/rlevante/reference/remove_no_var_items.md)
   : remove items with no variance
+- [`remove_no_var_items_bygroup()`](https://levante-framework.github.io/rlevante/reference/remove_no_var_items_bygroup.md)
+  : remove items with no invariance in any single group
+- [`remove_nonshared_items()`](https://levante-framework.github.io/rlevante/reference/remove_nonshared_items.md)
+  : remove items that aren't shared across all groups
 - [`score()`](https://levante-framework.github.io/rlevante/reference/score.md)
   : score
 - [`score_cat()`](https://levante-framework.github.io/rlevante/reference/score_cat.md)
@@ -80,5 +84,7 @@
   : scores for PA
 - [`score_sre()`](https://levante-framework.github.io/rlevante/reference/score_sre.md)
   : scores for SRE
+- [`to_mirt_shape()`](https://levante-framework.github.io/rlevante/reference/to_mirt_shape.md)
+  : format data for mirt
 - [`to_mirt_shape_grouped()`](https://levante-framework.github.io/rlevante/reference/to_mirt_shape_grouped.md)
   : format data for mirt
