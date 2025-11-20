@@ -164,6 +164,8 @@ recode_sds <- function(df) {
            resp_dims = map2(.data$resp_coded, .data$opts_dims, match_resp_dims)) |>
     mutate(n_matches = map_int(.data$opts_dims, sum))
 
+  if (nrow(sds_dims) == 0) return(df)
+
   sds_correct <- sds_dims |>
     mutate(subtrial_match = map_int(.data$resp_dims, length) > 0) |>
     select("run_id", "item_group", "trial_index", "trial_id", "resp", "subtrial_match") |>
