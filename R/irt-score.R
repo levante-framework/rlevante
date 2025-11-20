@@ -28,7 +28,8 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   # get model parameter values
   mod_vals <- model_vals(mod_rec) |> select(-"parnum")
   if ((!is.na(mod_spec$invariance) & mod_spec$invariance == "scalar") | n_distinct(groups) == 1) {
-    mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> select(-"group") |> distinct()
+    # mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> select(-"group") |> distinct()
+    mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> filter(group == group[[1]]) |> select(-"group")
   }
 
   # get data parameter structure
