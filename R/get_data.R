@@ -49,8 +49,11 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
       mutate(dataset = dataset_refs[[dataset_name]], .before = everything())
   })
 
-  # combine data over datasets
-  bind_rows(dataset_data)
+  dataset_data |>
+    # combine data over datasets
+    bind_rows() |>
+    # remove schema row
+    filter(if_any(matches("_id"), \(v) v != "schema_row"))
 }
 
 #' Get participants
@@ -63,37 +66,37 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' participants <- get_participants(dataset_spec)
 #' }
-get_participants <- function(dataset_spec, max_results = NULL) {
-
-  # get data for the tables with needed user data
-  user_tables <- c("groups", "users", "user_groups")
-  user_data <- user_tables |> rlang::set_names() |>
-    map(\(table_name) get_datasets_data(dataset_spec,
-                                        table_getter(table_name, max_results)))
-
-  # filter users to only children and replace invalid birth months/years with NA
-  users <- user_data$users |>
-    filter(.data$user_type %in% c("guest", "student")) |>
-    mutate(birth_month = validate_birth_month(.data$birth_month),
-           birth_year = validate_birth_year(.data$birth_year))
-
-  # groups
-  groups <- user_data$group |> distinct() |>
-    select("group_id", group_name = "name",
-           group_abbreviation = "abbreviation")
-
-  # combine user to group mapping with groups, collapse groups for each user
-  user_groups <- user_data$user_groups |> distinct() |>
-    select("user_id", "group_id") |>
-    left_join(groups, by = "group_id") |>
-    nest(groups = -.data$user_id)
-
-  # add ages and groups back into users, keep only needed columns
-  users |>
-    left_join(user_groups, by = "user_id") |>
-    select("dataset", "user_id", "birth_month", "birth_year", "sex", "grade",
-           matches("_id"), "groups")
-}
+# get_participants <- function(dataset_spec, max_results = NULL) {
+#
+#   # get data for the tables with needed user data
+#   user_tables <- c("groups", "users", "user_groups")
+#   user_data <- user_tables |> rlang::set_names() |>
+#     map(\(table_name) get_datasets_data(dataset_spec,
+#                                         table_getter(table_name, max_results)))
+#
+#   # filter users to only children and replace invalid birth months/years with NA
+#   users <- user_data$users |>
+#     filter(.data$user_type %in% c("guest", "student")) |>
+#     mutate(birth_month = validate_birth_month(.data$birth_month),
+#            birth_year = validate_birth_year(.data$birth_year))
+#
+#   # groups
+#   groups <- user_data$group |> distinct() |>
+#     select("group_id", group_name = "name",
+#            group_abbreviation = "abbreviation")
+#
+#   # combine user to group mapping with groups, collapse groups for each user
+#   user_groups <- user_data$user_groups |> distinct() |>
+#     select("user_id", "group_id") |>
+#     left_join(groups, by = "group_id") |>
+#     nest(groups = -.data$user_id)
+#
+#   # add ages and groups back into users, keep only needed columns
+#   users |>
+#     left_join(user_groups, by = "user_id") |>
+#     select("dataset", "user_id", "birth_month", "birth_year", "sex", "grade",
+#            matches("_id"), "groups")
+# }
 
 # construct SQL WHERE clause out of a variable name and vector of allowed values
 build_filter <- function(var, vals) {
@@ -239,56 +242,68 @@ get_runs <- function(dataset_spec,
                      remove_invalid_runs = TRUE,
                      max_results = NULL) {
 
-  run_vars <- c("run_id", "runs.user_id", "runs.task_id", "runs.task_version",
-                "runs.administration_id", #"administrations.public_name AS administration_name",
-                "variants.language", "time_started", "time_finished",
-                "num_attempted", "num_correct",
-                "test_comp_theta_estimate", "test_comp_theta_se",
-                "completed", "valid_run", "validation_msg_run",
-                "runs.variant_id", "variants.name AS variant_name",
-                "variants.max_incorrect", "variants.max_time",
-                "variants.sequential_stimulus", "variants.corpus")
-  user_vars <- c("birth_month", "birth_year")
-  query_str <- glue("SELECT {paste(c(run_vars, user_vars), collapse = ', ')}
-                    FROM runs
-                    LEFT JOIN users ON runs.user_id = users.user_id
-                    LEFT JOIN variants ON runs.variant_id = variants.variant_id
-                    LEFT JOIN administrations ON runs.administration_id = administrations.administration_id")
+  run_vars <- c("run_id",
+                "sites.site_id",
+                "sites.site_name",
+                "runs.user_id",
+                "runs.task_id",
+                "runs.task_version",
+                "runs.administration_id",
+                "runs.time_started",
+                "runs.time_finished",
+                "runs.num_attempted",
+                "runs.num_correct",
+                "runs.test_comp_theta_estimate",
+                "runs.test_comp_theta_se",
+                "runs.completed",
+                "runs.valid_run",
+                "runs.validation_msg_run",
+                "runs.variant_id",
+                "variants.variant_name",
+                "variants.language",
+                "variants.adaptive",
+                "variants.max_incorrect",
+                "variants.max_time",
+                "variants.sequential_stimulus",
+                "variants.corpus")
+  query_str <- glue("SELECT {paste(run_vars, collapse = ', ')} FROM runs
+                     LEFT JOIN variants ON runs.variant_id = variants.variant_id
+                     LEFT JOIN user_sites ON runs.user_id = user_sites.user_id
+                     LEFT JOIN sites ON user_sites.site_id = sites.site_id")
 
-  # runs <- get_datasets_data(dataset_spec, table_getter("runs", max_results))
   runs <- get_datasets_data(dataset_spec,
                             query_getter("runs", query_str, max_results))
 
-  runs <- runs |> filter(!(.data$task_id %in% c("intro", "schema_row")))
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
   missing_langs <- tribble(
     ~variant_id,            ~lang,
-    "OYKVpWxFYhA9Qh9w58Qy", "es",
-    "zlOE3yc4n4JimAhGtQ6r", "de",
-    "KNaxHVqdpe2CtS9NLoX8", "de",
-    "rq7PRMzgtkw52HMfxvNW", "en",
-    "8NLzzprrkwJPeY18iRRH", "en"
+    "FPbJw79lcfHKJR3fjABb", "de-DE",
+    "KNaxHVqdpe2CtS9NLoX8", "de-DE",
+    "LTQ0EQ4pvI4FAkjY98Pq", "de-DE",
+    "zlOE3yc4n4JimAhGtQ6r", "de-DE",
+
+    "1Y3K5lAs6yocDwkHH5aT", "es-CO",
+    "OYKVpWxFYhA9Qh9w58Qy", "es-CO",
+    "oD16mNDBnKwPnK7lvaCA", "es-CO",
+
+    "3fFvykenyEYGlAsRfYiJ", "en-US",
+    "5qBz8FFYIsuoYkuGXwVd", "en-US",
+    "8NLzzprrkwJPeY18iRRH", "en-US",
+    "r7o97xl8GcdtcCq651n4", "en-US"
   )
 
+  site_names <- list("pilot_western_ca" = "CA-western-pilot",
+                     "pilot_uniandes_co" = "CO-bogota-pilot",
+                     "pilot_uniandes_co" = "CO-rural-pilot",
+                     "pilot_mpieva_de" = "DE-mpieva-pilot")
+
   runs |>
-    # code whether run is adaptive
-    mutate(adaptive = .data$variant_name |>
-             str_to_lower() |> str_detect("adaptive"),
-           .after = "language") |>
-    # code run language
-    mutate(language = if_else(!is.na(.data$language), .data$language,
-                              str_extract(.data$variant_name, "^[a-z][a-z]"))) |>
+    mutate(site_name = site_name |> forcats::fct_recode(!!!site_names)) |>
     left_join(missing_langs, by = "variant_id") |>
     mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
     select(-"lang") |>
-    # validate birth month/year and compute age
-    mutate(birth_month = validate_birth_month(.data$birth_month),
-           birth_year = validate_birth_year(.data$birth_year),
-           age = compute_age(.data$birth_month, .data$birth_year, .data$time_started),
-           .after = "administration_id") |>
-    select(-c("birth_month", "birth_year")) |>
     arrange(.data$time_started) |>
     tidyr::separate_wider_delim(cols = "dataset", delim = ":",
                                 names = c("dataset", "ref", "version"))
