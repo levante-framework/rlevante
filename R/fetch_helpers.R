@@ -1,0 +1,72 @@
+# given a table name, return a function that takes a dataset reference and
+# returns data from the given table in that dataset
+table_getter <- function(table_name, max_results = NULL) {
+  \(dataset, dataset_table_names) {
+    message(glue("--Fetching table {table_name}"))
+    if (!(table_name %in% dataset_table_names)) return(tibble())
+    suppressWarnings(
+      dataset$table(table_name)$to_tibble(max_results = max_results)
+    )
+  }
+}
+
+# given a sql query, return a function that takes a dataset reference and
+# returns data from executing that sql query in that dataset
+query_getter <- function(table_name, query_str, max_results = NULL) {
+  message(glue("--Executing SQL query"))
+  \(dataset, dataset_table_names) {
+    if (!(table_name %in% dataset_table_names)) return(tibble())
+    suppressWarnings(
+      dataset$query(query_str)$to_tibble(max_results = max_results)
+    )
+  }
+}
+
+# given a dataset spec (list of lists of name and version strings)
+# and a function that takes a dataset and returns a tibble
+# run the function for each dataset and combine results into one tibble
+get_datasets_data <- function(dataset_spec, dataset_fun) {
+
+  # get reference to organization
+  org <- redivis::redivis$organization("levante")
+
+  # get reference to each dataset in dataset_spec
+  datasets <- dataset_spec |>
+    rlang::set_names(map_chr(dataset_spec, \(dn) dn[["name"]])) |>
+    map(\(dn) org$dataset(name = dn$name, version = dn$version))
+
+  # fetch each dataset to populate its properties
+  walk(datasets, \(ds) ds$get())
+
+  # get each dataset's canonical reference (name + persistent ID + version)
+  dataset_refs <- datasets |> map(\(ds) ds$scoped_reference)
+
+  # apply dataset_fun to each dataset
+  dataset_data <- imap(datasets, \(dataset, dataset_name) {
+    message(glue::glue("Fetching data for {dataset_name}"))
+    dataset_table_names <- dataset$list_tables() |> map_chr(\(tbl) tbl$name)
+    dataset_fun(dataset, dataset_table_names) |>
+      mutate(redivis_source = dataset_refs[[dataset_name]], .before = everything())
+  })
+
+  dataset_data |>
+    # combine data over datasets
+    bind_rows() |>
+    # remove schema row
+    filter(if_any(matches("_id"), \(v) v != "schema_row"))
+}
+
+
+# construct SQL WHERE clause out of a variable name and vector of allowed values
+build_filter <- function(var, vals) {
+  vals_str <- glue("'{vals}'") |> paste(collapse = ", ")
+  if (is.null(vals)) "" else glue("WHERE {var} IN ({vals_str})")
+}
+
+get_metadata_table <- function(table_name) {
+  metadata <- redivis::redivis$organization("levante")$dataset("levante_metadata_items:czjv")
+  message(glue::glue("Fetching item metadata for {table_name}"))
+  suppressWarnings(
+    metadata$table(table_name)$to_tibble()
+  )
+}
