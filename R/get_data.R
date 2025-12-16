@@ -46,7 +46,7 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
     message(glue::glue("Fetching data for {dataset_name}"))
     dataset_table_names <- dataset$list_tables() |> map_chr(\(tbl) tbl$name)
     dataset_fun(dataset, dataset_table_names) |>
-      mutate(dataset = dataset_refs[[dataset_name]], .before = everything())
+      mutate(redivis_source = dataset_refs[[dataset_name]], .before = everything())
   })
 
   dataset_data |>
@@ -130,7 +130,7 @@ get_trials_prelim <- function(dataset_spec,
 
   # if participants supplied, filter to trials for only those participants
   if (!is.null(participants)) {
-    trials <- trials |> semi_join(participants, by = c("user_id", "dataset"))
+    trials <- trials |> semi_join(participants, by = "user_id")
   }
 
   # if run filters supplied, get corresponding runs and filter to their trials
@@ -144,22 +144,7 @@ get_trials_prelim <- function(dataset_spec,
   # filter to valid trials
   if (remove_invalid_trials) trials <- trials |> filter(.data$valid_trial)
 
-  trials |>
-    filter(.data$trial_id != "schema_row") |>
-    remove_practice_trials() |>
-    # select("dataset", "task_id", "user_id", "run_id", "trial_id",
-    #        "item_id", "item_uid", "answer", # item_original = "item",
-    #        "response", "correct", "rt", "server_timestamp",
-    #        "valid_trial", "validation_msg_trial") |>
-    convert_rts() |>
-    mutate(response = .data$response |> na_if("nan"))
-  # add_trial_items() |>
-    # add_trial_numbers() |>
-    # arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number)
-    # select("dataset", "task_id", "user_id", "run_id", "trial_id", "trial_number",
-    #        "item_uid", "item_task", "item_group", "item", "chance", #item_id_original,
-    #        "correct", "rt", "rt_numeric", "response", "answer",
-    #        timestamp = "server_timestamp", "valid_trial", "validation_msg_trial")
+  trials |> remove_practice_trials()
 }
 
 #' Get trial data
@@ -197,13 +182,12 @@ get_trials <- function(dataset_spec,
     add_item_ids() |>
     add_item_metadata() |>
     add_trial_numbers() |>
-    tidyr::separate_wider_delim(cols = "dataset", delim = ":",
-                                names = c("dataset", "ref", "version")) |>
-    arrange(.data$dataset, .data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
-    select("dataset", "ref", "version", "task_id", "user_id", "run_id", "trial_id",
+    arrange(.data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
+    select("redivis_source", "task_id", "user_id", "run_id", "trial_id",
            "trial_number", "item_uid", "item_task", "item_group", "item",
-           "chance", "correct", "rt", "rt_numeric", "response", "item_original",
-           "answer", "distractors", timestamp = "server_timestamp",
+           "correct", "rt", "rt_numeric", "response", "response_type",
+           "item_original", "answer", "distractors", "chance", "difficulty",
+           "theta_estimate", "theta_se", timestamp = "server_timestamp",
            "valid_trial", "validation_msg_trial")
 }
 
@@ -242,9 +226,8 @@ get_runs <- function(dataset_spec,
                      remove_invalid_runs = TRUE,
                      max_results = NULL) {
 
-  run_vars <- c("run_id",
-                "sites.site_id",
-                "sites.site_name",
+  run_vars <- c("sites.site_name AS dataset",
+                "run_id",
                 "runs.user_id",
                 "runs.task_id",
                 "runs.task_version",
@@ -294,19 +277,20 @@ get_runs <- function(dataset_spec,
     "r7o97xl8GcdtcCq651n4", "en-US"
   )
 
-  site_names <- list("pilot_western_ca" = "CA-western-pilot",
-                     "pilot_uniandes_co" = "CO-bogota-pilot",
-                     "pilot_uniandes_co" = "CO-rural-pilot",
-                     "pilot_mpieva_de" = "DE-mpieva-pilot")
+  dataset_names <- list("pilot_western_ca_main" = "CA-western-pilot",
+                        "pilot_uniandes_co_bogota" = "CO-bogota-pilot",
+                        "pilot_uniandes_co_rural" = "CO-rural-pilot",
+                        "pilot_mpieva_de_main" = "DE-mpieva-pilot")
 
   runs |>
-    mutate(site_name = site_name |> forcats::fct_recode(!!!site_names)) |>
+    mutate(dataset = dataset |> forcats::fct_recode(!!!dataset_names),
+           site = dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
+           .before = dataset) |>
+    relocate(redivis_source, .after = dataset) |>
     left_join(missing_langs, by = "variant_id") |>
     mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
     select(-"lang") |>
-    arrange(.data$time_started) |>
-    tidyr::separate_wider_delim(cols = "dataset", delim = ":",
-                                names = c("dataset", "ref", "version"))
+    arrange(.data$redivis_source, .data$dataset, .data$time_started)
 }
 
 #' Get survey data

@@ -4,8 +4,6 @@ remove_practice_trials <- function(trials) {
   trials |>
     mutate(practice = .data$is_practice_trial |
              str_detect(.data$assessment_stage, "practice") |
-             str_detect(.data$assessment_stage, "instructions") |
-             str_detect(.data$corpus_trial_type, "training") |
              str_detect(.data$corpus_trial_type, "practice")) |>
     filter(is.na(.data$practice) | !.data$practice) |>
     select(-c("practice", "is_practice_trial"))
