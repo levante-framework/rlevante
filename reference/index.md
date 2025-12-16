@@ -17,8 +17,6 @@
   [`scores()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
   [`tabdata()`](https://levante-framework.github.io/rlevante/reference/ModelRecord.md)
   : constructor helper
-- [`build_filter()`](https://levante-framework.github.io/rlevante/reference/build_filter.md)
-  : Get participants
 - [`dedupe_items()`](https://levante-framework.github.io/rlevante/reference/dedupe_items.md)
   : add identifiers for each instance of each item
 - [`get_corpus_items()`](https://levante-framework.github.io/rlevante/reference/get_corpus_items.md)
@@ -31,6 +29,8 @@
 - [`get_model_spec()`](https://levante-framework.github.io/rlevante/reference/get_model_spec.md)
   : get the scoring specification in scoring_table for a given task +
   dataset
+- [`get_participants()`](https://levante-framework.github.io/rlevante/reference/get_participants.md)
+  : Get participants
 - [`get_registry_table()`](https://levante-framework.github.io/rlevante/reference/get_registry_table.md)
   : Get model registry file index table
 - [`get_runs()`](https://levante-framework.github.io/rlevante/reference/get_runs.md)
