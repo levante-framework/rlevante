@@ -28,7 +28,7 @@ code_survey_data <- function(surveys) {
     mutate(value = if_else(.data$reverse_coded,
                            map2_dbl(.data$value, .data$values, reverse_value),
                            .data$value)) |>
-    select("dataset", "survey_response_id", "survey_type", "survey_part",
+    select("redivis_source", "survey_response_id", "survey_type", "survey_part",
            "user_id", "child_id", contains("construct"), "question_type",
            "variable", "variable_order", "value", "boolean_response",
            "string_response", "numeric_response", "is_complete",
@@ -105,15 +105,9 @@ link_surveys <- function(surveys, participants) {
     summarise(survey_data = list(list_rbind(.data$survey_data)),
               n_responses = sum(.data$n_responses))
 
-  # survey_caregiver <- survey_child |>
-  #   full_join(survey_household,
-  #             by = join_by(survey_response_id, survey_type, user_id, timestamp)) |>
-  #   mutate(survey_data = map2(.data$survey_child, .data$survey_household, bind_rows)) |>
-  #   select(-"survey_child", -"survey_household")
-
   # recombine separated out survey types
   survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |> #, survey_linked) |>
-    left_join(children |> select("child_id", "birth_month", "birth_year"),
+    left_join(children |> select("child_id", "birth_month", "birth_year", "site", "dataset"),
               by = c("child_id")) |>
     mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$timestamp)) |>
     select(-contains("birth_")) |>
@@ -124,5 +118,5 @@ link_surveys <- function(surveys, participants) {
   survey_combined |> unnest("survey_data") |>
     mutate(survey_part = .data$survey_part |> str_replace("student", "child")) |>
     select(-"n_responses") |>
-    relocate(c("dataset", "ref", "version"), .before = everything())
+    relocate(site, dataset, redivis_source, .before = everything())
 }

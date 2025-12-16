@@ -56,6 +56,14 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
     filter(if_any(matches("_id"), \(v) v != "schema_row"))
 }
 
+
+# construct SQL WHERE clause out of a variable name and vector of allowed values
+build_filter <- function(var, vals) {
+  vals_str <- glue("'{vals}'") |> paste(collapse = ", ")
+  if (is.null(vals)) "" else glue("WHERE {var} IN ({vals_str})")
+}
+
+
 #' Get participants
 #'
 #' @inheritParams get_runs
@@ -66,6 +74,44 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
 #' participants <- get_participants(dataset_spec)
 #' }
+get_participants <- function(dataset_spec, max_results = NULL) {
+
+  user_vars <- c(
+    "sites.site_name AS dataset",
+    "users.user_id",
+    "users.birth_month",
+    "users.birth_year",
+    "users.parent1_id",
+    "users.parent2_id",
+    "users.teacher_id",
+    "user_cohorts.cohort_id",
+    "user_schools.school_id",
+    "user_classes.class_id"
+  )
+  query_str <- glue("SELECT {paste(user_vars, collapse = ', ')} FROM users
+                     LEFT JOIN user_sites ON users.user_id = user_sites.user_id
+                     LEFT JOIN sites ON user_sites.site_id = sites.site_id
+                     LEFT JOIN user_cohorts ON users.user_id = user_cohorts.user_id
+                     LEFT JOIN user_schools ON users.user_id = user_schools.user_id
+                     LEFT JOIN user_classes ON users.user_id = user_classes.user_id
+                     WHERE users.user_type IN ('student', 'guest')")
+
+  participants <- get_datasets_data(dataset_spec,
+                             query_getter("users", query_str, max_results))
+
+  dataset_names <- list("pilot_western_ca_main" = "CA-western-pilot",
+                        "pilot_uniandes_co_bogota" = "CO-bogota-pilot",
+                        "pilot_uniandes_co_rural" = "CO-rural-pilot",
+                        "pilot_mpieva_de_main" = "DE-mpieva-pilot")
+
+  participants |>
+    mutate(dataset = dataset |> forcats::fct_recode(!!!dataset_names),
+           site = dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
+           .before = dataset) |>
+    relocate(redivis_source, .after = dataset) |>
+    arrange(.data$dataset, .data$user_id)
+}
+
 # get_participants <- function(dataset_spec, max_results = NULL) {
 #
 #   # get data for the tables with needed user data
@@ -98,10 +144,94 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 #            matches("_id"), "groups")
 # }
 
-# construct SQL WHERE clause out of a variable name and vector of allowed values
-build_filter <- function(var, vals) {
-  vals_str <- glue("'{vals}'") |> paste(collapse = ", ")
-  if (is.null(vals)) "" else glue("WHERE {var} IN ({vals_str})")
+#' Get run data
+#'
+#' @param dataset_spec List of dataset names and versions to retrieve.
+#' @param remove_incomplete_runs Boolean indicating whether to drop runs that
+#'   were marked as incomplete (defaults to TRUE).
+#' @param remove_invalid_runs Boolean indicating whether to drop runs that were
+#'   marked as invalid (defaults to TRUE).
+#' @param max_results Max number of records to load for each table (defaults to
+#'   entire table).
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' runs <- get_runs(dataset_spec)
+#' }
+get_runs <- function(dataset_spec,
+                     remove_incomplete_runs = TRUE,
+                     remove_invalid_runs = TRUE,
+                     max_results = NULL) {
+
+  run_vars <- c(
+    "run_id",
+    "runs.user_id",
+    "runs.task_id",
+    "runs.task_version",
+    "runs.administration_id",
+    "runs.time_started",
+    "runs.time_finished",
+    "runs.num_attempted",
+    "runs.num_correct",
+    "runs.test_comp_theta_estimate",
+    "runs.test_comp_theta_se",
+    "runs.completed",
+    "runs.valid_run",
+    "runs.validation_msg_run",
+    "runs.variant_id",
+    "variants.variant_name",
+    "variants.language",
+    "variants.adaptive",
+    "variants.max_incorrect",
+    "variants.max_time",
+    "variants.sequential_stimulus",
+    "variants.corpus"
+  )
+  query_str <- glue("SELECT {paste(run_vars, collapse = ', ')} FROM runs
+                     LEFT JOIN variants ON runs.variant_id = variants.variant_id")
+  # LEFT JOIN user_sites ON runs.user_id = user_sites.user_id
+  # LEFT JOIN sites ON user_sites.site_id = sites.site_id")
+
+  runs <- get_datasets_data(dataset_spec,
+                            query_getter("runs", query_str, max_results))
+
+  if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
+  if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
+
+  missing_langs <- tribble(
+    ~variant_id,            ~lang,
+    "FPbJw79lcfHKJR3fjABb", "de-DE",
+    "KNaxHVqdpe2CtS9NLoX8", "de-DE",
+    "LTQ0EQ4pvI4FAkjY98Pq", "de-DE",
+    "zlOE3yc4n4JimAhGtQ6r", "de-DE",
+
+    "1Y3K5lAs6yocDwkHH5aT", "es-CO",
+    "OYKVpWxFYhA9Qh9w58Qy", "es-CO",
+    "oD16mNDBnKwPnK7lvaCA", "es-CO",
+
+    "3fFvykenyEYGlAsRfYiJ", "en-US",
+    "5qBz8FFYIsuoYkuGXwVd", "en-US",
+    "8NLzzprrkwJPeY18iRRH", "en-US",
+    "r7o97xl8GcdtcCq651n4", "en-US"
+  )
+
+  # dataset_names <- list("pilot_western_ca_main" = "CA-western-pilot",
+  #                       "pilot_uniandes_co_bogota" = "CO-bogota-pilot",
+  #                       "pilot_uniandes_co_rural" = "CO-rural-pilot",
+  #                       "pilot_mpieva_de_main" = "DE-mpieva-pilot")
+
+  runs |>
+    # mutate(dataset = dataset |> forcats::fct_recode(!!!dataset_names),
+    #        site = dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
+    #        .before = dataset) |>
+    # relocate(redivis_source, .after = dataset) |>
+    left_join(missing_langs, by = "variant_id") |>
+    mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
+    select(-"lang") |>
+    mutate(task_id = task_id |> stringr::str_remove("-es|-de$")) |>
+    arrange(.data$time_started)
 }
 
 #' Get trial data
@@ -182,6 +312,7 @@ get_trials <- function(dataset_spec,
     add_item_ids() |>
     add_item_metadata() |>
     add_trial_numbers() |>
+    mutate(task_id = task_id |> stringr::str_remove("-es|-de$")) |>
     arrange(.data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
     select("redivis_source", "task_id", "user_id", "run_id", "trial_id",
            "trial_number", "item_uid", "item_task", "item_group", "item",
@@ -203,94 +334,6 @@ get_trials <- function(dataset_spec,
 #' }
 get_trials_raw <- function(dataset_spec) {
   get_datasets_data(dataset_spec, table_getter("trials"))
-}
-
-#' Get run data
-#'
-#' @param dataset_spec List of dataset names and versions to retrieve.
-#' @param remove_incomplete_runs Boolean indicating whether to drop runs that
-#'   were marked as incomplete (defaults to TRUE).
-#' @param remove_invalid_runs Boolean indicating whether to drop runs that were
-#'   marked as invalid (defaults to TRUE).
-#' @param max_results Max number of records to load for each table (defaults to
-#'   entire table).
-#'
-#' @export
-#' @examples
-#' \dontrun{
-#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
-#' runs <- get_runs(dataset_spec)
-#' }
-get_runs <- function(dataset_spec,
-                     remove_incomplete_runs = TRUE,
-                     remove_invalid_runs = TRUE,
-                     max_results = NULL) {
-
-  run_vars <- c("sites.site_name AS dataset",
-                "run_id",
-                "runs.user_id",
-                "runs.task_id",
-                "runs.task_version",
-                "runs.administration_id",
-                "runs.time_started",
-                "runs.time_finished",
-                "runs.num_attempted",
-                "runs.num_correct",
-                "runs.test_comp_theta_estimate",
-                "runs.test_comp_theta_se",
-                "runs.completed",
-                "runs.valid_run",
-                "runs.validation_msg_run",
-                "runs.variant_id",
-                "variants.variant_name",
-                "variants.language",
-                "variants.adaptive",
-                "variants.max_incorrect",
-                "variants.max_time",
-                "variants.sequential_stimulus",
-                "variants.corpus")
-  query_str <- glue("SELECT {paste(run_vars, collapse = ', ')} FROM runs
-                     LEFT JOIN variants ON runs.variant_id = variants.variant_id
-                     LEFT JOIN user_sites ON runs.user_id = user_sites.user_id
-                     LEFT JOIN sites ON user_sites.site_id = sites.site_id")
-
-  runs <- get_datasets_data(dataset_spec,
-                            query_getter("runs", query_str, max_results))
-
-  if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
-  if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
-
-  missing_langs <- tribble(
-    ~variant_id,            ~lang,
-    "FPbJw79lcfHKJR3fjABb", "de-DE",
-    "KNaxHVqdpe2CtS9NLoX8", "de-DE",
-    "LTQ0EQ4pvI4FAkjY98Pq", "de-DE",
-    "zlOE3yc4n4JimAhGtQ6r", "de-DE",
-
-    "1Y3K5lAs6yocDwkHH5aT", "es-CO",
-    "OYKVpWxFYhA9Qh9w58Qy", "es-CO",
-    "oD16mNDBnKwPnK7lvaCA", "es-CO",
-
-    "3fFvykenyEYGlAsRfYiJ", "en-US",
-    "5qBz8FFYIsuoYkuGXwVd", "en-US",
-    "8NLzzprrkwJPeY18iRRH", "en-US",
-    "r7o97xl8GcdtcCq651n4", "en-US"
-  )
-
-  dataset_names <- list("pilot_western_ca_main" = "CA-western-pilot",
-                        "pilot_uniandes_co_bogota" = "CO-bogota-pilot",
-                        "pilot_uniandes_co_rural" = "CO-rural-pilot",
-                        "pilot_mpieva_de_main" = "DE-mpieva-pilot")
-
-  runs |>
-    mutate(dataset = dataset |> forcats::fct_recode(!!!dataset_names),
-           site = dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
-           .before = dataset) |>
-    relocate(redivis_source, .after = dataset) |>
-    left_join(missing_langs, by = "variant_id") |>
-    mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
-    select(-"lang") |>
-    arrange(.data$redivis_source, .data$dataset, .data$time_started)
 }
 
 #' Get survey data
@@ -322,11 +365,8 @@ get_surveys <- function(dataset_spec,
   if (remove_incomplete_surveys) surveys <- surveys |> filter(.data$is_complete)
 
   surveys |>
-    # mutate(survey_part = if_else(is.na(survey_part), survey_type, survey_part)) |>
     add_survey_items() |>
-    code_survey_data() |>
-    tidyr::separate_wider_delim(cols = "dataset", delim = ":",
-                                names = c("dataset", "ref", "version"))
+    code_survey_data()
 }
 
 get_metadata_table <- function(table_name) {
