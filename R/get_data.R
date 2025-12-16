@@ -84,17 +84,17 @@ get_participants <- function(dataset_spec, max_results = NULL) {
     "users.parent1_id",
     "users.parent2_id",
     "users.teacher_id",
-    "user_cohorts.cohort_id",
+    # "user_cohorts.cohort_id",
     "user_schools.school_id",
     "user_classes.class_id"
   )
   query_str <- glue("SELECT {paste(user_vars, collapse = ', ')} FROM users
                      LEFT JOIN user_sites ON users.user_id = user_sites.user_id
                      LEFT JOIN sites ON user_sites.site_id = sites.site_id
-                     LEFT JOIN user_cohorts ON users.user_id = user_cohorts.user_id
                      LEFT JOIN user_schools ON users.user_id = user_schools.user_id
                      LEFT JOIN user_classes ON users.user_id = user_classes.user_id
                      WHERE users.user_type IN ('student', 'guest')")
+  # LEFT JOIN user_cohorts ON users.user_id = user_cohorts.user_id
 
   participants <- get_datasets_data(dataset_spec,
                              query_getter("users", query_str, max_results))
