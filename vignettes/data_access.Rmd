@@ -24,7 +24,7 @@ theme_set(theme_classic())
 Get scores
 
 ```{r}
-scores <- get_scores(data_source = "levante_data_pilots:68kn", version = "next")
+scores <- get_scores(data_source = "levante_data_pilots:68kn", version = "current")
 scores |> count(dataset, sort = TRUE)
 scores |> count(task_id, sort = TRUE)
 ```
