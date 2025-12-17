@@ -12,3 +12,4 @@ score_cat(runs)
 \description{
 scores from CAT
 }
+\keyword{internal}

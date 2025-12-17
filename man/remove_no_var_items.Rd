@@ -14,3 +14,4 @@ remove_no_var_items(df, item_n_min = 1)
 \description{
 remove items with no variance
 }
+\keyword{internal}

@@ -14,3 +14,4 @@ recode_slider(df, slider_threshold)
 \description{
 recode correctness for slider
 }
+\keyword{internal}

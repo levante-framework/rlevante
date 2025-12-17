@@ -56,3 +56,4 @@ method for BIC generic
 
 method for logLik generic
 }
+\keyword{internal}

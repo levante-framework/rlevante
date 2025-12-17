@@ -15,21 +15,20 @@ URL: https://levante-framework.github.io/rlevante/
 Depends:
     R (>= 4.1.0)
 Imports:
-    assertthat,
     dplyr,
-    forcats,
     glue,
-    jsonlite,
-    lubridate,
     methods,
     purrr, 
+    redivis
+Suggests: 
+    forcats,
+    jsonlite,
+    lubridate,
     readr,
-    redivis, 
     rlang,
     stringr,
     tibble,
-    tidyr
-Suggests: 
+    tidyr,
     ggplot2,
     knitr,
     mirt,

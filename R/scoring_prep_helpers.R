@@ -1,9 +1,8 @@
 #' recode correctness and/or items for several tasks
+#' @keywords internal
 #'
 #' @param df trial data
 #' @param slider_threshold max normalized distance from slider target
-#'
-#' @export
 recode_trials <- \(df, slider_threshold = 0.15) {
   item_fixes <- tribble(
     ~item_uid,             ~answer_fixed,
@@ -20,14 +19,13 @@ recode_trials <- \(df, slider_threshold = 0.15) {
     recode_tom() |>
     # set chance values for slider items accordingly
     mutate(chance = if_else(.data$item_group == "slider", 1 / slider_threshold / 100, .data$chance),
-           chance = .data$chance |> replace_na(0))
+           chance = .data$chance |> tidyr::replace_na(0))
 }
 
 #' recode correctness + reclassify items for HF
+#' @keywords internal
 #'
 #' @inheritParams recode_trials
-#'
-#' @export
 recode_hf <- \(df) {
   hf_trials <- df |>
     filter(.data$item_task == "hf") |>
@@ -54,10 +52,9 @@ recode_hf <- \(df) {
 }
 
 #' recode correctness for slider
+#' @keywords internal
 #'
 #' @inheritParams recode_trials
-#'
-#' @export
 recode_slider <- \(df, slider_threshold) {
   slider_trials <- df |>
     filter(.data$item_group == "slider") |>
@@ -78,11 +75,10 @@ recode_slider <- \(df, slider_threshold) {
 }
 
 #' recode correctness for items with wrong answers
+#' @keywords internal
 #'
 #' @inheritParams recode_trials
 #' @param wrong_items tibble with columns item_uid and answer_fixed
-#'
-#' @export
 recode_wrong_items <- \(df, wrong_items) {
   wrong_trials <- df |>
     right_join(wrong_items) |>
@@ -94,14 +90,14 @@ recode_wrong_items <- \(df, wrong_items) {
 }
 
 #' recode items for ToM
+#' @keywords internal
 #'
 #' @inheritParams recode_trials
-#' @export
 recode_tom <- \(df) {
   tom <- df |> filter(.data$item_task == "tom")
   tom_disagg <- tom |>
     mutate(story = stringr::str_extract(.data$item_original, "^[0-9]+"),
-           item_uid = glue("{item_task}_story{story}_{item_group}_{item}")) |>
+           item_uid = glue::glue("{item_task}_story{story}_{item_group}_{item}")) |>
     select(-"story")
   df |>
     filter(.data$item_task != "tom") |>
@@ -109,19 +105,19 @@ recode_tom <- \(df) {
 }
 
 #' recode correctness for SDS
+#' @keywords internal
 #'
 #' @inheritParams recode_trials
-#' @export
 recode_sds <- function(df) {
 
   sds_data <- df |>
-    filter(.data$item_task == "sds" & str_detect(.data$item_group, "match")) |>
-    filter(!str_detect(.data$response, "mittel|rote|gelb|blau|gr\u00FCn")) |>
+    filter(.data$item_task == "sds" & stringr::str_detect(.data$item_group, "match")) |>
+    filter(!stringr::str_detect(.data$response, "mittel|rote|gelb|blau|gr\u00FCn")) |>
     filter(!(.data$dataset == "pilot_western_ca_main" & .data$timestamp < "2025-02-21"))
   if (nrow(sds_data) == 0) return(df)
 
   sds_indexed <- sds_data |>
-    mutate(different = str_detect(.data$item_original, "different")) |>
+    mutate(different = stringr::str_detect(.data$item_original, "different")) |>
     group_by(.data$run_id, .data$item_group) |>
     arrange(.data$timestamp, .by_group = TRUE) |>
     # use positions of "choice1" to infer a trial index grouping choices together
@@ -138,47 +134,47 @@ recode_sds <- function(df) {
     filter(all(.data$trial_index == .data$trial_index_s)) |>
     # remove trials if they have fewer (or too many) rows than they should
     # e.g. only 2 rows for 3match
-    mutate(match_k = str_extract(.data$item_group, "^.") |> as.numeric()) |>
+    mutate(match_k = stringr::str_extract(.data$item_group, "^.") |> as.numeric()) |>
     group_by(.data$run_id, .data$item_group, .data$trial_index) |>
     filter(n() == unique(.data$match_k)) |>
     # remove trials that don't have consistent response options for every response
     filter(n_distinct(.data$distractors) == 1) |>
     ungroup() |>
     # remove rows with any response that isn't two cards
-    # filter(str_count(response, ":") == 2) |>
+    # filter(stringr::str_count(response, ":") == 2) |>
     select("run_id", "trial_index", "item_group", "match_k", "trial_id",
            "item", resp = "response", opts = "distractors", "correct", "original_correct")
 
   # parse response and options strings into vectors of stimuli
   sds_opts <- sds_match |>
-    mutate(resp_parsed = .data$resp |> map(parse_response) |> map(sort),
-           opts_parsed = .data$opts |> map(parse_response) |> map(sort))
+    mutate(resp_parsed = .data$resp |> purrr::map(parse_response) |> purrr::map(sort),
+           opts_parsed = .data$opts |> purrr::map(parse_response) |> purrr::map(sort))
 
   sds_coded <- sds_opts |>
     # code dimension values for each stimulus in response and options
-    mutate(resp_coded = map2(.data$resp_parsed, .data$item_group, code_dims),
-           opts_coded = map2(.data$opts_parsed, .data$item_group, code_dims))
+    mutate(resp_coded = purrr::map2(.data$resp_parsed, .data$item_group, code_dims),
+           opts_coded = purrr::map2(.data$opts_parsed, .data$item_group, code_dims))
 
   sds_dims <- sds_coded |>
-    mutate(opts_dims = map(.data$opts_coded, match_opts_dims),
-           resp_dims = map2(.data$resp_coded, .data$opts_dims, match_resp_dims)) |>
-    mutate(n_matches = map_int(.data$opts_dims, sum))
+    mutate(opts_dims = purrr::map(.data$opts_coded, match_opts_dims),
+           resp_dims = purrr::map2(.data$resp_coded, .data$opts_dims, match_resp_dims)) |>
+    mutate(n_matches = purrr::map_int(.data$opts_dims, sum))
 
   if (nrow(sds_dims) == 0) return(df)
 
   sds_correct <- sds_dims |>
-    mutate(subtrial_match = map_int(.data$resp_dims, length) > 0) |>
+    mutate(subtrial_match = purrr::map_int(.data$resp_dims, length) > 0) |>
     select("run_id", "item_group", "trial_index", "trial_id", "resp", "subtrial_match") |>
-    nest(trials = c("trial_id", "resp", "subtrial_match")) |>
-    mutate(new = map(.data$trials, \(tr) map_lgl(1:nrow(tr), \(i) i == 1 | !(tr$resp[i] %in% tr$resp[1:(i-1)]))),
-           correct = map2(.data$trials, .data$new, \(tr, ne) tr |> mutate(new = ne, correct = .data$subtrial_match & new))) |>
+    tidyr::nest(trials = c("trial_id", "resp", "subtrial_match")) |>
+    mutate(new = purrr::map(.data$trials, \(tr) purrr::map_lgl(1:nrow(tr), \(i) i == 1 | !(tr$resp[i] %in% tr$resp[1:(i-1)]))),
+           correct = purrr::map2(.data$trials, .data$new, \(tr, ne) tr |> mutate(new = ne, correct = .data$subtrial_match & new))) |>
     select(-"new", -"trials") |>
-    unnest("correct") |>
+    tidyr::unnest("correct") |>
     select("run_id", "trial_id", "correct")
 
   sds_trials <- sds_data |> select(-"correct") |> inner_join(sds_correct)
 
   df |>
-    filter(!(.data$item_task == "sds" & str_detect(.data$item_group, "match"))) |>
+    filter(!(.data$item_task == "sds" & stringr::str_detect(.data$item_group, "match"))) |>
     bind_rows(sds_trials)
 }

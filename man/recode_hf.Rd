@@ -12,3 +12,4 @@ recode_hf(df)
 \description{
 recode correctness + reclassify items for HF
 }
+\keyword{internal}

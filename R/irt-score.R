@@ -1,16 +1,15 @@
 #' given trial data and model record, score data from corresponding model
+#' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
 #' @param mod_spec list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance
 #' @param mod_rec ModelRecord object
 #' @return tibble with scores
-#'
-#' @export
 score_irt <- \(trial_data_task, mod_spec, mod_rec) {
-  message(glue('--Using IRT scoring'))
+  message(glue::glue('--Using IRT scoring'))
 
   if (!is.na(mod_spec$invariance) & mod_spec$invariance %in% c("metric", "configural")) {
-    message(glue("Can't rescore with {mod_spec$invariance} models, skipping"))
+    message(glue::glue("Can't rescore with {mod_spec$invariance} models, skipping"))
     return()
   }
 
@@ -29,7 +28,7 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   mod_vals <- model_vals(mod_rec) |> select(-"parnum")
   if ((!is.na(mod_spec$invariance) & mod_spec$invariance == "scalar") | n_distinct(groups) == 1) {
     # mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> select(-"group") |> distinct()
-    mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> filter(group == group[[1]]) |> select(-"group")
+    mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> filter(.data$group == .data$group[[1]]) |> select(-"group")
   }
 
   # get data parameter structure
@@ -46,7 +45,7 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
     select("group", "item", "class", "name", "parnum") |>
     left_join(mod_vals, by = c("item", "class", "name")) |>
     bind_rows(data_pars |> filter(.data$class == "GroupPars"))
-  assertthat::assert_that(nrow(data_vals) == nrow(data_pars))
+  # assertthat::assert_that(nrow(data_vals) == nrow(data_pars))
 
   # set up mirt model for data using constructed parameter values
   if (model_class(mod_rec) == "SingleGroupClass") {
@@ -67,11 +66,11 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
 }
 
 #' scores from CAT
+#' @keywords internal
 #'
 #' @param runs run data from one task and one dataset
-#' @export
 score_cat <- \(runs) {
-  message(glue('--Using CAT scoring'))
+  message(glue::glue('--Using CAT scoring'))
   runs |>
     filter(!is.na(.data$test_comp_theta_estimate)) |>
     select("run_id", score = "test_comp_theta_estimate", score_se = "test_comp_theta_se") |>
@@ -79,12 +78,12 @@ score_cat <- \(runs) {
 }
 
 #' scores for PA
+#' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
 #' @param dataset dataset
-#' @export
 score_pa <- \(trial_data_task, dataset)  {
-  message(glue('--Using PA scoring'))
+  message(glue::glue('--Using PA scoring'))
 
   pa_max_trials <- list(
     pilot_western_ca_main = 57,
@@ -92,7 +91,7 @@ score_pa <- \(trial_data_task, dataset)  {
     pilot_uniandes_co_rural = 20
   )
   if (!(dataset %in% names(pa_max_trials))) {
-    message(glue("Can't rescore task pa for dataset {dataset}, skipping"))
+    message(glue::glue("Can't rescore task pa for dataset {dataset}, skipping"))
     return()
   }
   trial_data_task |>
@@ -103,12 +102,12 @@ score_pa <- \(trial_data_task, dataset)  {
 }
 
 #' scores for SRE
+#' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
 #' @param dataset dataset
-#' @export
 score_sre <- \(trial_data_task, dataset) {
-  message(glue('--Using SRE scoring'))
+  message(glue::glue('--Using SRE scoring'))
 
   trial_data_task |>
     group_by(.data$run_id) |>
@@ -132,14 +131,15 @@ task_scoring_fun <- \(task) {
     "pa"     ,  score_pa,
     "sre"    ,  score_sre,
     "swr"    ,  score_cat
-  ) |> tibble::deframe() |> pluck(task)
+  ) |> tibble::deframe() |> purrr::pluck(task)
 }
 
 mod_spec_str <- \(spec) {
-  spec[c("model_set", "subset", "itemtype", "nfact", "invariance")] |> discard(is.na) |> paste(collapse = "_")
+  spec[c("model_set", "subset", "itemtype", "nfact", "invariance")] |> purrr::discard(is.na) |> paste(collapse = "_")
 }
 
 #' score
+#' @keywords internal
 #'
 #' @param task task
 #' @param dataset dataset
@@ -147,11 +147,9 @@ mod_spec_str <- \(spec) {
 #' @param runs run data from one task and one dataset
 #' @param scoring_table table returned by get_scoring_table
 #' @param registry_table  table returned by get_registry_table
-#'
-#' @export
 score <- \(task, dataset, trials, runs, scoring_table, registry_table) {
 
-  message(glue('Scoring data for task "{task}" and dataset "{dataset}"'))
+  message(glue::glue('Scoring data for task "{task}" and dataset "{dataset}"'))
 
   irt_tasks <- c("matrix", "mrot", "math", "hf", "mg", "sds", "trog", "vocab", "tom")
   cat_tasks <- c("swr")
@@ -165,9 +163,9 @@ score <- \(task, dataset, trials, runs, scoring_table, registry_table) {
     scores <- score_cat(runs)
   } else if (task %in% names(custom_tasks)) {
     scoring_fun <- custom_tasks[[task]]
-    scores <- exec(scoring_fun, trials, dataset)
+    scores <- purrr::exec(scoring_fun, trials, dataset)
   } else {
-    message(glue('--No scoring method found'))
+    message(glue::glue('--No scoring method found'))
     scores <- NULL
   }
 

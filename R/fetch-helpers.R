@@ -2,7 +2,7 @@
 # returns data from the given table in that dataset
 table_getter <- function(table_name, max_results = NULL) {
   \(dataset, dataset_table_names) {
-    message(glue("--Fetching table {table_name}"))
+    message(glue::glue("--Fetching table {table_name}"))
     if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
       dataset$table(table_name)$to_tibble(max_results = max_results)
@@ -13,7 +13,7 @@ table_getter <- function(table_name, max_results = NULL) {
 # given a sql query, return a function that takes a dataset reference and
 # returns data from executing that sql query in that dataset
 query_getter <- function(table_name, query_str, max_results = NULL) {
-  message(glue("--Executing SQL query"))
+  message(glue::glue("--Executing SQL query"))
   \(dataset, dataset_table_names) {
     if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
@@ -32,19 +32,19 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 
   # get reference to each dataset in dataset_spec
   datasets <- dataset_spec |>
-    rlang::set_names(map_chr(dataset_spec, \(dn) dn[["name"]])) |>
-    map(\(dn) org$dataset(name = dn$name, version = dn$version))
+    purrr::set_names(purrr::map_chr(dataset_spec, \(dn) dn[["name"]])) |>
+    purrr::map(\(dn) org$dataset(name = dn$name, version = dn$version))
 
   # fetch each dataset to populate its properties
-  walk(datasets, \(ds) ds$get())
+  purrr::walk(datasets, \(ds) ds$get())
 
   # get each dataset's canonical reference (name + persistent ID + version)
-  dataset_refs <- datasets |> map(\(ds) ds$scoped_reference)
+  dataset_refs <- datasets |> purrr::map(\(ds) ds$scoped_reference)
 
   # apply dataset_fun to each dataset
-  dataset_data <- imap(datasets, \(dataset, dataset_name) {
+  dataset_data <- purrr::imap(datasets, \(dataset, dataset_name) {
     message(glue::glue("Fetching data for {dataset_name}"))
-    dataset_table_names <- dataset$list_tables() |> map_chr(\(tbl) tbl$name)
+    dataset_table_names <- dataset$list_tables() |> purrr::map_chr(\(tbl) tbl$name)
     dataset_fun(dataset, dataset_table_names) |>
       mutate(redivis_source = dataset_refs[[dataset_name]], .before = everything())
   })
@@ -56,17 +56,8 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
     filter(if_any(matches("_id"), \(v) v != "schema_row"))
 }
 
-
 # construct SQL WHERE clause out of a variable name and vector of allowed values
 build_filter <- function(var, vals) {
-  vals_str <- glue("'{vals}'") |> paste(collapse = ", ")
-  if (is.null(vals)) "" else glue("WHERE {var} IN ({vals_str})")
-}
-
-get_metadata_table <- function(table_name) {
-  metadata <- redivis::redivis$organization("levante")$dataset("levante_metadata_items:czjv")
-  message(glue::glue("Fetching item metadata for {table_name}"))
-  suppressWarnings(
-    metadata$table(table_name)$to_tibble()
-  )
+  vals_str <- glue::glue("'{vals}'") |> paste(collapse = ", ")
+  if (is.null(vals)) "" else glue::glue("WHERE {var} IN ({vals_str})")
 }

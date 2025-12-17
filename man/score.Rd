@@ -22,3 +22,4 @@ score(task, dataset, trials, runs, scoring_table, registry_table)
 \description{
 score
 }
+\keyword{internal}

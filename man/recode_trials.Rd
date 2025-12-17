@@ -14,3 +14,4 @@ recode_trials(df, slider_threshold = 0.15)
 \description{
 recode correctness and/or items for several tasks
 }
+\keyword{internal}

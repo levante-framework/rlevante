@@ -1,4 +1,5 @@
 #' ModelRecord class definition
+#' @keywords internal
 #'
 #' @export
 ModelRecord <- setClass(
@@ -23,6 +24,7 @@ ModelRecord <- setClass(
 )
 
 #' constructor helper
+#' @keywords internal
 #'
 #' @param mod mirt model object
 #' @param row_ids character vector
@@ -51,8 +53,8 @@ modelrecord <- \(mod, row_ids) {
 }
 
 #' helper to extract and tidy scores
+#' @keywords internal
 #' @rdname ModelRecord
-#' @export
 extract_scores <- \(mod, row_ids) {
   mirt::fscores(mod, method = "EAP", full.scores.SE = TRUE) |>
     as_tibble() |>
@@ -61,12 +63,14 @@ extract_scores <- \(mod, row_ids) {
 }
 
 #' method for show generic
+#' @keywords internal
 #' @rdname ModelRecord
 setMethod("show", "ModelRecord", \(object) {
-  cat(glue("{is(object)[[1]]} of a {object@model_class} model ({object@nfact} factor {object@itemtype})"))
+  cat(glue::glue("{is(object)[[1]]} of a {object@model_class} model ({object@nfact} factor {object@itemtype})"))
 })
 
 #' method for AIC generic
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 setMethod("AIC", "ModelRecord", \(object) {
@@ -74,6 +78,7 @@ setMethod("AIC", "ModelRecord", \(object) {
 })
 
 #' method for BIC generic
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 setMethod("BIC", "ModelRecord", \(object) {
@@ -81,6 +86,7 @@ setMethod("BIC", "ModelRecord", \(object) {
 })
 
 #' method for logLik generic
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 setMethod("logLik", "ModelRecord", \(object) {
@@ -89,23 +95,28 @@ setMethod("logLik", "ModelRecord", \(object) {
 
 # accessor functions for slots
 
+#' @keywords internal
 #' @rdname ModelRecord
 #' @param object ModelRecord object
 #' @export
 model_class <- \(object) object@model_class
 
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 model_vals <- \(object) object@model_vals
 
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 items <- \(object) object@items
 
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 scores <- \(object) object@scores
 
+#' @keywords internal
 #' @rdname ModelRecord
 #' @export
 tabdata <- \(object) object@tabdata

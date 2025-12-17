@@ -1,10 +1,101 @@
+#' Process trial data
+#' @keywords internal
+#'
+#' @inheritParams process_trials
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' trials_prelim <- process_trials_prelim(dataset_spec)
+#' }
+process_trials_prelim <- function(dataset_spec,
+                                  remove_incomplete_runs = TRUE,
+                                  remove_invalid_runs = TRUE,
+                                  remove_invalid_trials = FALSE,
+                                  tasks = NULL, # all tasks if null
+                                  participants = NULL, # all participants if null
+                                  max_results = NULL) {
+
+  where_str <- build_filter("task_id", tasks)
+  query_str <- glue::glue("SELECT * FROM trials {where_str}") |> stringr::str_trim()
+
+  trials <- get_datasets_data(dataset_spec,
+                              query_getter("trials", query_str, max_results))
+
+  # if participants supplied, filter to trials for only those participants
+  if (!is.null(participants)) {
+    trials <- trials |> semi_join(participants, by = "user_id")
+  }
+
+  # if run filters supplied, get corresponding runs and filter to their trials
+  if (any(remove_incomplete_runs, remove_invalid_runs)) {
+    runs <- process_runs(dataset_spec,
+                         remove_incomplete_runs = remove_incomplete_runs,
+                         remove_invalid_runs = remove_invalid_runs)
+    trials <- trials |> semi_join(runs, by = c("run_id"))
+  }
+
+  # filter to valid trials
+  if (remove_invalid_trials) trials <- trials |> filter(.data$valid_trial)
+
+  trials |> remove_practice_trials()
+}
+
+#' Process trial data
+#' @keywords internal
+#'
+#' @inheritParams process_runs
+#' @param remove_invalid_trials Boolean indicating whether to drop trials that
+#'   were marked as invalid (defaults to FALSE).
+#' @param tasks Character vector of tasks to include.
+#' @param participants (Optional) Data frame that includes the columns "dataset"
+#'   and "user_id", if supplied trial data will be filtered to only those user
+#'   IDs.
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' trials <- process_trials(dataset_spec)
+#' }
+process_trials <- function(dataset_spec,
+                           remove_incomplete_runs = TRUE,
+                           remove_invalid_runs = TRUE,
+                           remove_invalid_trials = FALSE,
+                           tasks = NULL, # all tasks if null
+                           participants = NULL, # all participants if null
+                           max_results = NULL) {
+
+  trials <- process_trials_prelim(dataset_spec = dataset_spec,
+                                  remove_incomplete_runs = remove_incomplete_runs,
+                                  remove_invalid_runs = remove_invalid_runs,
+                                  remove_invalid_trials = remove_invalid_trials,
+                                  tasks = tasks,
+                                  participants = participants,
+                                  max_results = max_results)
+  trials |>
+    add_item_ids() |>
+    add_item_metadata() |>
+    add_trial_numbers() |>
+    mutate(task_id = .data$task_id |> stringr::str_remove("-es|-de$")) |>
+    arrange(.data$task_id, .data$user_id, .data$run_id, .data$trial_number) |>
+    select("redivis_source", "task_id", "user_id", "run_id", "trial_id",
+           "trial_number", "item_uid", "item_task", "item_group", "item",
+           "correct", "rt", "rt_numeric", "response", "response_type",
+           "item_original", "answer", "distractors", "chance", "difficulty",
+           "theta_estimate", "theta_se", timestamp = "server_timestamp",
+           "valid_trial", "validation_msg_trial")
+}
+
+
 # helper function for processing trial data
 
 remove_practice_trials <- function(trials) {
   trials |>
     mutate(practice = .data$is_practice_trial |
-             str_detect(.data$assessment_stage, "practice") |
-             str_detect(.data$corpus_trial_type, "practice")) |>
+             stringr::str_detect(.data$assessment_stage, "practice") |
+             stringr::str_detect(.data$corpus_trial_type, "practice")) |>
     filter(is.na(.data$practice) | !.data$practice) |>
     select(-c("practice", "is_practice_trial"))
 }
@@ -21,20 +112,20 @@ add_trial_numbers <- function(trials) {
 add_item_ids <- function(trials) {
 
   # get item IDs coded by trial
-  trial_items <- get_trial_items()
+  trial_items <- fetch_trial_items()
   trial_map <- trial_items |>
-    mutate(trials = trials |> map(jsonlite::fromJSON) |> map(unlist)) |>
-    unnest(trials) |>
+    mutate(trials = trials |> purrr::map(jsonlite::fromJSON) |> purrr::map(unlist)) |>
+    tidyr::unnest(trials) |>
     select(item_uid_trial = "item_uid", trial_id = "trials")
 
   # get item IDs coded by item (corpus_trial_type, item, answer, distractors)
-  mapping_items <- get_mapping_items()
+  mapping_items <- fetch_mapping_items()
   item_map <- mapping_items |>
     mutate(across(c("corpus_trial_type", "item", "answer", "distractors"),
-                  \(s) replace_na(s, ""))) |>
+                  \(s) tidyr::replace_na(s, ""))) |>
     mutate(item_key = paste(.data$corpus_trial_type, .data$item,
                             .data$answer, .data$distractors) |>
-             str_trim()) |>
+             stringr::str_trim()) |>
     select(item_uid_mapping = "item_uid", "item_key") |>
     distinct()
 
@@ -79,34 +170,34 @@ add_item_ids <- function(trials) {
   trials_prepped <- trials |>
     # create item IDs for ROAR tasks (sre | pa -> item_id, swr -> answer)
     mutate(item_uid_roar = case_when(
-      str_detect(task_id, "^pa(-|$)") ~ glue("pa_{item_id}"),
-      str_detect(task_id, "^sre(-|$)") ~ glue("sre_{item_id}"),
-      str_detect(task_id, "^swr(-|$)") ~ glue("swr_{answer}"),
+      stringr::str_detect(task_id, "^pa(-|$)") ~ glue::glue("pa_{item_id}"),
+      stringr::str_detect(task_id, "^sre(-|$)") ~ glue::glue("sre_{item_id}"),
+      stringr::str_detect(task_id, "^swr(-|$)") ~ glue::glue("swr_{answer}"),
     ) |> as.character()) |>
     # fix wrong item IDs in item banks
     mutate(item_uid = .data$item_uid |>
-             str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
-             str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
-             str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
-             str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
-             str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
-             str_replace("^tom_ha_", "ha_") |>
-             str_replace("^vocab__", "vocab_word_") |>
+             stringr::str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
+             stringr::str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
+             stringr::str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
+             stringr::str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
+             stringr::str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
+             stringr::str_replace("^tom_ha_", "ha_") |>
+             stringr::str_replace("^vocab__", "vocab_word_") |>
              forcats::fct_recode(!!!itembank_recodes) |>
              as.character() |>
              na_if("math_fraction_512_16") |>
              na_if("mg_forward_3grid_len2")) |>
     # remove stray SDS instruction items
-    filter(is.na(.data$item_uid) | !str_detect(.data$item_uid, "-instr")) |>
+    filter(is.na(.data$item_uid) | !stringr::str_detect(.data$item_uid, "-instr")) |>
     # recode memory-game answers
     mutate(answer = if_else(.data$task_id == "memory-game",
-                            as.character(str_count(.data$answer, ":")),
+                            as.character(stringr::str_count(.data$answer, ":")),
                             .data$answer)) |>
     # create item key for joining with item map
     mutate(across(c(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors),
-                  \(s) replace_na(s, ""))) |>
+                  \(s) tidyr::replace_na(s, ""))) |>
     mutate(item_key = paste(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors) |>
-             str_trim()) |>
+             stringr::str_trim()) |>
     # remove trials with no item information
     filter(!is.na(.data$item_uid) | !is.na(.data$item_key))
 
@@ -143,18 +234,18 @@ add_item_ids <- function(trials) {
 
 
 add_item_metadata <- function(trials) {
-  corpus_items <- get_corpus_items() |> distinct()
+  corpus_items <- fetch_corpus_items() |> distinct()
   trials |>
     filter(!is.na(.data$item_uid)) |>
     left_join(corpus_items, by = "item_uid") |>
     # code item_task for roar tasks
     mutate(item_task = if_else(
       .data$item_uid_source == "item_uid_roar",
-      str_extract(.data$task_id, "^[A-z]*"),
+      stringr::str_extract(.data$task_id, "^[A-z]*"),
       .data$item_task
     )) |>
-    mutate(group = replace_na(.data$group, ""),
-           entry = replace_na(.data$entry, "")) |>
+    mutate(group = tidyr::replace_na(.data$group, ""),
+           entry = tidyr::replace_na(.data$entry, "")) |>
     rename(item_original = "item", item_group = "group", item = "entry")
 }
 
@@ -170,7 +261,7 @@ code_numberline <- function(trials, threshold = 0.15) {
     tidyr::separate_wider_delim(.data$item, "_",
                                 names = c("answer", "max_value"),
                                 cols_remove = FALSE) |>
-    mutate(answer = .data$answer |> str_replace("^0", "0."),
+    mutate(answer = .data$answer |> stringr::str_replace("^0", "0."),
            across(c(.data$answer, .data$max_value), as.numeric),
            correct = (abs(as.numeric(.data$response) - .data$answer) / .data$max_value < threshold)) |>
     select(-c("answer", "max_value"))

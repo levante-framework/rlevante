@@ -1,7 +1,7 @@
 # turn json-ish response/distractors string into character vector
 # e.g. "{'0': 'sm-blue-triangle', '1': 'lg-yellow-triangle'}" -> c("sm-blue-triangle", "lg-yellow-triangle")
 parse_response <- \(resp) {
-  if (is.na(resp) || str_trim(resp) == "") return(character(0))
+  if (is.na(resp) || stringr::str_trim(resp) == "") return(character(0))
 
   # convert single quotes to double quotes to parse as JSON
   json_str <- stringr::str_replace_all(resp, "'", '"')
@@ -14,33 +14,35 @@ parse_response <- \(resp) {
 code_stim <- \(stim, grp) {
 
   # extract number if present, other use default "1"
-  num <- str_extract(stim, "\\d") |> discard(is.na)
+  num <- stringr::str_extract(stim, "\\d") |> purrr::discard(is.na)
   if (length(num) == 0) num <- "1"
   # extract background color if present, otherwise use default "white"
-  bg <- str_extract(stim, "gray|black|striped") |> discard(is.na)
+  bg <- stringr::str_extract(stim, "gray|black|striped") |> purrr::discard(is.na)
   if (length(bg) == 0) bg <- "white"
 
   # first 3 parts are always size/color/shape, then number and background from above
-  att <- rlang::set_names(c(stim[1:3], num, bg), c("size", "color", "shape", "number", "background"))
+  att <- purrr::set_names(c(stim[1:3], num, bg), c("size", "color", "shape", "number", "background"))
 
 }
 
 # split vector of stimuli (e.g. med-green-circle-2-black) into parts and infer parts' dimensions
 code_dims <- \(resp, grp) {
-  resp |> stringr::str_split("-") |> map(\(s) code_stim(s, grp))
+  resp |> stringr::str_split("-") |> purrr::map(\(s) code_stim(s, grp))
 }
 
 # given list of character vectors of named dimensions,
 # return how many pairs of items match on each dimension,
 # excluding dimensions that all items match on
 match_opts_dims <- \(opts) {
-  opts |> transpose() |> map(unlist) |> map(base::table) |> discard(\(x) length(x) == 1) |>
-    map(\(x) sum(choose(x, 2))) |> unlist()
+  opts |> purrr::transpose() |> purrr::map(unlist) |> purrr::map(base::table) |>
+    purrr::discard(\(x) length(x) == 1) |> purrr::map(\(x) sum(choose(x, 2))) |>
+    unlist()
 }
 
 match_resp_dims <- \(resp, opts_dims) {
-  resp_t <- resp |> transpose() |> map(unlist)
-  resp_t[names(opts_dims)] |> map(n_distinct) |> keep(\(x) x < length(resp)) |> names() |> sort()
+  resp_t <- resp |> purrr::transpose() |> purrr::map(unlist)
+  resp_t[names(opts_dims)] |> purrr::map(n_distinct) |>
+    purrr::keep(\(x) x < length(resp)) |> names() |> sort()
 }
 
 code_misses <- \(opts_dims, resp_dims, k) {

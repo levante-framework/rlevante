@@ -14,3 +14,4 @@ score_sre(trial_data_task, dataset)
 \description{
 scores for SRE
 }
+\keyword{internal}

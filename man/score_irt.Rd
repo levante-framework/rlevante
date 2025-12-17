@@ -19,3 +19,4 @@ tibble with scores
 \description{
 given trial data and model record, score data from corresponding model
 }
+\keyword{internal}
