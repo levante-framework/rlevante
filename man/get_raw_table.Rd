@@ -7,6 +7,8 @@
 get_raw_table(table_name, data_source, version = "current")
 }
 \arguments{
+\item{table_name}{String indicating name of table to get}
+
 \item{data_source}{Name of Redivis dataset}
 
 \item{version}{Version of Redivis dataset}
@@ -16,6 +18,6 @@ Get raw table
 }
 \examples{
 \dontrun{
-runs <- get_raw_table(table_name = "runs", dataset = "levante-data-example:bm7r", version = "current")
+runs <- get_raw_table(table_name = "runs", dataset = "levante-data-example:bm7r")
 }
 }

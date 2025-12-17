@@ -23,6 +23,7 @@ process_runs <- function(dataset_spec,
   run_vars <- c(
     "run_id",
     "runs.user_id",
+    "runs.age",
     "runs.task_id",
     "runs.task_version",
     "runs.administration_id",

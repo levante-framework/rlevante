@@ -1,0 +1,58 @@
+---
+title: "Data access"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{data_access}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rlevante)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_classic())
+```
+
+Get scores
+
+```{r}
+scores <- get_scores(data_source = "levante_data_pilots:68kn", version = "next")
+scores |> count(dataset, sort = TRUE)
+scores |> count(task_id, sort = TRUE)
+```
+
+```{r}
+ggplot(scores, aes(x = age, y = score, colour = site)) +
+  facet_wrap(vars(task_id)) +
+  geom_point()
+```
+
+Get participants
+
+```{r}
+participants <- get_participants("levante_data_pilots:68kn")
+participants |> count(dataset, sort = TRUE)
+```
+
+Get trial-level data
+
+```{r}
+trials <- get_trials("levante_data_pilots:68kn")
+trials |> count(dataset, sort = TRUE)
+trials |> count(task_id, sort = TRUE)
+```
+
+Get survey response data
+
+```{r}
+surveys <- get_surveys("levante_data_pilots:68kn")
+surveys |> count(dataset, sort = TRUE)
+```
