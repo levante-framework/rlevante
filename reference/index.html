@@ -16,6 +16,10 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/data_access.html">Data access</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -41,55 +45,6 @@
 
       <dl><dt>
 
-          <code><a href="ModelRecord-class.html">ModelRecord-class</a></code> <code><a href="ModelRecord-class.html">ModelRecord</a></code>
-
-        </dt>
-        <dd>ModelRecord class definition</dd>
-
-        <dt>
-
-          <code><a href="ModelRecord.html">modelrecord()</a></code> <code><a href="ModelRecord.html">extract_scores()</a></code> <code><a href="ModelRecord.html">show(<i>&lt;ModelRecord&gt;</i>)</a></code> <code><a href="ModelRecord.html">AIC(<i>&lt;ModelRecord&gt;</i>)</a></code> <code><a href="ModelRecord.html">BIC(<i>&lt;ModelRecord&gt;</i>)</a></code> <code><a href="ModelRecord.html">logLik(<i>&lt;ModelRecord&gt;</i>)</a></code> <code><a href="ModelRecord.html">model_class()</a></code> <code><a href="ModelRecord.html">model_vals()</a></code> <code><a href="ModelRecord.html">items()</a></code> <code><a href="ModelRecord.html">scores()</a></code> <code><a href="ModelRecord.html">tabdata()</a></code>
-
-        </dt>
-        <dd>constructor helper</dd>
-
-        <dt>
-
-          <code><a href="dedupe_items.html">dedupe_items()</a></code>
-
-        </dt>
-        <dd>add identifiers for each instance of each item</dd>
-
-        <dt>
-
-          <code><a href="get_corpus_items.html">get_corpus_items()</a></code>
-
-        </dt>
-        <dd>Get metadata for corpus items</dd>
-
-        <dt>
-
-          <code><a href="get_mapping_items.html">get_mapping_items()</a></code>
-
-        </dt>
-        <dd>Get metadata for mapping items</dd>
-
-        <dt>
-
-          <code><a href="get_model_record.html">get_model_record()</a></code>
-
-        </dt>
-        <dd>get the model record indexed in registry_table for a given scoring specification</dd>
-
-        <dt>
-
-          <code><a href="get_model_spec.html">get_model_spec()</a></code>
-
-        </dt>
-        <dd>get the scoring specification in scoring_table for a given task + dataset</dd>
-
-        <dt>
-
           <code><a href="get_participants.html">get_participants()</a></code>
 
         </dt>
@@ -97,199 +52,31 @@
 
         <dt>
 
-          <code><a href="get_registry_table.html">get_registry_table()</a></code>
+          <code><a href="get_raw_table.html">get_raw_table()</a></code>
 
         </dt>
-        <dd>Get model registry file index table</dd>
-
-        <dt>
-
-          <code><a href="get_runs.html">get_runs()</a></code>
-
-        </dt>
-        <dd>Get run data</dd>
+        <dd>Get raw table</dd>
 
         <dt>
 
           <code><a href="get_scores.html">get_scores()</a></code>
 
         </dt>
-        <dd>Get score data</dd>
-
-        <dt>
-
-          <code><a href="get_scoring_table.html">get_scoring_table()</a></code>
-
-        </dt>
-        <dd>Get scoring specification table</dd>
-
-        <dt>
-
-          <code><a href="get_survey_items.html">get_survey_items()</a></code>
-
-        </dt>
-        <dd>Get metadata for survey items</dd>
+        <dd>Get scores</dd>
 
         <dt>
 
           <code><a href="get_surveys.html">get_surveys()</a></code>
 
         </dt>
-        <dd>Get survey data</dd>
-
-        <dt>
-
-          <code><a href="get_trial_items.html">get_trial_items()</a></code>
-
-        </dt>
-        <dd>Get metadata for trial items</dd>
+        <dd>Get surveys</dd>
 
         <dt>
 
           <code><a href="get_trials.html">get_trials()</a></code>
 
         </dt>
-        <dd>Get trial data</dd>
-
-        <dt>
-
-          <code><a href="get_trials_prelim.html">get_trials_prelim()</a></code>
-
-        </dt>
-        <dd>Get trial data</dd>
-
-        <dt>
-
-          <code><a href="get_trials_raw.html">get_trials_raw()</a></code>
-
-        </dt>
-        <dd>Get raw trial data</dd>
-
-        <dt>
-
-          <code><a href="link_surveys.html">link_surveys()</a></code>
-
-        </dt>
-        <dd>Link survey data to participant data</dd>
-
-        <dt>
-
-          <code><a href="notebook_dataset.html">notebook_dataset()</a></code>
-
-        </dt>
-        <dd>Determine dataset of current notebook on Redivis</dd>
-
-        <dt>
-
-          <code><a href="recode_hf.html">recode_hf()</a></code>
-
-        </dt>
-        <dd>recode correctness + reclassify items for HF</dd>
-
-        <dt>
-
-          <code><a href="recode_sds.html">recode_sds()</a></code>
-
-        </dt>
-        <dd>recode correctness for SDS</dd>
-
-        <dt>
-
-          <code><a href="recode_slider.html">recode_slider()</a></code>
-
-        </dt>
-        <dd>recode correctness for slider</dd>
-
-        <dt>
-
-          <code><a href="recode_tom.html">recode_tom()</a></code>
-
-        </dt>
-        <dd>recode items for ToM</dd>
-
-        <dt>
-
-          <code><a href="recode_trials.html">recode_trials()</a></code>
-
-        </dt>
-        <dd>recode correctness and/or items for several tasks</dd>
-
-        <dt>
-
-          <code><a href="recode_wrong_items.html">recode_wrong_items()</a></code>
-
-        </dt>
-        <dd>recode correctness for items with wrong answers</dd>
-
-        <dt>
-
-          <code><a href="remove_no_var_items.html">remove_no_var_items()</a></code>
-
-        </dt>
-        <dd>remove items with no variance</dd>
-
-        <dt>
-
-          <code><a href="remove_no_var_items_bygroup.html">remove_no_var_items_bygroup()</a></code>
-
-        </dt>
-        <dd>remove items with no invariance in any single group</dd>
-
-        <dt>
-
-          <code><a href="remove_nonshared_items.html">remove_nonshared_items()</a></code>
-
-        </dt>
-        <dd>remove items that aren't shared across all groups</dd>
-
-        <dt>
-
-          <code><a href="score.html">score()</a></code>
-
-        </dt>
-        <dd>score</dd>
-
-        <dt>
-
-          <code><a href="score_cat.html">score_cat()</a></code>
-
-        </dt>
-        <dd>scores from CAT</dd>
-
-        <dt>
-
-          <code><a href="score_irt.html">score_irt()</a></code>
-
-        </dt>
-        <dd>given trial data and model record, score data from corresponding model</dd>
-
-        <dt>
-
-          <code><a href="score_pa.html">score_pa()</a></code>
-
-        </dt>
-        <dd>scores for PA</dd>
-
-        <dt>
-
-          <code><a href="score_sre.html">score_sre()</a></code>
-
-        </dt>
-        <dd>scores for SRE</dd>
-
-        <dt>
-
-          <code><a href="to_mirt_shape.html">to_mirt_shape()</a></code>
-
-        </dt>
-        <dd>format data for mirt</dd>
-
-        <dt>
-
-          <code><a href="to_mirt_shape_grouped.html">to_mirt_shape_grouped()</a></code>
-
-        </dt>
-        <dd>format data for mirt</dd>
+        <dd>Get trials</dd>
       </dl></div>
   </main></div>
 

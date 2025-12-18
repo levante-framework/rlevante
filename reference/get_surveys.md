@@ -1,44 +1,27 @@
-# Get survey data
+# Get surveys
 
-Get survey data
+Get surveys
 
 ## Usage
 
 ``` r
-get_surveys(
-  dataset_spec,
-  survey_types = c("caregiver", "student", "teacher"),
-  remove_incomplete_surveys = FALSE,
-  max_results = NULL
-)
+get_surveys(data_source, version = "current")
 ```
 
 ## Arguments
 
-- dataset_spec:
+- data_source:
 
-  List of dataset names and versions to retrieve.
+  Name of Redivis dataset
 
-- survey_types:
+- version:
 
-  Character vector of survey types to include (caregiver, student,
-  teacher).
-
-- remove_incomplete_surveys:
-
-  Boolean indicating whether to drop surveys that were marked as
-  incomplete (defaults to FALSE).
-
-- max_results:
-
-  Max number of records to load for each table (defaults to entire
-  table).
+  Version of Redivis dataset
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
-surveys <- get_surveys(dataset_spec)
+surveys <- get_surveys(dataset = "levante-data-example:bm7r", version = "current")
 } # }
 ```

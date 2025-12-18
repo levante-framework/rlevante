@@ -1,62 +1,27 @@
-# Get trial data
+# Get trials
 
-Get trial data
+Get trials
 
 ## Usage
 
 ``` r
-get_trials(
-  dataset_spec,
-  remove_incomplete_runs = TRUE,
-  remove_invalid_runs = TRUE,
-  remove_invalid_trials = FALSE,
-  tasks = NULL,
-  participants = NULL,
-  max_results = NULL
-)
+get_trials(data_source, version = "current")
 ```
 
 ## Arguments
 
-- dataset_spec:
+- data_source:
 
-  List of dataset names and versions to retrieve.
+  Name of Redivis dataset
 
-- remove_incomplete_runs:
+- version:
 
-  Boolean indicating whether to drop runs that were marked as incomplete
-  (defaults to TRUE).
-
-- remove_invalid_runs:
-
-  Boolean indicating whether to drop runs that were marked as invalid
-  (defaults to TRUE).
-
-- remove_invalid_trials:
-
-  Boolean indicating whether to drop trials that were marked as invalid
-  (defaults to FALSE).
-
-- tasks:
-
-  Character vector of tasks to include.
-
-- participants:
-
-  (Optional) Data frame that includes the columns "dataset" and
-  "user_id", if supplied trial data will be filtered to only those user
-  IDs.
-
-- max_results:
-
-  Max number of records to load for each table (defaults to entire
-  table).
+  Version of Redivis dataset
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
-trials <- get_trials(dataset_spec)
+trials <- get_trials(dataset = "levante-data-example:bm7r", version = "current")
 } # }
 ```

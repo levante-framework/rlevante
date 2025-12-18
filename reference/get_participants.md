@@ -5,25 +5,23 @@ Get participants
 ## Usage
 
 ``` r
-get_participants(dataset_spec, max_results = NULL)
+get_participants(data_source, version = "current")
 ```
 
 ## Arguments
 
-- dataset_spec:
+- data_source:
 
-  List of dataset names and versions to retrieve.
+  Name of Redivis dataset
 
-- max_results:
+- version:
 
-  Max number of records to load for each table (defaults to entire
-  table).
+  Version of Redivis dataset
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
-participants <- get_participants(dataset_spec)
+participants <- get_participants(dataset = "levante-data-example:bm7r", version = "current")
 } # }
 ```
