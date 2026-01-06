@@ -9,13 +9,13 @@
 
 ## Citation
 
-Frank M, Braginsky M (2025). *rlevante: Download LEVANTE Data*. R
+Frank M, Braginsky M (2026). *rlevante: Download LEVANTE Data*. R
 package version 0.1.0, <https://levante-framework.github.io/rlevante/>.
 
     @Manual{,
       title = {rlevante: Download LEVANTE Data},
       author = {Michael Frank and Mika Braginsky},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.1.0},
       url = {https://levante-framework.github.io/rlevante/},
     }
