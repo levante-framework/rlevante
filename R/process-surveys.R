@@ -1,5 +1,6 @@
 #' Process survey data
 #' @keywords internal
+#' @export
 #'
 #' @inheritParams process_runs
 #' @param survey_types Character vector of survey types to include (caregiver,
@@ -7,7 +8,6 @@
 #' @param remove_incomplete_surveys Boolean indicating whether to drop surveys
 #'   that were marked as incomplete (defaults to FALSE).
 #'
-#' @export
 #' @examples
 #' \dontrun{
 #' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
@@ -73,6 +73,7 @@ code_survey_data <- function(surveys) {
 
 #' Link survey data to participant data
 #' @keywords internal
+#' @export
 #'
 #' @param surveys Survey data as returned by `process_surveys()`.
 #' @param participants Participant data as returned by `process_participants()`.

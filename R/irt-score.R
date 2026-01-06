@@ -140,6 +140,7 @@ mod_spec_str <- \(spec) {
 
 #' score
 #' @keywords internal
+#' @export
 #'
 #' @param task task
 #' @param dataset dataset

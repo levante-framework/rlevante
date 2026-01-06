@@ -1,5 +1,6 @@
 #' recode correctness and/or items for several tasks
 #' @keywords internal
+#' @export
 #'
 #' @param df trial data
 #' @param slider_threshold max normalized distance from slider target

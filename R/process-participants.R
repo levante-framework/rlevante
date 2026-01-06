@@ -34,10 +34,16 @@ process_participants <- function(dataset_spec, max_results = NULL) {
   participants <- get_datasets_data(dataset_spec,
                                     query_getter("users", query_str, max_results))
 
-  dataset_names <- list("pilot_western_ca_main" = "CA-western-pilot",
-                        "pilot_uniandes_co_bogota" = "CO-bogota-pilot",
-                        "pilot_uniandes_co_rural" = "CO-rural-pilot",
-                        "pilot_mpieva_de_main" = "DE-mpieva-pilot")
+  dataset_names <- list(
+    "pilot_uniandes_co_bogota"     = "CO-bogota-pilot",
+    "pilot_uniandes_co_rural"      = "CO-rural-pilot",
+    "pilot_western_ca_main"        = "CA-western-pilot",
+    "pilot_mpieva_de_main"         = "DE-leipzig-pilot",
+    "pilot_langcog_us_downex"      = "US-downward_extension-pilot",
+    "partner_mpib_de_main"         = "partner-mpib-de",
+    "partner_childexplore_intl_ef" = "partner-childexplore-intl",
+    "partner_sparklab_us_downex"   = "partner-sparklab-us"
+  )
 
   participants |>
     mutate(dataset = .data$dataset |> forcats::fct_recode(!!!dataset_names),
