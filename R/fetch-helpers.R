@@ -13,12 +13,14 @@ table_getter <- function(table_name, max_results = NULL) {
 # given a sql query, return a function that takes a dataset reference and
 # returns data from executing that sql query in that dataset
 query_getter <- function(table_name, query_str, max_results = NULL) {
-  message(glue::glue("--Executing SQL query"))
   \(dataset, dataset_table_names) {
+    message(glue::glue("--Executing SQL query"))
     if (!(table_name %in% dataset_table_names)) return(tibble())
-    suppressWarnings(
-      dataset$query(query_str)$to_tibble(max_results = max_results)
-    )
+    # suppressWarnings(
+      q <- dataset$query(query_str)
+      if (q$properties$outputNumRows == 0) return(tibble())
+      q$to_tibble(max_results = max_results)
+    # )
   }
 }
 
