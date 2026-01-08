@@ -38,17 +38,19 @@ process_participants <- function(dataset_spec, max_results = NULL) {
     "pilot_uniandes_co_bogota"     = "CO-bogota-pilot",
     "pilot_uniandes_co_rural"      = "CO-rural-pilot",
     "pilot_western_ca_main"        = "CA-western-pilot",
-    "pilot_mpieva_de_main"         = "DE-leipzig-pilot",
+    "pilot_mpieva_de_main"         = "DE-mpieva-pilot",
     "pilot_langcog_us_downex"      = "US-downward_extension-pilot",
     "partner_mpib_de_main"         = "partner-mpib-de",
     "partner_childexplore_intl_ef" = "partner-childexplore-intl",
     "partner_sparklab_us_downex"   = "partner-sparklab-us"
   )
 
-  participants |>
-    mutate(dataset = .data$dataset |> forcats::fct_recode(!!!dataset_names),
-           site = .data$dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
-           .before = "dataset") |>
-    relocate("redivis_source", .after = "dataset") |>
-    arrange(.data$dataset, .data$user_id)
+  suppressWarnings(
+    participants |>
+      mutate(dataset = .data$dataset |> forcats::fct_recode(!!!dataset_names),
+             site = .data$dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
+             .before = "dataset") |>
+      relocate("redivis_source", .after = "dataset") |>
+      arrange(.data$dataset, .data$user_id)
+  )
 }

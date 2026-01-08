@@ -16,11 +16,11 @@ query_getter <- function(table_name, query_str, max_results = NULL) {
   \(dataset, dataset_table_names) {
     message(glue::glue("--Executing SQL query"))
     if (!(table_name %in% dataset_table_names)) return(tibble())
-    # suppressWarnings(
+    suppressWarnings(
       q <- dataset$query(query_str)
-      if (q$properties$outputNumRows == 0) return(tibble())
-      q$to_tibble(max_results = max_results)
-    # )
+    )
+    if (q$properties$outputNumRows == 0) return(tibble())
+    q$to_tibble(max_results = max_results)
   }
 }
 

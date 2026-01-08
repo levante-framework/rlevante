@@ -167,39 +167,41 @@ add_item_ids <- function(trials) {
     "ha_knock_attribution"       = "tom_knock_papers_attribution"
   )
 
-  trials_prepped <- trials |>
-    # create item IDs for ROAR tasks (sre | pa -> item_id, swr -> answer)
-    mutate(item_uid_roar = case_when(
-      stringr::str_detect(task_id, "^pa(-|$)") ~ glue::glue("pa_{item_id}"),
-      stringr::str_detect(task_id, "^sre(-|$)") ~ glue::glue("sre_{item_id}"),
-      stringr::str_detect(task_id, "^swr(-|$)") ~ glue::glue("swr_{answer}"),
-    ) |> as.character()) |>
-    # fix wrong item IDs in item banks
-    mutate(item_uid = .data$item_uid |>
-             stringr::str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
-             stringr::str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
-             stringr::str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
-             stringr::str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
-             stringr::str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
-             stringr::str_replace("^tom_ha_", "ha_") |>
-             stringr::str_replace("^vocab__", "vocab_word_") |>
-             forcats::fct_recode(!!!itembank_recodes) |>
-             as.character() |>
-             na_if("math_fraction_512_16") |>
-             na_if("mg_forward_3grid_len2")) |>
-    # remove stray SDS instruction items
-    filter(is.na(.data$item_uid) | !stringr::str_detect(.data$item_uid, "-instr")) |>
-    # recode memory-game answers
-    mutate(answer = if_else(.data$task_id == "memory-game",
-                            as.character(stringr::str_count(.data$answer, ":")),
-                            .data$answer)) |>
-    # create item key for joining with item map
-    mutate(across(c(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors),
-                  \(s) tidyr::replace_na(s, ""))) |>
-    mutate(item_key = paste(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors) |>
-             stringr::str_trim()) |>
-    # remove trials with no item information
-    filter(!is.na(.data$item_uid) | !is.na(.data$item_key))
+  suppressWarnings(
+    trials_prepped <- trials |>
+      # create item IDs for ROAR tasks (sre | pa -> item_id, swr -> answer)
+      mutate(item_uid_roar = case_when(
+        stringr::str_detect(task_id, "^pa(-|$)") ~ glue::glue("pa_{item_id}"),
+        stringr::str_detect(task_id, "^sre(-|$)") ~ glue::glue("sre_{item_id}"),
+        stringr::str_detect(task_id, "^swr(-|$)") ~ glue::glue("swr_{answer}"),
+      ) |> as.character()) |>
+      # fix wrong item IDs in item banks
+      mutate(item_uid = .data$item_uid |>
+               stringr::str_replace("^mrot_3d_.*?_", "mrot_3d_shape_") |>
+               stringr::str_replace("^mrot_(.*)_200", "mrot_\\1_160") |>
+               stringr::str_replace("^mrot_(.*)_240", "mrot_\\1_120") |>
+               stringr::str_replace("^mrot_(.*)_280", "mrot_\\1_080") |>
+               stringr::str_replace("^mrot_(.*)_320", "mrot_\\1_040") |>
+               stringr::str_replace("^tom_ha_", "ha_") |>
+               stringr::str_replace("^vocab__", "vocab_word_") |>
+               forcats::fct_recode(!!!itembank_recodes) |>
+               as.character() |>
+               na_if("math_fraction_512_16") |>
+               na_if("mg_forward_3grid_len2")) |>
+      # remove stray SDS instruction items
+      filter(is.na(.data$item_uid) | !stringr::str_detect(.data$item_uid, "-instr")) |>
+      # recode memory-game answers
+      mutate(answer = if_else(.data$task_id == "memory-game",
+                              as.character(stringr::str_count(.data$answer, ":")),
+                              .data$answer)) |>
+      # create item key for joining with item map
+      mutate(across(c(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors),
+                    \(s) tidyr::replace_na(s, ""))) |>
+      mutate(item_key = paste(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors) |>
+               stringr::str_trim()) |>
+      # remove trials with no item information
+      filter(!is.na(.data$item_uid) | !is.na(.data$item_key))
+  )
 
   trials_joined <- trials_prepped |>
     select("trial_id", "task_id", "item_key", "item_uid", "item_uid_roar") |>
