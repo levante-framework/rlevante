@@ -8,50 +8,42 @@
 score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   message(glue::glue('--Using IRT scoring'))
 
-  if (!is.na(mod_spec$invariance) & mod_spec$invariance %in% c("metric", "configural")) {
-    message(glue::glue("Can't rescore with {mod_spec$invariance} models, skipping"))
-    return()
-  }
-
   # prep new data for model
-  data_filtered <- trial_data_task |> rename(group = "site") |> dedupe_items() |> remove_no_var_items()
-
+  data_filtered <- trial_data_task |> rename(group = "site") |> dedupe_items()
   data_wide <- data_filtered |> to_mirt_shape_grouped()
   data_prepped <- data_wide |> select(-"group")
   groups <- data_wide |> pull("group")
+  data_group <- unique(groups)
+
+  # handle data having groups that aren't in model
+  if (any(!(data_group %in% mod_rec@group_names))) {
+    # for metric or configural models, scoring not possible
+    if (!is.na(mod_spec$invariance) & mod_spec$invariance %in% c("metric", "configural")) {
+      message(glue::glue("For scoring with {mod_spec$invariance} models, all groups in data must be in specified model."))
+      return()
+      # for scalar models, scoring using any group should be equivalent
+    } else if (!is.na(mod_spec$invariance) & mod_spec$invariance == "scalar") {
+      data_group <- mod_rec@group_names[[1]]
+    }
+  }
 
   # subset data to items present in model
   overlap_items <- intersect(colnames(data_prepped), items(mod_rec))
   data_aligned <- data_prepped |> select(!!overlap_items)
+  # add columns with NA values for items present in model but not in data
+  missing_items <- setdiff(items(mod_rec), colnames(data_prepped))
+  data_aligned[,missing_items] <- NA
 
-  # get model parameter values
-  mod_vals <- model_vals(mod_rec) |> select(-"parnum")
-  if ((!is.na(mod_spec$invariance) & mod_spec$invariance == "scalar") | n_distinct(groups) == 1) {
-    # mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> select(-"group") |> distinct()
-    mod_vals <- mod_vals |> filter(.data$class != "GroupPars") |> filter(.data$group == .data$group[[1]]) |> select(-"group")
-  }
-
-  # get data parameter structure
+  # set up mirt model object for data using parameter values from model record
+  mod_vals <- model_vals(mod_rec)
   if (model_class(mod_rec) == "SingleGroupClass") {
-    data_pars <- mirt::mirt(data = data_aligned, pars = "values")
+    # reconstruct single group model
+    mod <- mirt::mirt(data = mod_rec@data, pars = mod_vals, TOL = NaN)
   } else if (model_class(mod_rec) == "MultipleGroupClass") {
-    data_pars <- mirt::multipleGroup(data = data_aligned, group = groups, pars = "values")
-  }
-
-  # replace data parameter values with model values
-  # TODO: is dropping item from the model that are not in the data problematic?
-  data_vals <- data_pars |>
-    filter(.data$class != "GroupPars") |>
-    select("group", "item", "class", "name", "parnum") |>
-    left_join(mod_vals, by = c("item", "class", "name")) |>
-    bind_rows(data_pars |> filter(.data$class == "GroupPars"))
-  # assertthat::assert_that(nrow(data_vals) == nrow(data_pars))
-
-  # set up mirt model for data using constructed parameter values
-  if (model_class(mod_rec) == "SingleGroupClass") {
-    mod <- mirt::mirt(data = data_aligned, pars = data_vals, TOL = NaN)
-  } else if (model_class(mod_rec) == "MultipleGroupClass") {
-    mod <- mirt::multipleGroup(data = data_aligned, group = groups, pars = data_vals, TOL = NaN)
+    # reconstruct multiple group model
+    mod_recon <- mirt::multipleGroup(data = mod_rec@data, group = mod_rec@groups, pars = mod_vals, TOL = NaN)
+    # extract single group model for given group
+    mod <- mirt::extract.group(mod_recon, group = data_group)
   }
 
   # get scores from model
