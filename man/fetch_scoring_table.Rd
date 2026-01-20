@@ -4,7 +4,7 @@
 \alias{fetch_scoring_table}
 \title{Fetch scoring specification table}
 \usage{
-fetch_scoring_table()
+fetch_scoring_table(version = "current")
 }
 \description{
 Fetch scoring specification table

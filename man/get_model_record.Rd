@@ -7,7 +7,7 @@
 get_model_record(spec, registry_table)
 }
 \arguments{
-\item{spec}{list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance}
+\item{spec}{list with entries item_task, model_set, subset, itemtype, nfact, invariance}
 
 \item{registry_table}{tibble returned by get_registry_table()}
 }

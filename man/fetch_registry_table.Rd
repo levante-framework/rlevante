@@ -4,7 +4,7 @@
 \alias{fetch_registry_table}
 \title{Fetch model registry file index table}
 \usage{
-fetch_registry_table()
+fetch_registry_table(version = "current")
 }
 \description{
 Fetch model registry file index table
