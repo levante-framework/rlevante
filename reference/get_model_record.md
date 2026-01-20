@@ -13,8 +13,8 @@ get_model_record(spec, registry_table)
 
 - spec:
 
-  list with entries item_task, dataset, model_set, subset, itemtype,
-  nfact, invariance
+  list with entries item_task, model_set, subset, itemtype, nfact,
+  invariance
 
 - registry_table:
 

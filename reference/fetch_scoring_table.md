@@ -5,5 +5,5 @@ Fetch scoring specification table
 ## Usage
 
 ``` r
-fetch_scoring_table()
+fetch_scoring_table(version = "current")
 ```
