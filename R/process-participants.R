@@ -13,6 +13,7 @@ process_participants <- function(dataset_spec, max_results = NULL) {
 
   user_vars <- c(
     "sites.site_name AS dataset",
+    "users.created_at",
     "users.user_id",
     "users.birth_month",
     "users.birth_year",
@@ -45,10 +46,17 @@ process_participants <- function(dataset_spec, max_results = NULL) {
     "partner_sparklab_us_downex"   = "partner-sparklab-us"
   )
 
+  co_guest_end <- as.POSIXct("2024-06-30")
   suppressWarnings(
     participants |>
-      mutate(dataset = .data$dataset |> forcats::fct_recode(!!!dataset_names),
-             site = .data$dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
+      # recode site/dataset names
+      mutate(dataset = .data$dataset |> forcats::fct_recode(!!!dataset_names)) |>
+      # assume all guest users from before 2024-06-30 are part of pilot_uniandes_co_bogota
+      mutate(dataset = if_else(is.na(.data$dataset) & .data$created_at < co_guest_end,
+                               "pilot_uniandes_co_bogota", .data$dataset)) |>
+      select(-"created_at") |>
+      # extract site from dataset
+      mutate(site = .data$dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
              .before = "dataset") |>
       relocate("redivis_source", .after = "dataset") |>
       arrange(.data$dataset, .data$user_id)
