@@ -18,16 +18,30 @@ process_surveys <- function(dataset_spec,
                             remove_incomplete_surveys = FALSE,
                             max_results = NULL) {
 
-  where_str <- build_filter("survey_id", survey_types)
-  query_str <- glue::glue("SELECT * FROM survey_responses {where_str}") |> stringr::str_trim()
+  where_str <- build_filter("surveys.survey_type", survey_types, allow_null = TRUE)
+  query_str <- glue::glue(
+    "SELECT * FROM survey_responses
+     LEFT JOIN surveys ON survey_responses.survey_id = surveys.survey_id
+      {where_str}"
+  )
 
   surveys <- get_datasets_data(dataset_spec,
                                query_getter("survey_responses", query_str, max_results))
+
   if (nrow(surveys) == 0) return()
 
   if (remove_incomplete_surveys) surveys <- surveys |> filter(.data$is_complete)
 
   surveys |>
+    select(-"survey_id_1") |>
+    mutate(survey_type = if_else(
+      is.na(.data$survey_type) & stringr::str_detect(.data$survey_id, ":data"),
+      "student",
+      .data$survey_type)) |>
+    mutate(survey_part = if_else(
+      is.na(.data$survey_part) & stringr::str_detect(.data$survey_id, ":data"),
+      "general",
+      .data$survey_part)) |>
     add_survey_items() |>
     code_survey_data()
 }
@@ -39,13 +53,13 @@ add_survey_items <- function(surveys) {
   survey_items <- fetch_survey_items()
   suppressWarnings(
     survey_items_coded <- survey_items |>
-      mutate(values = coalesce(.data$values, "[]"),
+      mutate(values = if_else(is.na(.data$values) | .data$values == "", "[]", .data$values),
              values = .data$values |> purrr::map(jsonlite::fromJSON) |> purrr::map(as.numeric))
   )
 
   surveys |>
-    rename(variable = "question_id", survey_type = "survey_id") |>
-    inner_join(survey_items_coded, by = c("survey_type", "variable"))
+    rename(variable = "question") |>
+    inner_join(survey_items_coded, by = c("survey_type", "survey_part", "variable"))
 
 }
 
@@ -63,11 +77,12 @@ code_survey_data <- function(surveys) {
     mutate(value = if_else(.data$reverse_coded,
                            purrr::map2_dbl(.data$value, .data$values, reverse_value),
                            .data$value)) |>
-    select("redivis_source", "survey_response_id", "survey_type", "survey_part",
+    select("redivis_source", "survey_id", "survey_type", "survey_part",
            "user_id", "child_id", contains("construct"), "question_type",
            "variable", "variable_order", "value", "boolean_response",
            "string_response", "numeric_response", "is_complete",
-           timestamp = "created_at")
+           timestamp = "created_at") |>
+    arrange(.data$redivis_source, .data$survey_id, .data$variable_order)
 }
 
 
@@ -89,7 +104,7 @@ link_surveys <- function(surveys, participants) {
 
   user_survey_data <- surveys |>
     mutate(survey_group = .data$survey_part) |>
-    tidyr::nest(survey_data = -c("survey_type", "survey_response_id",
+    tidyr::nest(survey_data = -c("survey_type", "survey_id",
                                  "timestamp", "survey_group", "user_id", "child_id")) |>
     mutate(n_responses = purrr::map_int(.data$survey_data, nrow)) |>
     filter(.data$n_responses > 1)
@@ -136,7 +151,7 @@ link_surveys <- function(surveys, participants) {
 
   # caregiver survey combined
   survey_caregiver <- bind_rows(survey_household, survey_child) |>
-    group_by(.data$survey_response_id, .data$survey_type, .data$user_id,
+    group_by(.data$survey_id, .data$survey_type, .data$user_id,
              .data$child_id, .data$timestamp) |>
     summarise(survey_data = list(purrr::list_rbind(.data$survey_data)),
               n_responses = sum(.data$n_responses))

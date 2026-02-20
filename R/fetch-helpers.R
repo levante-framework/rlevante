@@ -59,7 +59,8 @@ get_datasets_data <- function(dataset_spec, dataset_fun) {
 }
 
 # construct SQL WHERE clause out of a variable name and vector of allowed values
-build_filter <- function(var, vals) {
+build_filter <- function(var, vals, allow_null = FALSE) {
   vals_str <- glue::glue("'{vals}'") |> paste(collapse = ", ")
-  if (is.null(vals)) "" else glue::glue("WHERE {var} IN ({vals_str})")
+  null <- if (allow_null) glue::glue("{var} IS NULL OR ") else ""
+  if (is.null(vals)) "" else glue::glue("WHERE {null}{var} IN ({vals_str})")
 }
