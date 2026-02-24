@@ -4,20 +4,20 @@
 \alias{get_raw_table}
 \title{Get raw table}
 \usage{
-get_raw_table(table_name, data_source, version = "current")
+get_raw_table(table_name, data_source, data_source_version = "current")
 }
 \arguments{
 \item{table_name}{String indicating name of table to get}
 
-\item{data_source}{Name of Redivis dataset}
+\item{data_source}{String indicating which Redivis dataset to get}
 
-\item{version}{Version of Redivis dataset}
+\item{data_source_version}{String indicating which version of `data_source` to get}
 }
 \description{
 Get raw table
 }
 \examples{
 \dontrun{
-runs <- get_raw_table(table_name = "runs", dataset = "levante-data-example:bm7r")
+runs <- get_raw_table(table_name = "runs", data_source = "levante-data-example:bm7r")
 }
 }
