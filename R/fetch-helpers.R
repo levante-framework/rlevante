@@ -14,7 +14,7 @@ table_getter <- function(table_name, max_results = NULL) {
 # returns data from executing that sql query in that dataset
 query_getter <- function(table_name, query_str, max_results = NULL) {
   \(dataset, dataset_table_names) {
-    message(glue::glue("--Executing SQL query"))
+    message(glue::glue("--Executing query on table {table_name}"))
     if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
       q <- dataset$query(query_str)

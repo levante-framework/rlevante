@@ -6,7 +6,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' dataset_spec <- list(list(name = "levante_data_example:d0rt", version = "current"))
 #' trials_prelim <- process_trials_prelim(dataset_spec)
 #' }
 process_trials_prelim <- function(dataset_spec,
@@ -56,7 +56,7 @@ process_trials_prelim <- function(dataset_spec,
 #' @export
 #' @examples
 #' \dontrun{
-#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' dataset_spec <- list(list(name = "levante_data_example:d0rt", version = "current"))
 #' trials <- process_trials(dataset_spec)
 #' }
 process_trials <- function(dataset_spec,

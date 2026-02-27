@@ -16,6 +16,6 @@ Get participants
 }
 \examples{
 \dontrun{
-participants <- get_participants(dataset = "levante-data-example:bm7r", version = "current")
+participants <- get_participants(dataset = "levante_data_example:d0rt", version = "current")
 }
 }

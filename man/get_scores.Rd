@@ -16,6 +16,6 @@ Get scores
 }
 \examples{
 \dontrun{
-scores <- get_scores(dataset = "levante-data-example:bm7r", version = "current")
+scores <- get_scores(dataset = "levante_data_example:d0rt", version = "current")
 }
 }

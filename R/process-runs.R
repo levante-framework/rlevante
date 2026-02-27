@@ -12,7 +12,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+#' dataset_spec <- list(list(name = "levante_data_example:d0rt", version = "current"))
 #' runs <- process_runs(dataset_spec)
 #' }
 process_runs <- function(dataset_spec,

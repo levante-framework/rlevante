@@ -6,7 +6,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' participants <- get_participants(dataset = "levante-data-example:bm7r", version = "current")
+#' participants <- get_participants(dataset = "levante_data_example:d0rt", version = "current")
 #' }
 get_participants <- function(data_source, version = "current") {
   dataset_spec <- list(list(name = data_source, version = version))
@@ -20,7 +20,7 @@ get_participants <- function(data_source, version = "current") {
 #' @export
 #' @examples
 #' \dontrun{
-#' scores <- get_scores(dataset = "levante-data-example:bm7r", version = "current")
+#' scores <- get_scores(dataset = "levante_data_example:d0rt", version = "current")
 #' }
 get_scores <- function(data_source, version = "current") {
   dataset_spec <- list(list(name = data_source, version = version))
@@ -34,7 +34,7 @@ get_scores <- function(data_source, version = "current") {
 #' @export
 #' @examples
 #' \dontrun{
-#' surveys <- get_surveys(dataset = "levante-data-example:bm7r", version = "current")
+#' surveys <- get_surveys(dataset = "levante_data_example:d0rt", version = "current")
 #' }
 get_surveys <- function(data_source, version = "current") {
   dataset_spec <- list(list(name = data_source, version = version))
@@ -48,7 +48,7 @@ get_surveys <- function(data_source, version = "current") {
 #' @export
 #' @examples
 #' \dontrun{
-#' trials <- get_trials(dataset = "levante-data-example:bm7r", version = "current")
+#' trials <- get_trials(dataset = "levante_data_example:d0rt", version = "current")
 #' }
 get_trials <- function(data_source, version = "current") {
   dataset_spec <- list(list(name = data_source, version = version))

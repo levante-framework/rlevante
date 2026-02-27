@@ -18,6 +18,6 @@ Get raw table
 }
 \examples{
 \dontrun{
-runs <- get_raw_table(table_name = "runs", data_source = "levante-data-example:bm7r")
+runs <- get_raw_table(table_name = "runs", data_source = "levante_data_example_raw:bm7r")
 }
 }
