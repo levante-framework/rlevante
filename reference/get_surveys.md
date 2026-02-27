@@ -22,6 +22,6 @@ get_surveys(data_source, version = "current")
 
 ``` r
 if (FALSE) { # \dontrun{
-surveys <- get_surveys(dataset = "levante-data-example:bm7r", version = "current")
+surveys <- get_surveys(dataset = "levante_data_example:d0rt", version = "current")
 } # }
 ```

@@ -56,7 +56,7 @@ process_trials_prelim(
 
 ``` r
 if (FALSE) { # \dontrun{
-dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+dataset_spec <- list(list(name = "levante_data_example:d0rt", version = "current"))
 trials_prelim <- process_trials_prelim(dataset_spec)
 } # }
 ```

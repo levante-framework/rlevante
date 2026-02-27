@@ -22,6 +22,6 @@ get_scores(data_source, version = "current")
 
 ``` r
 if (FALSE) { # \dontrun{
-scores <- get_scores(dataset = "levante-data-example:bm7r", version = "current")
+scores <- get_scores(dataset = "levante_data_example:d0rt", version = "current")
 } # }
 ```

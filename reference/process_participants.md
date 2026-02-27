@@ -23,7 +23,7 @@ process_participants(dataset_spec, max_results = NULL)
 
 ``` r
 if (FALSE) { # \dontrun{
-dataset_spec <- list(list(name = "levante-example-dataset:bm7r", version = "current"))
+dataset_spec <- list(list(name = "levante_data_example:d0rt", version = "current"))
 participants <- process_participants(dataset_spec)
 } # }
 ```

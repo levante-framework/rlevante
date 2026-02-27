@@ -5,7 +5,7 @@ Get raw table
 ## Usage
 
 ``` r
-get_raw_table(table_name, data_source, version = "current")
+get_raw_table(table_name, data_source, data_source_version = "current")
 ```
 
 ## Arguments
@@ -16,16 +16,16 @@ get_raw_table(table_name, data_source, version = "current")
 
 - data_source:
 
-  Name of Redivis dataset
+  String indicating which Redivis dataset to get
 
-- version:
+- data_source_version:
 
-  Version of Redivis dataset
+  String indicating which version of \`data_source\` to get
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-runs <- get_raw_table(table_name = "runs", dataset = "levante-data-example:bm7r")
+runs <- get_raw_table(table_name = "runs", data_source = "levante_data_example_raw:bm7r")
 } # }
 ```
