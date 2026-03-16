@@ -32,11 +32,11 @@ To find and use a dataset’s reference ID, follow these steps:
 
 1. Go to your dataset’s page on Redivis. For example, the link to our publicly available pilot data release is https://stanford.redivis.com/datasets/68kn-csrddrz5x. Once there, click on “API Information” in the right navigation panel.
 
-![Step 1. Click "API information" in the right navigation file](rlevante/man/figures/find_refIDs_step1.png)
+![Step 1. Click "API information" in the right navigation file](man/figures/find_refIDs_step1.png)
 
 2. On the pop-up, check the box in the upper right hand corner for “Qualified references."
 
-![Step 2. Check "Qualified References"](rlevante/man/figures/find_refIDs_step2.png)  
+![Step 2. Check "Qualified References"](man/figures/find_refIDs_step2.png)  
 
 3. Record the string used to specify the dataset, including both its name and reference ID (“68kn” in the example below).  
 
