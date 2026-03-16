@@ -140,17 +140,17 @@ mod_spec_str <- \(spec) {
 #' @param runs run data from one task and one dataset
 #' @param scoring_table table returned by get_scoring_table
 #' @param registry_table  table returned by get_registry_table
-score <- \(task, dataset, trials, runs, scoring_table, registry_table) {
+score <- \(task, dataset, trials, runs, scoring_table, registry_dir) {
 
   message(glue::glue('Scoring data for task "{task}" and dataset "{dataset}"'))
 
-  irt_tasks <- c("matrix", "mrot", "math", "hf", "mg", "sds", "trog", "vocab", "tom")
   cat_tasks <- c("swr")
   custom_tasks <- list(pa = score_pa, sre = score_sre)
 
-  if (task %in% irt_tasks) {
-    mod_spec <- get_model_spec(task, dataset, scoring_table)
-    mod_rec <- get_model_record(mod_spec, registry_table)
+  # if scoring_table has entry for task + dataset, use that model spec
+  mod_spec <- get_model_spec(task, dataset, scoring_table)
+  if (!is.null(mod_spec)) {
+    mod_rec <- get_model_record(mod_spec, registry_dir)
     scores <- score_irt(trials, mod_spec, mod_rec)
   } else if (task %in% cat_tasks) {
     scores <- score_cat(runs)
