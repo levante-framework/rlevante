@@ -7,9 +7,9 @@
 link_surveys(surveys, participants)
 }
 \arguments{
-\item{surveys}{Survey data as returned by `process_surveys()`.}
+\item{surveys}{Survey data as returned by \code{process_surveys()}.}
 
-\item{participants}{Participant data as returned by `process_participants()`.}
+\item{participants}{Participant data as returned by \code{process_participants()}.}
 }
 \description{
 Link survey data to participant data

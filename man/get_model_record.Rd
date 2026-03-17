@@ -2,19 +2,19 @@
 % Please edit documentation in R/irt-registry.R
 \name{get_model_record}
 \alias{get_model_record}
-\title{get the model record indexed in registry_table for a given scoring specification}
+\title{get the model record indexed in registry_dir for a given scoring specification}
 \usage{
-get_model_record(spec, registry_table)
+get_model_record(spec, registry_dir)
 }
 \arguments{
 \item{spec}{list with entries item_task, model_set, subset, itemtype, nfact, invariance}
 
-\item{registry_table}{tibble returned by get_registry_table()}
+\item{registry_dir}{tibble returned by registry_dir()}
 }
 \value{
 ModelRecord object
 }
 \description{
-get the model record indexed in registry_table for a given scoring specification
+get the model record indexed in registry_dir for a given scoring specification
 }
 \keyword{internal}
