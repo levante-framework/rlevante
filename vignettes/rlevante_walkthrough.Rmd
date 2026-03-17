@@ -1,0 +1,24 @@
+---
+title: "rlevante_walkthrough"
+output: html_document
+---
+
+Before you begin this user walkthrough, please see our [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for 1) how to install rlevante and 2) how to gain access to the data.
+
+## From Redivis to R
+
+Permission to access the data is granted via [Redivis](https://redivis.com/), a data-sharing platform used for all LEVANTE datasets. Public releases of LEVANTE datasets on Redivis include at least four tables: participants, scores, surveys, and trials. 
+
+**Table 1.** Redivis tables commonly read into data frames by rlevante
+
+| Name         | Description                                                                                                                           | Additional information                                                                               |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| participants | Information about child participants, where each row is a child participant.                                                          | Contains child participant ids, approximate birthdates, and any associated caregiver or teacher ids. |
+| scores       | Information about task ability scores across participants and tasks, where each row is a single score.                                | - Overview of tasks administered  -[Guidelines for interpreting scores and details about scoring methods](https://researcher.levante-network.org/measures/scoring-and-psychometrics) |
+| surveys      | Information about survey responses across participants and surveys, where each row is a single survey item response.                  | [Child survey info](https://researcher.levante-network.org/measures/direct-child-measures/attitudes/thoughts-feelings), [Caregiver survey info](https://researcher.levante-network.org/measures/caregiver-surveys), [Teacher survey info](https://researcher.levante-network.org/measures/teacher-survey)                                        |
+| trials       | Information about trial level task responses across participants, tasks, and trials, where each row is a single trial-level response. | [Overview of tasks administered](https://researcher.levante-network.org/measures/direct-child-measures)                                                                       |
+## rlevante walkthrough
+Each table can be read into R as a data frame using a specific rlevante “get” function. Each “get” function takes at least two arguments, including a dataset name (required) and version number (defaults to the current version unless otherwise specified). 
+
+First, use `get_participants` to examine child participant ids, approximate birthdates, and any associated caregiver or teacher ids. 
+
