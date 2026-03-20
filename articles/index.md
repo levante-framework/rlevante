@@ -2,5 +2,4 @@
 
 ### All vignettes
 
-- [Data
-  access](https://levante-framework.github.io/rlevante/articles/data_access.md):
+- [rlevante_walkthrough](https://levante-framework.github.io/rlevante/articles/rlevante_walkthrough.md):

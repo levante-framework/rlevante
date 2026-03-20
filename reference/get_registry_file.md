@@ -5,5 +5,5 @@ fetch file from model registry
 ## Usage
 
 ``` r
-get_registry_file(mod_filename, registry_table)
+get_registry_file(mod_filename, registry_dir)
 ```

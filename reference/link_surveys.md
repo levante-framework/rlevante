@@ -12,11 +12,13 @@ link_surveys(surveys, participants)
 
 - surveys:
 
-  Survey data as returned by \`process_surveys()\`.
+  Survey data as returned by
+  [`process_surveys()`](https://levante-framework.github.io/rlevante/reference/process_surveys.md).
 
 - participants:
 
-  Participant data as returned by \`process_participants()\`.
+  Participant data as returned by
+  [`process_participants()`](https://levante-framework.github.io/rlevante/reference/process_participants.md).
 
 ## Examples
 

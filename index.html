@@ -35,7 +35,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/data_access.html">Data access</a></li>
+<li><a class="dropdown-item" href="articles/rlevante_walkthrough.html">rlevante_walkthrough</a></li>
   </ul>
 </li>
       </ul>
@@ -53,11 +53,48 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="rlevante">rlevante<a class="anchor" aria-label="anchor" href="#rlevante"></a>
 </h1></div>
-<p>LEVANTE R package</p>
+<p>R package for accessing LEVANTE data. Some useful links:<br>
+- <a href="https://researcher.levante-network.org/overview" class="external-link">An overview of the LEVANTE project</a> - <a href="https://researcher.levante-network.org/measures/scoring-and-psychometrics" class="external-link">Details about LEVANTE’s scoring and psychometrics</a> - <a href="https://researcher.levante-network.org/measures/direct-child-measures" class="external-link">Details about the LEVANTE child tasks</a> - <a href="https://researcher.levante-network.org/data" class="external-link">How to access the LEVANTE data.</a> Prior to completing the steps described at this link, you only have access to an example dataset with toy data. - <a href="https://researcher.levante-network.org/data-overview" class="external-link">Data browser.</a> You can browse scored and trial level task public data using our data browser. If you are a partner with access to additional datasets on Redivis, you will also be able to load and browse those datasets on the data browser.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p><code>devtools::install_git(url="https://github.com/levante-framework/rlevante")</code></p>
+<pre><code><span><span class="co">#install.packages(“devtools”) # if you need the devtools package, uncomment this line</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span>url<span class="op">=</span><span class="st">"https://github.com/levante-framework/rlevante"</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p>A collection of “get” functions to acquire LEVANTE data. For example, use get_scores to download scored cognitive task data.</p>
+<pre><code><span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_scores.html">get_scores</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"levante-data-example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span></span></code></pre>
+<div class="section level3">
+<h3 id="accessing-datasets-and-codebooks">Accessing datasets and codebooks<a class="anchor" aria-label="anchor" href="#accessing-datasets-and-codebooks"></a>
+</h3>
+<p>Permission to access the data is granted via Redivis, a data-sharing platform used for all LEVANTE datasets. Individuals seeking to access any LEVANTE data must create an account on Redivis and sign our data use agreement.</p>
+<p>Datasets available to the public include <a href="https://stanford.redivis.com/datasets/68kn-csrddrz5x" class="external-link">levante-data-pilots</a> and levante-example-data. If you are a partner with access to your own data in a private repository, see <a href="https://researcher.levante-network.org/data" class="external-link">this page</a> for information about how to set up data access.</p>
+<p>Once you have access to a dataset on Redivis, you can use rlevante to read the data directly into R. Please see our rlevante user walkthrough for more information and examples.</p>
+</div>
+<div class="section level3">
+<h3 id="reference-identifiers">Reference identifiers<a class="anchor" aria-label="anchor" href="#reference-identifiers"></a>
+</h3>
+<p>In addition to its name, each dataset has a reference ID. While not required, specifying this ID is more stable for your code than specifying dataset names, because dataset names can easily be edited.</p>
+<p>To find and use a dataset’s reference ID, follow these steps:</p>
+<ol style="list-style-type: decimal">
+<li>Go to your dataset’s page on Redivis. For example, the link to our publicly available pilot data release is <a href="https://stanford.redivis.com/datasets/68kn-csrddrz5x" class="external-link uri">https://stanford.redivis.com/datasets/68kn-csrddrz5x</a>. Once there, click on “API Information” in the right navigation panel.</li>
+</ol>
+<div class="float">
+<img src="reference/figures/find_refIDs_step1.png" alt="Step 1. Click “API information” in the right navigation file"><div class="figcaption">Step 1. Click “API information” in the right navigation file</div>
+</div>
+<ol start="2" style="list-style-type: decimal">
+<li>On the pop-up, check the box in the upper right hand corner for “Qualified references.”</li>
+</ol>
+<div class="float">
+<img src="reference/figures/find_refIDs_step2.png" alt="Step 2. Check “Qualified References”"><div class="figcaption">Step 2. Check “Qualified References”</div>
+</div>
+<ol start="3" style="list-style-type: decimal">
+<li>Record the string used to specify the dataset, including both its name and reference ID (“68kn” in the example below).</li>
+</ol>
+<p>In rlevante functions, this string can be used as an argument to identify this dataset (e.g., get_participants(data_source = “levante_data_pilots:68kn”)). The “v2_0” portion refers to the version number.</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">

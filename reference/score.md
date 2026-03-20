@@ -5,7 +5,7 @@ score
 ## Usage
 
 ``` r
-score(task, dataset, trials, runs, scoring_table, registry_table)
+score(task, dataset, trials, runs, scoring_table, registry_dir)
 ```
 
 ## Arguments

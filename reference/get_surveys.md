@@ -1,6 +1,9 @@
 # Get surveys
 
-Get surveys
+`get_surveys()` returns information about survey responses as a data
+frame. See the [rlevante
+documentation](https://levante-framework.github.io/rlevante/index.html)
+for more information about how to access LEVANTE datasets and codebooks.
 
 ## Usage
 
@@ -17,6 +20,10 @@ get_surveys(data_source, version = "current")
 - version:
 
   Version of Redivis dataset
+
+## Value
+
+A data frame where each row is a survey item response.
 
 ## Examples
 
