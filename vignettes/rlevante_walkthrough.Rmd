@@ -87,7 +87,7 @@ surveys <- get_surveys("levante-data-example:d0rt")
 surveys |> count(dataset, sort = TRUE)
 ```
 
-Finally, if you are researchers accessing your own data collected through the LEVANTE table, you can use `get_raw_data` to access additional tables within your private dataset. 
+Finally, researchers accessing their own LEVANTE data can use `get_raw_data` to access additional tables within private datasets.
 
 ```{r}
 
