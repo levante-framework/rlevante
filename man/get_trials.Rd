@@ -11,8 +11,11 @@ get_trials(data_source, version = "current")
 
 \item{version}{Version of Redivis dataset}
 }
+\value{
+A data frame where each row is a trial.
+}
 \description{
-Get trials
+\code{get_trials()} returns information about each trial as a data frame. See the \href{https://levante-framework.github.io/rlevante/index.html}{rlevante documentation} for more information about how to access LEVANTE datasets and codebooks.
 }
 \examples{
 \dontrun{

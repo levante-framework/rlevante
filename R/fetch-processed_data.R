@@ -1,8 +1,9 @@
 #' Get participants
 #'
+#' `get_participants()` returns information about participants as a data frame. See the [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for more information about how to access LEVANTE datasets and codebooks.
 #' @param data_source Name of Redivis dataset
 #' @param version Version of Redivis dataset
-#'
+#' @returns A data frame where each row contains information about a child participant.
 #' @export
 #' @examples
 #' \dontrun{
@@ -15,8 +16,9 @@ get_participants <- function(data_source, version = "current") {
 
 #' Get scores
 #'
+#' `get_scores()` returns information about scores as a data frame. See the [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for more information about how to access LEVANTE datasets and codebooks.
 #' @inheritParams get_participants
-#'
+#' @returns A data frame where each row is a task ability score. See our [Scoring and Psychometrics page](https://researcher.levante-network.org/measures/scoring-and-psychometrics) to learn how to interpret scores.
 #' @export
 #' @examples
 #' \dontrun{
@@ -29,8 +31,9 @@ get_scores <- function(data_source, version = "current") {
 
 #' Get surveys
 #'
+#' `get_surveys()` returns information about survey responses as a data frame. See the [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for more information about how to access LEVANTE datasets and codebooks.
 #' @inheritParams get_participants
-#'
+#' @returns A data frame where each row is a survey item response.
 #' @export
 #' @examples
 #' \dontrun{
@@ -43,8 +46,9 @@ get_surveys <- function(data_source, version = "current") {
 
 #' Get trials
 #'
+#' `get_trials()` returns information about each trial as a data frame. See the [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for more information about how to access LEVANTE datasets and codebooks.
 #' @inheritParams get_participants
-#'
+#' @returns A data frame where each row is a trial.
 #' @export
 #' @examples
 #' \dontrun{
