@@ -54,7 +54,11 @@
 <div class="page-header"><h1 id="rlevante">rlevante<a class="anchor" aria-label="anchor" href="#rlevante"></a>
 </h1></div>
 <p>R package for accessing LEVANTE data. Some useful links:<br>
-- <a href="https://researcher.levante-network.org/overview" class="external-link">An overview of the LEVANTE project</a> - <a href="https://researcher.levante-network.org/measures/scoring-and-psychometrics" class="external-link">Details about LEVANTE’s scoring and psychometrics</a> - <a href="https://researcher.levante-network.org/measures/direct-child-measures" class="external-link">Details about the LEVANTE child tasks</a> - <a href="https://researcher.levante-network.org/data" class="external-link">How to access the LEVANTE data.</a> Prior to completing the steps described at this link, you only have access to an example dataset with toy data. - <a href="https://researcher.levante-network.org/data-overview" class="external-link">Data browser.</a> You can browse scored and trial level task public data using our data browser. If you are a partner with access to additional datasets on Redivis, you will also be able to load and browse those datasets on the data browser.</p>
+- <a href="https://researcher.levante-network.org/overview" class="external-link">An overview of the LEVANTE project</a>.<br>
+- <a href="https://researcher.levante-network.org/measures/scoring-and-psychometrics" class="external-link">Details about LEVANTE’s scoring and psychometrics</a>.<br>
+- <a href="https://researcher.levante-network.org/measures/direct-child-measures" class="external-link">Details about the LEVANTE child tasks</a>.<br>
+- <a href="https://researcher.levante-network.org/data" class="external-link">How to access the LEVANTE data.</a> Prior to completing the steps described at this link, you only have access to an example dataset with toy data.<br>
+- <a href="https://researcher.levante-network.org/data-overview" class="external-link">Data browser.</a> You can browse scored and trial level task public data using our data browser. If you are a partner with access to additional datasets on Redivis, you will also be able to load and browse those datasets on the data browser.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -81,19 +85,14 @@
 <ol style="list-style-type: decimal">
 <li>Go to your dataset’s page on Redivis. For example, the link to our publicly available pilot data release is <a href="https://stanford.redivis.com/datasets/68kn-csrddrz5x" class="external-link uri">https://stanford.redivis.com/datasets/68kn-csrddrz5x</a>. Once there, click on “API Information” in the right navigation panel.</li>
 </ol>
-<div class="float">
-<img src="reference/figures/find_refIDs_step1.png" alt="Step 1. Click “API information” in the right navigation file"><div class="figcaption">Step 1. Click “API information” in the right navigation file</div>
-</div>
+<p><img src="reference/figures/find_refIDs_step1.png"></p>
 <ol start="2" style="list-style-type: decimal">
 <li>On the pop-up, check the box in the upper right hand corner for “Qualified references.”</li>
 </ol>
-<div class="float">
-<img src="reference/figures/find_refIDs_step2.png" alt="Step 2. Check “Qualified References”"><div class="figcaption">Step 2. Check “Qualified References”</div>
-</div>
+<p><img src="reference/figures/find_refIDs_step2.png"></p>
 <ol start="3" style="list-style-type: decimal">
-<li>Record the string used to specify the dataset, including both its name and reference ID (“68kn” in the example below).</li>
+<li>Record the string used to specify the dataset, including both its name (“levante_data_pilots”“) and reference ID (“68kn”). In rlevante functions, this string can be used as an argument to identify this dataset (e.g., get_participants(data_source = “levante_data_pilots:68kn”)).</li>
 </ol>
-<p>In rlevante functions, this string can be used as an argument to identify this dataset (e.g., get_participants(data_source = “levante_data_pilots:68kn”)). The “v2_0” portion refers to the version number.</p>
 </div>
 </div>
 </div>

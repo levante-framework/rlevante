@@ -2,19 +2,20 @@
 
 R package for accessing LEVANTE data. Some useful links:  
 - [An overview of the LEVANTE
-project](https://researcher.levante-network.org/overview) - [Details
-about LEVANTE’s scoring and
-psychometrics](https://researcher.levante-network.org/measures/scoring-and-psychometrics) -
-[Details about the LEVANTE child
-tasks](https://researcher.levante-network.org/measures/direct-child-measures) -
-[How to access the LEVANTE
+project](https://researcher.levante-network.org/overview).  
+- [Details about LEVANTE’s scoring and
+psychometrics](https://researcher.levante-network.org/measures/scoring-and-psychometrics).  
+- [Details about the LEVANTE child
+tasks](https://researcher.levante-network.org/measures/direct-child-measures).  
+- [How to access the LEVANTE
 data.](https://researcher.levante-network.org/data) Prior to completing
 the steps described at this link, you only have access to an example
-dataset with toy data. - [Data
-browser.](https://researcher.levante-network.org/data-overview) You can
-browse scored and trial level task public data using our data browser.
-If you are a partner with access to additional datasets on Redivis, you
-will also be able to load and browse those datasets on the data browser.
+dataset with toy data.  
+- [Data browser.](https://researcher.levante-network.org/data-overview)
+You can browse scored and trial level task public data using our data
+browser. If you are a partner with access to additional datasets on
+Redivis, you will also be able to load and browse those datasets on the
+data browser.
 
 ## Installation
 
@@ -59,23 +60,15 @@ To find and use a dataset’s reference ID, follow these steps:
     <https://stanford.redivis.com/datasets/68kn-csrddrz5x>. Once there,
     click on “API Information” in the right navigation panel.
 
-![Step 1. Click “API information” in the right navigation
-file](reference/figures/find_refIDs_step1.png)
-
-Step 1. Click “API information” in the right navigation file
+![](reference/figures/find_refIDs_step1.png)
 
 2.  On the pop-up, check the box in the upper right hand corner for
     “Qualified references.”
 
-![Step 2. Check “Qualified
-References”](reference/figures/find_refIDs_step2.png)
-
-Step 2. Check “Qualified References”
+![](reference/figures/find_refIDs_step2.png)
 
 3.  Record the string used to specify the dataset, including both its
-    name and reference ID (“68kn” in the example below).
-
-In rlevante functions, this string can be used as an argument to
-identify this dataset (e.g., get_participants(data_source =
-“levante_data_pilots:68kn”)). The “v2_0” portion refers to the version
-number.
+    name (“levante_data_pilots”“) and reference ID (“68kn”). In rlevante
+    functions, this string can be used as an argument to identify this
+    dataset (e.g., get_participants(data_source =
+    “levante_data_pilots:68kn”)).
