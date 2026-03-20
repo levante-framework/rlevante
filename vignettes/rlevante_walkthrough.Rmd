@@ -3,7 +3,25 @@ title: "rlevante_walkthrough"
 output: html_document
 ---
 
-Before you begin this user walkthrough, please see our [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for 1) how to install rlevante and 2) how to gain access to the data.
+---
+title: "rlevante walkthrough"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rlevante_walkthrough}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Before you begin this user walkthrough, please see our [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for 1) how to install rlevante and 2) how to gain access to the data. 
+
+This walkthrough uses an example dataset of 15 participants (levante-data-example) for teaching purposes. Access to the example dataset requires creating an account and joining the LEVANTE organization on Redivis, a data-sharing platform. For more information, see our [Researcher Site page on Data Access](https://researcher.levante-network.org/data).
 
 ## From Redivis to R
 
@@ -13,12 +31,67 @@ Permission to access the data is granted via [Redivis](https://redivis.com/), a 
 
 | Name         | Description                                                                                                                           | Additional information                                                                               |
 |--------------|---------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| participants | Information about child participants, where each row is a child participant.                                                          | Contains child participant ids, approximate birthdates, and any associated caregiver or teacher ids. |
-| scores       | Information about task ability scores across participants and tasks, where each row is a single score.                                | - Overview of tasks administered  -[Guidelines for interpreting scores and details about scoring methods](https://researcher.levante-network.org/measures/scoring-and-psychometrics) |
-| surveys      | Information about survey responses across participants and surveys, where each row is a single survey item response.                  | [Child survey info](https://researcher.levante-network.org/measures/direct-child-measures/attitudes/thoughts-feelings), [Caregiver survey info](https://researcher.levante-network.org/measures/caregiver-surveys), [Teacher survey info](https://researcher.levante-network.org/measures/teacher-survey)                                        |
-| trials       | Information about trial level task responses across participants, tasks, and trials, where each row is a single trial-level response. | [Overview of tasks administered](https://researcher.levante-network.org/measures/direct-child-measures)                                                                       |
-## rlevante walkthrough
-Each table can be read into R as a data frame using a specific rlevante “get” function. Each “get” function takes at least two arguments, including a dataset name (required) and version number (defaults to the current version unless otherwise specified). 
+| participants | Information about child participants, where each row is a child participant.                                                          |  |
+| scores       | Information about task ability scores across participants and tasks, where each row is a single score.                                | - [Overview of tasks](https://researcher.levante-network.org/measures/direct-child-measures)  <br> - [Guidelines for interpreting scores and details about scoring methods](https://researcher.levante-network.org/measures/scoring-and-psychometrics) |
+| surveys      | Information about survey responses across participants and surveys, where each row is a single survey item response.                  | - [Child survey info](https://researcher.levante-network.org/measures/direct-child-measures/attitudes/thoughts-feelings) <br> -  [Caregiver survey info](https://researcher.levante-network.org/measures/caregiver-surveys) <br> - [Teacher survey info](https://researcher.levante-network.org/measures/teacher-survey)                                        |
+| trials       | Information about trial level task responses across participants, tasks, and trials, where each row is a single trial-level response. | - [Overview of tasks](https://researcher.levante-network.org/measures/direct-child-measures)                                                                       |. 
 
-First, use `get_participants` to examine child participant ids, approximate birthdates, and any associated caregiver or teacher ids. 
+## Using rlevante to load LEVANTE data
+Each table from Redivis can be read into R as a data frame using a specific rlevante “get” function. Each “get” function takes at least two arguments, including a dataset name (required) and version number (defaults to the current version unless otherwise specified). 
 
+First, load rlevante and other packages, as needed.
+```{r setup}
+library(rlevante)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_classic())
+```
+
+Then, use `get_participants` to obtain child participant ids, approximate birthdates, and any associated caregiver or teacher ids. 
+```{r}
+participants <- get_participants("levante-data-example:d0rt", version = "current")
+
+participants |> count(dataset, sort = TRUE)
+```
+
+Use `get_scores` to obtain scored cognitive task data. 
+```{r}
+scores <- get_scores(data_source = "levante-data-example:d0rt")
+
+scores |> count(dataset, sort = TRUE)
+
+scores |> count(task_id, sort = TRUE)
+```
+
+```{r}
+ggplot(scores, aes(x = age, y = score)) +
+  facet_wrap(vars(task_id)) +
+  geom_point()
+```
+
+Use `get_trials` to access trial-level data.
+
+```{r}
+trials <- get_trials("levante-data-example:d0rt")
+
+trials |> count(dataset, sort = TRUE)
+
+trials |> count(task_id, sort = TRUE)
+```
+
+Use `get_surveys` to access item-level survey data.
+```{r}
+
+surveys <- get_surveys("levante-data-example:d0rt")
+
+surveys |> count(dataset, sort = TRUE)
+```
+
+Finally, if you are researchers accessing your own data collected through the LEVANTE table, you can use `get_raw_data` to access additional tables within your private dataset. 
+
+```{r}
+
+administrations <- get_raw_table(table_name = "administrations", data_source =  "levante-data-example-raw:bm7r")
+
+administrations |> count(public_name, sort = TRUE)
+```
