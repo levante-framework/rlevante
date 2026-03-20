@@ -18,14 +18,11 @@ dedupe_items <- function(df, item_sep = "-") {
 #' @keywords internal
 #'
 #' @param df trial data
-#' @param item_n_min minimum number of times an item needs to have been seen to be retained
-remove_no_var_items <- function(df, item_n_min = 1) {
+remove_no_var_items <- function(df) {
   df |>
     group_by(.data$item_inst) |>
-    mutate(item_mean = mean(.data$correct, na.rm = TRUE),
-           item_n = length(.data$correct)) |> # item means
-    ungroup() |>
-    filter(.data$item_mean > 0, .data$item_mean < 1, .data$item_n > item_n_min) # need to be between 0 and 1
+    filter(n_distinct(.data$correct) > 1) |>
+    ungroup()
 }
 
 #' remove items that aren't shared across all groups
@@ -46,16 +43,14 @@ remove_nonshared_items <- function(df) {
 #' @keywords internal
 #'
 #' @inheritParams remove_no_var_items
-remove_no_var_items_bygroup <- function(df, item_n_min = 1) {
+remove_no_var_items_bygroup <- function(df) {
   df |>
     group_by(.data$item_inst, .data$group) |>
-    mutate(item_mean = mean(.data$correct, na.rm = TRUE),
-           item_n = length(.data$correct)) |> # item means
+    mutate(n_cat = n_distinct(.data$correct)) |>
     group_by(.data$item_inst) |>
-    mutate(low_var = any(.data$item_mean == 0) | any(.data$item_mean == 1),
-           low_n = any(.data$item_n < item_n_min)) |>
+    mutate(low_cat = any(.data$n_cat < 0)) |>
     ungroup() |>
-    filter(!.data$low_var, !.data$low_n) # need to be between 0 and 1
+    filter(!.data$low_cat)
 }
 
 #' format data for mirt

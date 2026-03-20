@@ -137,7 +137,7 @@ link_surveys <- function(surveys, participants) {
 
   # caregiver survey, household (across children) section
   survey_household <- user_survey_data |>
-    filter(.data$survey_type == "caregiver", stringr::str_detect(.data$survey_group, "caregiver")) |>
+    filter(.data$survey_type == "caregiver", stringr::str_detect(.data$survey_group, "general")) |>
     # rename(survey_household = "survey_data") |>
     select(-"survey_group", -"child_id") |>
     inner_join(parents, by = c("user_id" = "parent_id"), relationship = "many-to-many") |>
@@ -145,7 +145,7 @@ link_surveys <- function(surveys, participants) {
 
   # caregiver survey, child-specific section
   survey_child <- user_survey_data |>
-    filter(.data$survey_type == "caregiver", .data$survey_group == "child_specific") |>
+    filter(.data$survey_type == "caregiver", .data$survey_group == "specific") |>
     # rename(survey_child = "survey_data") |>
     select(-"survey_group")
 

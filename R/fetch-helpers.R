@@ -17,7 +17,7 @@ query_getter <- function(table_name, query_str, max_results = NULL) {
     message(glue::glue("--Executing query on table {table_name}"))
     if (!(table_name %in% dataset_table_names)) return(tibble())
     suppressWarnings(
-      q <- dataset$query(query_str)
+      q <- dataset$query(query_str)$get()
     )
     if (q$properties$outputNumRows == 0) return(tibble())
     q$to_tibble(max_results = max_results)
