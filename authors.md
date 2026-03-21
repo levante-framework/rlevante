@@ -7,6 +7,9 @@
 - **Mika Braginsky**. Author, maintainer.
   [](https://orcid.org/0000-0001-9039-3220)
 
+- **Theresa Cheng**. Contributor.
+  [](https://orcid.org/0000-0002-8557-565X)
+
 ## Citation
 
 Frank M, Braginsky M (2026). *rlevante: Download LEVANTE Data*. R
