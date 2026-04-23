@@ -46,11 +46,10 @@ remove_nonshared_items <- function(df) {
 remove_no_var_items_bygroup <- function(df) {
   df |>
     group_by(.data$item_inst, .data$group) |>
-    mutate(n_cat = n_distinct(.data$correct)) |>
+    mutate(n_cat_group = n_distinct(.data$correct)) |>
     group_by(.data$item_inst) |>
-    mutate(low_cat = any(.data$n_cat < 0)) |>
-    ungroup() |>
-    filter(!.data$low_cat)
+    filter(n_distinct(n_cat_group) == 1) |>
+    ungroup()
 }
 
 #' format data for mirt
