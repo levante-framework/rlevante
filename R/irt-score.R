@@ -138,8 +138,8 @@ mod_spec_str <- \(spec) {
 #' @param dataset dataset
 #' @param trials trial data from one task and one dataset
 #' @param runs run data from one task and one dataset
-#' @param scoring_table table returned by get_scoring_table
-#' @param registry_table  table returned by get_registry_table
+#' @param scoring_table tibble returned by fetch_scoring_table()
+#' @param registry_dir redivis directory returned by fetch_registry_dir()
 score <- \(task, dataset, trials, runs, scoring_table, registry_dir) {
 
   message(glue::glue('Scoring data for task "{task}" and dataset "{dataset}"'))

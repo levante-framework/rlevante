@@ -70,7 +70,7 @@ code_survey_data <- function(surveys) {
     # code 0/1 for true/false
     mutate(value = if_else(is.na(.data$numeric_response) & !is.na(.data$boolean_response),
                            as.numeric(.data$boolean_response), .data$numeric_response),
-           .after = .data$variable) |>
+           .after = "variable") |>
     arrange(.data$variable_order) |>
     mutate(variable = forcats::fct_inorder(.data$variable)) |>
     # reverse code values if needed
@@ -128,7 +128,7 @@ link_surveys <- function(surveys, participants) {
     select(-"child_id") |>
     left_join(teachers, by = c("user_id" = "teacher_id")) |>
     tidyr::unnest("children") |>
-    select(-"survey_group")
+    select(-"survey_group", -matches("children"))
 
   parents <- children |>
     select("child_id", "parent1_id", "parent2_id") |>
@@ -154,12 +154,14 @@ link_surveys <- function(surveys, participants) {
     group_by(.data$survey_id, .data$survey_type, .data$user_id,
              .data$child_id, .data$timestamp) |>
     summarise(survey_data = list(purrr::list_rbind(.data$survey_data)),
-              n_responses = sum(.data$n_responses))
+              n_responses = sum(.data$n_responses)) |>
+    ungroup()
 
   # recombine separated out survey types
-  survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |> #, survey_linked) |>
-    left_join(children |> select("child_id", "birth_month", "birth_year", "site", "dataset"),
-              by = c("child_id")) |>
+  children_demapped <- children |>
+    select("child_id", "birth_month", "birth_year", "site", "dataset", "school_id", "class_id")
+  survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |>
+    left_join(children_demapped, by = c("child_id")) |>
     mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$timestamp)) |>
     select(-contains("birth_")) |>
     rename(respondent_id = "user_id", survey_timestamp = "timestamp") |>

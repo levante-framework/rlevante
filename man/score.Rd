@@ -15,9 +15,9 @@ score(task, dataset, trials, runs, scoring_table, registry_dir)
 
 \item{runs}{run data from one task and one dataset}
 
-\item{scoring_table}{table returned by get_scoring_table}
+\item{scoring_table}{tibble returned by fetch_scoring_table()}
 
-\item{registry_table}{table returned by get_registry_table}
+\item{registry_dir}{redivis directory returned by fetch_registry_dir()}
 }
 \description{
 score
