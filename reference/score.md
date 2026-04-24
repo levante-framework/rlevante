@@ -28,8 +28,8 @@ score(task, dataset, trials, runs, scoring_table, registry_dir)
 
 - scoring_table:
 
-  table returned by get_scoring_table
+  tibble returned by fetch_scoring_table()
 
-- registry_table:
+- registry_dir:
 
-  table returned by get_registry_table
+  redivis directory returned by fetch_registry_dir()
