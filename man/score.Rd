@@ -4,7 +4,7 @@
 \alias{score}
 \title{score}
 \usage{
-score(task, dataset, trials, runs, scoring_table, registry_table)
+score(task, dataset, trials, runs, scoring_table, registry_dir)
 }
 \arguments{
 \item{task}{task}

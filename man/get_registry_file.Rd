@@ -4,7 +4,7 @@
 \alias{get_registry_file}
 \title{fetch file from model registry}
 \usage{
-get_registry_file(mod_filename, registry_table)
+get_registry_file(mod_filename, registry_dir)
 }
 \description{
 fetch file from model registry

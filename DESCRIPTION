@@ -6,7 +6,9 @@ Authors@R:
     c(person("Michael", "Frank", , "mcfrank@stanford.edu", role = c("aut"),
              comment = c(ORCID = "0000-0002-7551-4378")),
       person("Mika", "Braginsky", , "mika.br@gmail.com", role = c("aut", "cre"),
-             comment = c(ORCID = "0000-0001-9039-3220")))
+             comment = c(ORCID = "0000-0001-9039-3220")),
+      person("Theresa", "Cheng", , "twcheng@stanford.edu", role = c("ctb"),
+             comment = c(ORCID = "0000-0002-8557-565X")))
 Description: Download data from LEVANTE, a global project for studying child development. 
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -35,5 +37,6 @@ Suggests:
     rmarkdown
 Remotes:
     redivis=redivis/redivis-r
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr

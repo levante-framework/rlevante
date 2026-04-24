@@ -11,10 +11,13 @@ get_raw_table(table_name, data_source, data_source_version = "current")
 
 \item{data_source}{String indicating which Redivis dataset to get}
 
-\item{data_source_version}{String indicating which version of `data_source` to get}
+\item{data_source_version}{String indicating which version of \code{data_source} to get}
+}
+\value{
+A data frame corresponding to the specified Redivis table.
 }
 \description{
-Get raw table
+\code{get_raw_table()} returns any table from Redivis as a data frame. See the \href{https://levante-framework.github.io/rlevante/index.html}{rlevante documentation} for more information about how to access LEVANTE datasets and codebooks.
 }
 \examples{
 \dontrun{
