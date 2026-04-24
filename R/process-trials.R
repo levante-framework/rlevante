@@ -170,6 +170,7 @@ add_item_ids <- function(trials) {
   suppressWarnings(
     trials_prepped <- trials |>
       # create item IDs for ROAR tasks (pa -> subtask + answer, sre -> item_id, swr -> answer)
+      mutate(subtask = if ("subtask" %in% colnames(trials)) subtask else "") |>
       mutate(item_uid_roar = case_when(
         stringr::str_detect(task_id, "^pa(-|$)") ~ glue::glue("pa_{stringr::str_to_lower(subtask)}_{answer}"),
         stringr::str_detect(task_id, "^sre(-|$)") ~ glue::glue("sre_{item_id}"),

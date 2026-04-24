@@ -128,7 +128,7 @@ link_surveys <- function(surveys, participants) {
     select(-"child_id") |>
     left_join(teachers, by = c("user_id" = "teacher_id")) |>
     tidyr::unnest("children") |>
-    select(-"survey_group", -"children")
+    select(-"survey_group", -matches("children"))
 
   parents <- children |>
     select("child_id", "parent1_id", "parent2_id") |>
