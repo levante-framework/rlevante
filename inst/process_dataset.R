@@ -5,7 +5,10 @@ library(purrr)
 library(redivis)
 
 # copy of all code chunks in process_dataset workflow
-ds <- "pilot-uniandes-co-rural"
+# ds <- "pilot-uniandes-co-rural"
+# ds <- "pilot-uniandes-co-bogota"
+# ds <- "pilot-western-co-main"
+# ds <- "pilot-mpieva-de-main"
 dataset_spec <- list(list(name = ds, version = "current"))
 
 # participants
@@ -84,8 +87,8 @@ runs_scored <- run_data |>
   mutate(score = round(score, 2), score_se = round(score_se, 2)) |>
   select(redivis_source, site, dataset, run_id, user_id, age, administration_id,
          task_id, task_version, task_code = item_task, language, adaptive, num_attempted,
-         score, score_se, score_type, scoring_model, max_incorrect, max_time,
-         sequential_stimulus, corpus)
+         score, score_se, score_type, scoring_model, registry_version,
+         max_incorrect, max_time, sequential_stimulus, corpus)
 
 # surveys
 

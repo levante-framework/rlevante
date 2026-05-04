@@ -54,7 +54,8 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
     as_tibble() |>
     rename(score = "F1", score_se = "SE_F1") |>
     mutate(run_id = rownames(data_prepped), .before = everything()) |>
-    mutate(score_type = "ability", scoring_model = mod_spec_str(mod_spec))
+    mutate(score_type = "ability", scoring_model = mod_spec_str(mod_spec),
+           registry_version = stringr::str_extract(mod_spec$redivis_source, "(?<=:)[^:]*$"))
 }
 
 #' scores from CAT
@@ -69,7 +70,7 @@ score_cat <- \(runs) {
     mutate(score_type = "ability_cat")
 }
 
-#' scores for PA
+#' scores for PA -- deprecated
 #' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
@@ -105,25 +106,8 @@ score_sre <- \(trial_data_task, dataset) {
     group_by(.data$run_id) |>
     filter(.data$trial_number <= 180) |>
     summarise(score = (sum(.data$correct) - sum(!.data$correct)) / 180) |>
-    mutate(score_type = "guessing_adjusted_number_correct")
-}
-
-task_scoring_fun <- \(task) {
-  task_metrics <- tibble::tribble(
-    ~item_task, ~scoring_fun,
-    "hf"     ,  score_irt,
-    "sds"    ,  score_irt,
-    "mg"     ,  score_irt,
-    "math"   ,  score_irt,
-    "matrix" ,  score_irt,
-    "mrot"   ,  score_irt,
-    "trog"   ,  score_irt,
-    "vocab"  ,  score_irt,
-    "tom"    ,  score_irt,
-    "pa"     ,  score_pa,
-    "sre"    ,  score_sre,
-    "swr"    ,  score_cat
-  ) |> tibble::deframe() |> purrr::pluck(task)
+    mutate(score = scale(score)[,1]) |>
+    mutate(score_type = "guessing_adjusted_number_correct_scaled")
 }
 
 mod_spec_str <- \(spec) {
@@ -145,7 +129,8 @@ score <- \(task, dataset, trials, runs, scoring_table, registry_dir) {
   message(glue::glue('Scoring data for task "{task}" and dataset "{dataset}"'))
 
   cat_tasks <- c("swr")
-  custom_tasks <- list(pa = score_pa, sre = score_sre)
+  custom_tasks <- list(sre = score_sre)
+  # custom_tasks <- list(pa = score_pa, sre = score_sre)
 
   # if scoring_table has entry for task + dataset, use that model spec
   mod_spec <- get_model_spec(task, dataset, scoring_table)
