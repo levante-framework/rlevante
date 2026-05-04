@@ -70,8 +70,8 @@ To find and use a dataset’s reference ID, follow these steps:
 3.  Record the string used to specify the dataset, including both its
     name (“levante_data_pilots”“) and reference ID (“68kn”). In rlevante
     functions, this string can be used as an argument to identify this
-    dataset (e.g., get_participants(data_source =
-    “levante_data_pilots:68kn”)).
+    dataset (e.g., get_participants(data_source
+    =”levante_data_pilots:68kn”)).
 
 # Package index
 

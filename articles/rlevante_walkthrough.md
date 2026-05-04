@@ -32,6 +32,7 @@ arguments, including a dataset name (required) and version number
 First, load rlevante and other packages, as needed.
 
 ``` r
+
 library(rlevante)
 library(dplyr)
 #> 
@@ -50,6 +51,7 @@ Then, use `get_participants` to obtain child participant ids,
 approximate birthdates, and any associated caregiver or teacher ids.
 
 ``` r
+
 participants <- get_participants("levante-data-example:d0rt", version = "current")
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table participants
@@ -64,6 +66,7 @@ participants |> count(dataset, sort = TRUE)
 Use `get_scores` to obtain scored cognitive task data.
 
 ``` r
+
 scores <- get_scores(data_source = "levante-data-example:d0rt")
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table scores
@@ -92,6 +95,7 @@ scores |> count(task_id, sort = TRUE)
 ```
 
 ``` r
+
 ggplot(scores, aes(x = age, y = score)) +
   facet_wrap(vars(task_id)) +
   geom_point()
@@ -102,6 +106,7 @@ ggplot(scores, aes(x = age, y = score)) +
 Use `get_trials` to access trial-level data.
 
 ``` r
+
 trials <- get_trials("levante-data-example:d0rt")
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table trials
@@ -133,6 +138,7 @@ Use `get_surveys` to access item-level survey data.
 
 ``` r
 
+
 surveys <- get_surveys("levante-data-example:d0rt")
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table surveys
@@ -148,6 +154,7 @@ Finally, researchers accessing their own LEVANTE data can use
 `get_raw_data` to access additional tables within private datasets.
 
 ``` r
+
 
 administrations <- get_raw_table(table_name = "administrations", data_source =  "levante-data-example-raw:bm7r")
 #> Fetching data for levante-data-example-raw:bm7r
