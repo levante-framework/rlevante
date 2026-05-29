@@ -55,6 +55,7 @@ get_surveys <- function(data_source, version = "current") {
 #' trials <- get_trials(data_source = "levante_data_example:d0rt", version = "current")
 #' }
 get_trials <- function(data_source, version = "current") {
+  message("Measures adapted from the Rapid Online Assessment of Reading (Language Sounds, Sentence Reading, Word Reading) are covered under a Stanford Academic License (https://github.com/yeatmanlab/roar-mp/blob/main/LICENSE).")
   dataset_spec <- list(list(name = data_source, version = version))
   get_datasets_data(dataset_spec, table_getter("trials"))
 }
