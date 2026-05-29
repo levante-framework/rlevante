@@ -128,7 +128,8 @@ score <- \(task, dataset, trials, runs, scoring_table, registry_dir) {
 
   message(glue::glue('Scoring data for task "{task}" and dataset "{dataset}"'))
 
-  cat_tasks <- c("swr")
+  cat_tasks <- c()
+  # cat_tasks <- c("swr")
   custom_tasks <- list(sre = score_sre)
   # custom_tasks <- list(pa = score_pa, sre = score_sre)
 
