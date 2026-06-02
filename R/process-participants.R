@@ -35,7 +35,7 @@ process_participants <- function(dataset_spec, max_results = NULL) {
   participants <- get_datasets_data(dataset_spec,
                                     query_getter("users", query_str, max_results))
 
-  dataset_names <- list(
+  legacy_dataset_names <- list(
     "pilot_uniandes_co_bogota"     = "CO-bogota-pilot",
     "pilot_uniandes_co_rural"      = "CO-rural-pilot",
     "pilot_western_ca_main"        = "CA-western-pilot",
@@ -50,13 +50,15 @@ process_participants <- function(dataset_spec, max_results = NULL) {
   suppressWarnings(
     participants |>
       # recode site/dataset names
-      mutate(dataset = .data$dataset |> forcats::fct_recode(!!!dataset_names)) |>
+      mutate(dataset = if_else(.data$dataset %in% legacy_dataset_names,
+                               forcats::fct_recode(.data$dataset, !!!legacy_dataset_names),
+                               str_replace_all(.data$dataset, "-", "_"))) |>
       # assume all guest users from before 2024-06-30 are part of pilot_uniandes_co_bogota
       mutate(dataset = if_else(is.na(.data$dataset) & .data$created_at < co_guest_end,
                                "pilot_uniandes_co_bogota", .data$dataset)) |>
       select(-"created_at") |>
       # extract site from dataset
-      mutate(site = .data$dataset |> stringr::str_extract("^[A-z]+_[A-z]+_[A-z]+(?=_)"),
+      mutate(site = .data$dataset |> stringr::str_extract("^[A-z0-9]+_[A-z]+_[A-z]+(?=_)"),
              .before = "dataset") |>
       relocate("redivis_source", .after = "dataset") |>
       arrange(.data$dataset, .data$user_id)
