@@ -223,10 +223,13 @@ add_item_ids <- function(trials) {
     summarise(item_uid_source = list(.data$item_uid_source)) |>
     ungroup()
 
-  # check that no trials have multiple conflicted item IDs
+  # validate that no trial maps to multiple conflicting item IDs
   conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1) |> ungroup()
-  # message(nrow(conflicts))
-  # assertthat::assert_that(nrow(conflicts) == 0)
+  if (nrow(conflicts) > 0) {
+    warning(glue::glue("{n_distinct(conflicts$trial_id)} trial(s) map to multiple ",
+                       "conflicting item IDs and may be scored incorrectly"),
+            call. = FALSE)
+  }
 
   # join mapped trials back into overall trials
   trials_prepped |>
