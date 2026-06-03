@@ -32,6 +32,6 @@ to learn how to interpret scores.
 
 ``` r
 if (FALSE) { # \dontrun{
-scores <- get_scores(dataset = "levante_data_example:d0rt", version = "current")
+scores <- get_scores(data_source = "levante_data_example:d0rt", version = "current")
 } # }
 ```

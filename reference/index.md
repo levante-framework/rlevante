@@ -2,6 +2,8 @@
 
 ## All functions
 
+- [`get_item_parameters()`](https://levante-framework.github.io/rlevante/reference/get_item_parameters.md)
+  : Get item parameters
 - [`get_participants()`](https://levante-framework.github.io/rlevante/reference/get_participants.md)
   : Get participants
 - [`get_raw_table()`](https://levante-framework.github.io/rlevante/reference/get_raw_table.md)

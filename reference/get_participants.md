@@ -30,6 +30,6 @@ participant.
 
 ``` r
 if (FALSE) { # \dontrun{
-participants <- get_participants(dataset = "levante_data_example:d0rt", version = "current")
+participants <- get_participants(data_source = "levante_data_example:d0rt", version = "current")
 } # }
 ```

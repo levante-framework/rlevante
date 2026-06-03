@@ -29,6 +29,11 @@ use get_scores to download scored cognitive task data.
 
     scores <- get_scores(data_source = "levante-data-example:d0rt", version = "current")
 
+Use get_item_parameters to download the IRT item parameters used in
+LEVANTE scoring.
+
+    item_parameters <- get_item_parameters()
+
 ### Accessing datasets and codebooks
 
 Permission to access the data is granted via Redivis, a data-sharing

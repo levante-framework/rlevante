@@ -152,6 +152,32 @@ surveys |> count(dataset, sort = TRUE)
 #> 1 pilot_mpieva_de_main    69
 ```
 
+Use `get_item_parameters` to access the IRT item parameters used in
+LEVANTE scoring.
+
+``` r
+
+
+item_parameters <- get_item_parameters()
+#> Fetching item parameters
+
+item_parameters |> count(item_task, sort = TRUE)
+#> # A tibble: 11 × 2
+#>    item_task     n
+#>    <chr>     <int>
+#>  1 swr        1383
+#>  2 vocab       470
+#>  3 math        359
+#>  4 tom         171
+#>  5 matrix      153
+#>  6 pa          110
+#>  7 trog         99
+#>  8 mg           24
+#>  9 sds          17
+#> 10 mrot         12
+#> 11 hf           10
+```
+
 Finally, researchers accessing their own LEVANTE data can use
 `get_raw_data` to access additional tables within private datasets.
 

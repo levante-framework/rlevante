@@ -29,6 +29,6 @@ A data frame where each row is a survey item response.
 
 ``` r
 if (FALSE) { # \dontrun{
-surveys <- get_surveys(dataset = "levante_data_example:d0rt", version = "current")
+surveys <- get_surveys(data_source = "levante_data_example:d0rt", version = "current")
 } # }
 ```

@@ -1,6 +1,6 @@
-# scores for PA
+# scores for PA – deprecated
 
-scores for PA
+scores for PA – deprecated
 
 ## Usage
 

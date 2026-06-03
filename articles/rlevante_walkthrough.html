@@ -236,10 +236,32 @@ ids.</p>
 <span><span class="co">#&gt;   dataset                  n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de_main    69</span></span></code></pre></div>
+<p>Use <code>get_item_parameters</code> to access the IRT item
+parameters used in LEVANTE scoring.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">item_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_item_parameters.html">get_item_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Fetching item parameters</span></span>
+<span></span>
+<span><span class="va">item_parameters</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">item_task</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 2</span></span></span>
+<span><span class="co">#&gt;    item_task     n</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> swr        <span style="text-decoration: underline;">1</span>383</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> vocab       470</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> math        359</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> tom         171</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> matrix      153</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> pa          110</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> trog         99</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> mg           24</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> sds          17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> mrot         12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> hf           10</span></span></code></pre></div>
 <p>Finally, researchers accessing their own LEVANTE data can use
 <code>get_raw_data</code> to access additional tables within private
 datasets.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">administrations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_raw_table.html">get_raw_table</a></span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"administrations"</span>, data_source <span class="op">=</span>  <span class="st">"levante-data-example-raw:bm7r"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Fetching data for levante-data-example-raw:bm7r</span></span>
