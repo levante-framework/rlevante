@@ -95,3 +95,5 @@ administrations <- get_raw_table(table_name = "administrations", data_source =  
 
 administrations |> count(public_name, sort = TRUE)
 ```
+
+To go beyond loading already-scored data — understanding how LEVANTE scores are produced, and reproducing or auditing them yourself with the model registry — see the [Scoring and the model registry](scoring-and-model-registry.html) vignette.

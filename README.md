@@ -17,6 +17,7 @@ A collection of “get” functions to acquire LEVANTE data. For example, use ge
 ```
 scores <- get_scores(data_source = "levante-data-example:d0rt", version = "current")
 ```
+To understand how those scores are produced — and to reproduce or audit them yourself using the LEVANTE model registry — see the [Scoring and the model registry](https://levante-framework.github.io/rlevante/articles/scoring-and-model-registry.html) vignette.
 
 ### Accessing datasets and codebooks
 Permission to access the data is granted via Redivis, a data-sharing platform used for all LEVANTE datasets. Individuals seeking to access any LEVANTE data must create an account on Redivis and sign our data use agreement. 
@@ -39,3 +40,5 @@ To find and use a dataset’s reference ID, follow these steps:
 ![](man/figures/find_refIDs_step2.png)   
 
 3. Record the string used to specify the dataset, including both its name ("levante_data_pilots"") and reference ID (“68kn”). In rlevante functions, this string can be used as an argument to identify this dataset (e.g., get_participants(data_source = "levante_data_pilots:68kn")).
+
+You can also pin a specific dataset *version* by appending it to the reference, giving a fully qualified `name:hash:version` string (e.g., `get_scores(data_source = "levante_data_pilots:68kn:v1_0")`). Pinning the version makes your analysis reproducible, whereas `version = "current"` (the default) tracks the latest release. When you call a "get" function with `version = "current"`, rlevante reports the qualified reference it resolved to, which you can copy to pin future runs.

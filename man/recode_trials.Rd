@@ -2,7 +2,7 @@
 % Please edit documentation in R/scoring_prep_helpers.R
 \name{recode_trials}
 \alias{recode_trials}
-\title{recode correctness and/or items for several tasks}
+\title{Recode trial correctness for scoring}
 \usage{
 recode_trials(df, slider_threshold = 0.15)
 }
@@ -11,7 +11,18 @@ recode_trials(df, slider_threshold = 0.15)
 
 \item{slider_threshold}{max normalized distance from slider target}
 }
+\value{
+A data frame of recoded, scoring-ready trials.
+}
 \description{
-recode correctness and/or items for several tasks
+\code{recode_trials()} applies the task-specific corrections that make
+\code{\link[=get_trials]{get_trials()}} output scoring-ready, and \strong{must be applied before IRT
+scoring}: the calibrated models were fit on recoded trials, so scoring raw
+\code{get_trials()} output yields subtly wrong values. Corrections include slider
+thresholding (a response is correct within \code{slider_threshold} of the target,
+with chance set to \code{1 / slider_threshold / 100}), Hearts & Flowers RT and
+start/stay/switch coding, Same/Different Selection and Theory of Mind
+recodes, known item-key fixes (e.g. \code{math_subtract_37_24}), and chance-level
+backfill. See \code{vignette("scoring-and-model-registry")}.
 }
 \keyword{internal}

@@ -1,4 +1,10 @@
 #' ModelRecord class definition
+#'
+#' A fitted LEVANTE IRT model and its metadata, as stored in the model
+#' registry. Access its contents with [items()], [model_class()],
+#' [model_vals()], and [scores()]; see
+#' `vignette("scoring-and-model-registry")` for details.
+#'
 #' @keywords internal
 #'
 #' @export
