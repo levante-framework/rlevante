@@ -34,6 +34,13 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   missing_items <- setdiff(items(mod_rec), colnames(data_prepped))
   data_aligned[,missing_items] <- NA
 
+  # reorder columns to the model's item order: mirt::fscores() matches the
+  # columns of response.pattern to the model's items by position, not by name,
+  # so a mismatched column order silently scores each response against the
+  # wrong items
+  data_aligned <- data_aligned[, items(mod_rec)]
+  stopifnot(identical(colnames(data_aligned), items(mod_rec)))
+
   # set up mirt model object for data using parameter values from model record
   mod_vals <- model_vals(mod_rec)
   if (model_class(mod_rec) == "SingleGroupClass") {

@@ -34,9 +34,11 @@ Suggests:
     ggplot2,
     knitr,
     mirt,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 Remotes:
     redivis=redivis/redivis-r
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr
+Config/testthat/edition: 3
