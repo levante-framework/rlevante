@@ -81,8 +81,11 @@ recode_slider <- \(df, slider_threshold) {
 #' @inheritParams recode_trials
 #' @param wrong_items tibble with columns item_uid and answer_fixed
 recode_wrong_items <- \(df, wrong_items) {
+  # inner_join (not right_join): only recode wrong-answer items that are
+  # actually present. right_join would keep unmatched wrong_items keys, adding
+  # a spurious all-NA trial row when an item bank entry isn't in the data.
   wrong_trials <- df |>
-    right_join(wrong_items) |>
+    inner_join(wrong_items) |>
     mutate(correct = !is.na(.data$response) & .data$response == .data$answer_fixed)
   df |>
     anti_join(wrong_items) |>

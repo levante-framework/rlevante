@@ -58,6 +58,23 @@ test_that("recode_wrong_items() rescores against the corrected answer key", {
   expect_false("answer_fixed" %in% names(out))
 })
 
+test_that("recode_wrong_items() adds no row when the fixed item is absent", {
+  # data contains none of the wrong-answer items; output must be unchanged and
+  # must NOT gain a spurious all-NA row for the missing item bank entry
+  df <- tibble(
+    item_uid = c("other1", "other2"),
+    response = c("a", "b"),
+    correct = c(TRUE, FALSE)
+  )
+  fixes <- tibble(item_uid = "math_subtract_37_24", answer_fixed = "13")
+
+  out <- suppressMessages(recode_wrong_items(df, fixes))
+
+  expect_equal(nrow(out), 2)
+  expect_setequal(out$item_uid, c("other1", "other2"))
+  expect_false(any(is.na(out$item_uid)))
+})
+
 test_that("recode_tom() builds item_uid from story, group, and item", {
   df <- tibble(
     item_task = "tom",
