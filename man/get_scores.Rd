@@ -19,6 +19,6 @@ A data frame where each row is a task ability score. See our \href{https://resea
 }
 \examples{
 \dontrun{
-scores <- get_scores(dataset = "levante_data_example:d0rt", version = "current")
+scores <- get_scores(data_source = "levante_data_example:d0rt", version = "current")
 }
 }
