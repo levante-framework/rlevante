@@ -19,6 +19,6 @@ A data frame where each row contains information about a child participant.
 }
 \examples{
 \dontrun{
-participants <- get_participants(dataset = "levante_data_example:d0rt", version = "current")
+participants <- get_participants(data_source = "levante_data_example:d0rt", version = "current")
 }
 }

@@ -17,6 +17,10 @@ A collection of “get” functions to acquire LEVANTE data. For example, use ge
 ```
 scores <- get_scores(data_source = "levante-data-example:d0rt", version = "current")
 ```
+Use get_item_parameters to download the IRT item parameters used in LEVANTE scoring.
+```
+item_parameters <- get_item_parameters()
+```
 
 ### Accessing datasets and codebooks
 Permission to access the data is granted via Redivis, a data-sharing platform used for all LEVANTE datasets. Individuals seeking to access any LEVANTE data must create an account on Redivis and sign our data use agreement. 

@@ -23,5 +23,10 @@ Authors:
   \item Michael Frank \email{mcfrank@stanford.edu} (\href{https://orcid.org/0000-0002-7551-4378}{ORCID})
 }
 
+Other contributors:
+\itemize{
+  \item Theresa Cheng \email{twcheng@stanford.edu} (\href{https://orcid.org/0000-0002-8557-565X}{ORCID}) [contributor]
+}
+
 }
 \keyword{internal}
