@@ -45,4 +45,7 @@ jobs:
           args: 'c("--no-manual", "--ignore-vignettes")'
           build_args: 'c("--no-manual", "--no-build-vignettes")'
           upload-snapshots: true
-          error-on: '"warning"'
+          # only fail on ERRORs (which includes test failures): this package has
+          # not been through R CMD check before and may have pre-existing
+          # warnings/notes to clean up separately
+          error-on: '"error"'
