@@ -251,9 +251,3 @@ add_item_metadata <- function(trials) {
            entry = tidyr::replace_na(.data$entry, "")) |>
     rename(item_original = "item", item_group = "group", item = "entry")
 }
-
-# add numeric RTs
-convert_rts <- function(trials) {
-  trials |> mutate(rt_numeric = suppressWarnings(as.numeric(.data$rt)),
-                   .after = .data$rt)
-}
