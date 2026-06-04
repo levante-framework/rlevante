@@ -61,8 +61,8 @@ process_runs <- function(dataset_spec,
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
-  missing_langs <- tribble(
-    ~variant_id,            ~lang,
+  missing_language <- tribble(
+    ~variant_id,            ~language_,
     "FPbJw79lcfHKJR3fjABb", "de-DE",
     "KNaxHVqdpe2CtS9NLoX8", "de-DE",
     "LTQ0EQ4pvI4FAkjY98Pq", "de-DE",
@@ -75,14 +75,24 @@ process_runs <- function(dataset_spec,
     "3fFvykenyEYGlAsRfYiJ", "en-US",
     "5qBz8FFYIsuoYkuGXwVd", "en-US",
     "8NLzzprrkwJPeY18iRRH", "en-US",
-    "r7o97xl8GcdtcCq651n4", "en-US"
+    "r7o97xl8GcdtcCq651n4", "en-US",
+  )
+
+  missing_adaptive <- tribble(
+    ~variant_id,            ~adaptive_,
+    "OYKVpWxFYhA9Qh9w58Qy",  FALSE,     # confirmed non-adaptive (memory-game)
+    "zlOE3yc4n4JimAhGtQ6r",  FALSE,     # TODO: confirm non-adaptive
+    "rq7PRMzgtkw52HMfxvNW",  FALSE,     # TODO: confirm non-adaptive
+    "8NLzzprrkwJPeY18iRRH",  FALSE,     # TODO: confirm non-adaptive
   )
 
   runs |>
-    # fill in language from variants missing language field
-    left_join(missing_langs, by = "variant_id") |>
-    mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
-    select(-"lang") |>
+    # fill in language/adaptive for variants missing them
+    left_join(missing_language, by = "variant_id") |>
+    left_join(missing_adaptive, by = "variant_id") |>
+    mutate(language = if_else(!is.na(.data$language), .data$language, .data$language_),
+           adaptive = if_else(!is.na(.data$adaptive), .data$adaptive, .data$adaptive_)) |>
+    select(-"language_", -"adaptive_") |>
     # remove language suffix in task_id
     mutate(task_id = .data$task_id |> stringr::str_remove("-es|-de$")) |>
     # invalidate ages for invalid users
