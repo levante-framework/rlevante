@@ -43,11 +43,14 @@ process_runs <- function(dataset_spec,
     "variants.max_incorrect",
     "variants.max_time",
     "variants.sequential_stimulus",
-    "variants.corpus"
+    "variants.corpus",
+    "users.valid_user",
+    "users.validation_msg_user"
   )
   query_str <- glue::glue(
     "SELECT {paste(run_vars, collapse = ', ')} FROM runs
-     LEFT JOIN variants ON runs.variant_id = variants.variant_id"
+     LEFT JOIN variants ON runs.variant_id = variants.variant_id
+     LEFT JOIN users ON runs.user_id = users.user_id"
   )
   # LEFT JOIN user_sites ON runs.user_id = user_sites.user_id
   # LEFT JOIN sites ON user_sites.site_id = sites.site_id")
@@ -76,9 +79,13 @@ process_runs <- function(dataset_spec,
   )
 
   runs |>
+    # fill in language from variants missing language field
     left_join(missing_langs, by = "variant_id") |>
     mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
     select(-"lang") |>
+    # remove language suffix in task_id
     mutate(task_id = .data$task_id |> stringr::str_remove("-es|-de$")) |>
+    # invalidate ages for invalid users
+    mutate(age = if_else(!valid_user, NA, age)) |>
     arrange(.data$time_started)
 }
