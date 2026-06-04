@@ -15,6 +15,15 @@ A data frame where each row is an item parameter estimate. See our \href{https:/
 \description{
 \code{get_item_parameters()} returns the IRT item parameters used in LEVANTE scoring as a data frame. See the \href{https://levante-framework.github.io/rlevante/index.html}{rlevante documentation} for more information about how to access LEVANTE datasets and codebooks.
 }
+\details{
+This table reports \code{difficulty} and \code{discrimination} only; it \strong{omits the
+guessing parameter} \code{g}. The deployed models use a fixed guessing lower
+asymptote at each item's chance level, so to reconstruct an item response
+function you must include it (\code{P = g + (1 - g) * plogis(a * (theta - b))}).
+The authoritative, complete parameter set is \code{model_vals(record)}
+(\code{mirt::mod2values()}), which includes \code{g}; see
+\code{vignette("scoring-and-model-registry")}.
+}
 \examples{
 \dontrun{
 item_parameters <- get_item_parameters()
