@@ -1,31 +1,42 @@
 fetch_metadata_table <- function(table_name) {
   metadata <- redivis::redivis$organization("levante")$dataset("levante_metadata_items:czjv")
-  message(glue::glue("Fetching item metadata for {table_name}"))
+  message(glue::glue("Fetching item metadata from {table_name}"))
   suppressWarnings(
     metadata$table(table_name)$to_tibble()
   )
 }
 
-#' Get metadata for trial items
+#' Get item UIDs mapped by trial_id
 #'
 #' @keywords internal
 #' @examples
 #' \dontrun{
-#' trial_items <- fetch_trial_items()
+#' mapping_trial <- fetch_item_mapping_trial()
 #' }
-fetch_trial_items <- function() {
-  fetch_metadata_table("trial_items:hjas")
+fetch_item_mapping_trial <- function() {
+  fetch_metadata_table("item_mapping_trial:hjas")
 }
 
-#' Get metadata for mapping items
+#' Get item UIDs mapped by fields
 #'
 #' @keywords internal
 #' @examples
 #' \dontrun{
-#' mapping_items <- fetch_mapping_items()
+#' mapping_fields <- fetch_item_mapping_fields()
 #' }
-fetch_mapping_items <- function() {
-  fetch_metadata_table("mapping_items:6v86")
+fetch_item_mapping_fields <- function() {
+  fetch_metadata_table("item_mapping_fields:6v86")
+}
+
+#' Get item UIDs mapped by item_id
+#'
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' mapping_id <- fetch_item_mapping_id()
+#' }
+fetch_item_mapping_id <- function() {
+  fetch_metadata_table("item_mapping_id:tma7")
 }
 
 #' Get metadata for corpus items
