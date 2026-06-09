@@ -10,12 +10,13 @@
 <url><loc>https://levante-framework.github.io/rlevante/reference/ModelRecord.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/dedupe_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/fetch_corpus_items.html</loc></url>
-<url><loc>https://levante-framework.github.io/rlevante/reference/fetch_mapping_items.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/fetch_item_mapping_fields.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/fetch_item_mapping_id.html</loc></url>
+<url><loc>https://levante-framework.github.io/rlevante/reference/fetch_item_mapping_trial.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/fetch_registry_dir.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/fetch_registry_table.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/fetch_scoring_table.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/fetch_survey_items.html</loc></url>
-<url><loc>https://levante-framework.github.io/rlevante/reference/fetch_trial_items.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_item_parameters.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_model_record.html</loc></url>
 <url><loc>https://levante-framework.github.io/rlevante/reference/get_model_spec.html</loc></url>
