@@ -43,11 +43,14 @@ process_runs <- function(dataset_spec,
     "variants.max_incorrect",
     "variants.max_time",
     "variants.sequential_stimulus",
-    "variants.corpus"
+    "variants.corpus",
+    "users.valid_user",
+    "users.validation_msg_user"
   )
   query_str <- glue::glue(
     "SELECT {paste(run_vars, collapse = ', ')} FROM runs
-     LEFT JOIN variants ON runs.variant_id = variants.variant_id"
+     LEFT JOIN variants ON runs.variant_id = variants.variant_id
+     LEFT JOIN users ON runs.user_id = users.user_id"
   )
   # LEFT JOIN user_sites ON runs.user_id = user_sites.user_id
   # LEFT JOIN sites ON user_sites.site_id = sites.site_id")
@@ -58,8 +61,8 @@ process_runs <- function(dataset_spec,
   if (remove_invalid_runs) runs <- runs |> filter(.data$valid_run)
   if (remove_incomplete_runs) runs <- runs |> filter(.data$completed)
 
-  missing_langs <- tribble(
-    ~variant_id,            ~lang,
+  missing_language <- tribble(
+    ~variant_id,            ~language_,
     "FPbJw79lcfHKJR3fjABb", "de-DE",
     "KNaxHVqdpe2CtS9NLoX8", "de-DE",
     "LTQ0EQ4pvI4FAkjY98Pq", "de-DE",
@@ -72,13 +75,27 @@ process_runs <- function(dataset_spec,
     "3fFvykenyEYGlAsRfYiJ", "en-US",
     "5qBz8FFYIsuoYkuGXwVd", "en-US",
     "8NLzzprrkwJPeY18iRRH", "en-US",
-    "r7o97xl8GcdtcCq651n4", "en-US"
+    "r7o97xl8GcdtcCq651n4", "en-US",
+  )
+
+  missing_adaptive <- tribble(
+    ~variant_id,            ~adaptive_,
+    "OYKVpWxFYhA9Qh9w58Qy",  FALSE,     # confirmed non-adaptive (memory-game)
+    "zlOE3yc4n4JimAhGtQ6r",  FALSE,     # TODO: confirm non-adaptive
+    "rq7PRMzgtkw52HMfxvNW",  FALSE,     # TODO: confirm non-adaptive
+    "8NLzzprrkwJPeY18iRRH",  FALSE,     # TODO: confirm non-adaptive
   )
 
   runs |>
-    left_join(missing_langs, by = "variant_id") |>
-    mutate(language = if_else(!is.na(.data$language), .data$language, .data$lang)) |>
-    select(-"lang") |>
+    # fill in language/adaptive for variants missing them
+    left_join(missing_language, by = "variant_id") |>
+    left_join(missing_adaptive, by = "variant_id") |>
+    mutate(language = if_else(!is.na(.data$language), .data$language, .data$language_),
+           adaptive = if_else(!is.na(.data$adaptive), .data$adaptive, .data$adaptive_)) |>
+    select(-"language_", -"adaptive_") |>
+    # remove language suffix in task_id
     mutate(task_id = .data$task_id |> stringr::str_remove("-es|-de$")) |>
+    # invalidate ages for invalid users
+    mutate(age = if_else(!.data$valid_user, NA, .data$age)) |>
     arrange(.data$time_started)
 }

@@ -52,7 +52,7 @@ process_participants <- function(dataset_spec, max_results = NULL) {
       # recode site/dataset names
       mutate(dataset = if_else(.data$dataset %in% legacy_dataset_names,
                                forcats::fct_recode(.data$dataset, !!!legacy_dataset_names),
-                               str_replace_all(.data$dataset, "-", "_"))) |>
+                               stringr::str_replace_all(.data$dataset, "-", "_"))) |>
       # assume all guest users from before 2024-06-30 are part of pilot_uniandes_co_bogota
       mutate(dataset = if_else(is.na(.data$dataset) & .data$created_at < co_guest_end,
                                "pilot_uniandes_co_bogota", .data$dataset)) |>
