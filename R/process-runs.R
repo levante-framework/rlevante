@@ -96,6 +96,6 @@ process_runs <- function(dataset_spec,
     # remove language suffix in task_id
     mutate(task_id = .data$task_id |> stringr::str_remove("-es|-de$")) |>
     # invalidate ages for invalid users
-    mutate(age = if_else(!valid_user, NA, age)) |>
+    mutate(age = if_else(!.data$valid_user, NA, .data$age)) |>
     arrange(.data$time_started)
 }

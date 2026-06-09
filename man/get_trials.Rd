@@ -19,6 +19,6 @@ A data frame where each row is a trial.
 }
 \examples{
 \dontrun{
-trials <- get_trials(dataset = "levante_data_example:d0rt", version = "current")
+trials <- get_trials(data_source = "levante_data_example:d0rt", version = "current")
 }
 }
