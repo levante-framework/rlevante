@@ -154,29 +154,33 @@ arguments, including a dataset name (required) and version number
 <p>Then, use <code>get_participants</code> to obtain child participant
 ids, approximate birthdates, and any associated caregiver or teacher
 ids.</p>
+<p><code>get_participants</code> is the first rlevante function in this
+code. When you run it, you’ll be prompted to authenticate with a pop-up
+browser on Redivis (an academic database manager that we use at LEVANTE)
+to ensure that you have the right permissions to access the dataset.
+Subsequent rlevante calls to this dataset within the same session should
+not require additional authentication.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">participants</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_participants.html">get_participants</a></span><span class="op">(</span><span class="st">"levante-data-example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Pull participant data from Redivis and save it to a data frame called "participants"</span></span>
+<span><span class="va">participants</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_participants.html">get_participants</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"levante-data-example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Fetching data for levante-data-example:d0rt</span></span>
 <span><span class="co">#&gt; --Fetching table participants</span></span>
 <span></span>
-<span><span class="va">participants</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">dataset</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># Now let's do some preliminary checks on the participants data</span></span>
+<span><span class="va">participants</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">site</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of participants from each site — the levante-data-example and private site data releases only contain data from a single site, but the public data releases contain many sites/datasets stapled together</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
-<span><span class="co">#&gt;   dataset                  n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de_main    15</span></span></code></pre></div>
+<span><span class="co">#&gt;   site                n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de    15</span></span></code></pre></div>
 <p>Use <code>get_scores</code> to obtain scored cognitive task data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_scores.html">get_scores</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"levante-data-example:d0rt"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Pull scored data from Redivis and save it to a data frame called "scores"</span></span>
+<span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_scores.html">get_scores</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"levante-data-example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Fetching data for levante-data-example:d0rt</span></span>
 <span><span class="co">#&gt; --Fetching table scores</span></span>
 <span></span>
-<span><span class="va">scores</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">dataset</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
-<span><span class="co">#&gt;   dataset                  n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de_main    33</span></span>
-<span></span>
-<span><span class="va">scores</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">task_id</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># Now let's do some preliminary checks on the scores data</span></span>
+<span><span class="va">scores</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">task_id</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of scores for each task. for a list of item_task abbreviations, see Table 1 here: https://researcher.levante-network.org/measures/direct-child-measures</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 2</span></span></span>
 <span><span class="co">#&gt;    task_id                      n</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -192,24 +196,27 @@ ids.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> sre                          1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> swr                          1</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">scores</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="co"># This plot returns scores by age fro each task.</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">scores</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">task_id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rlevante_walkthrough_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 <p>Use <code>get_trials</code> to access trial-level data.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trials</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trials.html">get_trials</a></span><span class="op">(</span><span class="st">"levante-data-example:d0rt"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Pull trial-level data from Redivis and save it to a data frame called "trials"</span></span>
+<span><span class="va">trials</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trials.html">get_trials</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"levante-data-example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Measures adapted from the Rapid Online Assessment of Reading (Language Sounds, Sentence Reading, Word Reading) are covered under a Stanford Academic License (https://github.com/yeatmanlab/roar-mp/blob/main/LICENSE).</span></span>
 <span><span class="co">#&gt; Fetching data for levante-data-example:d0rt</span></span>
 <span><span class="co">#&gt; --Fetching table trials</span></span>
 <span></span>
-<span><span class="va">trials</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">dataset</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># Now let's do some preliminary checks on the trials data</span></span>
+<span><span class="va">trials</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">site</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of trials per site</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
-<span><span class="co">#&gt;   dataset                  n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de_main  <span style="text-decoration: underline;">1</span>320</span></span>
+<span><span class="co">#&gt;   site                n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de  <span style="text-decoration: underline;">1</span>320</span></span>
 <span></span>
-<span><span class="va">trials</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">task_id</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">trials</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">task_id</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of trials per task</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 2</span></span></span>
 <span><span class="co">#&gt;    task_id                      n</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -226,24 +233,25 @@ ids.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> sre                         32</span></span></code></pre></div>
 <p>Use <code>get_surveys</code> to access item-level survey data.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">surveys</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_surveys.html">get_surveys</a></span><span class="op">(</span><span class="st">"levante-data-example:d0rt"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Pull survey data from Redivis and save it to a data frame called "surveys"</span></span>
+<span><span class="va">surveys</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_surveys.html">get_surveys</a></span><span class="op">(</span>data_source <span class="op">=</span> <span class="st">"levante-data-example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Fetching data for levante-data-example:d0rt</span></span>
 <span><span class="co">#&gt; --Fetching table surveys</span></span>
 <span></span>
-<span><span class="va">surveys</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">dataset</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># Now let's do some preliminary checks on the trials data</span></span>
+<span><span class="va">surveys</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">site</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of surveys per site</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
-<span><span class="co">#&gt;   dataset                  n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de_main    69</span></span></code></pre></div>
+<span><span class="co">#&gt;   site                n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pilot_mpieva_de    69</span></span></code></pre></div>
 <p>Use <code>get_item_parameters</code> to access the IRT item
 parameters used in LEVANTE scoring.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<code class="sourceCode R"><span><span class="co"># Pull up-to-date item parameters from Redivis</span></span>
 <span><span class="va">item_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_item_parameters.html">get_item_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Fetching item parameters</span></span>
 <span></span>
-<span><span class="va">item_parameters</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">item_task</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">item_parameters</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">item_task</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of parameters per task</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 2</span></span></span>
 <span><span class="co">#&gt;    item_task     n</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -260,14 +268,18 @@ parameters used in LEVANTE scoring.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> hf           10</span></span></code></pre></div>
 <p>Finally, researchers accessing their own LEVANTE data can use
 <code>get_raw_data</code> to access additional tables within private
-datasets.</p>
+datasets. <code>get_raw_data</code> is a general function that can pull
+any table that you specify, provided that the table exists. When pulling
+raw data, please note that some of the table names are different than
+the processed data. Check your dataset page to ensure that the table
+exists.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">administrations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_raw_table.html">get_raw_table</a></span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"administrations"</span>, data_source <span class="op">=</span>  <span class="st">"levante-data-example-raw:bm7r"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Pull data from any table within from Redivis – in this case, we're pulling the administrations table (each assignment is an administration)</span></span>
+<span><span class="va">administrations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_raw_table.html">get_raw_table</a></span><span class="op">(</span>table_name <span class="op">=</span> <span class="st">"administrations"</span>, data_source <span class="op">=</span>  <span class="st">"levante-data-example-raw:bm7r"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Fetching data for levante-data-example-raw:bm7r</span></span>
 <span><span class="co">#&gt; --Fetching table administrations</span></span>
 <span></span>
-<span><span class="va">administrations</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">public_name</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">administrations</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">public_name</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># returns the number of completions per assignment, based on that assignment's name</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 18 × 2</span></span></span>
 <span><span class="co">#&gt;    public_name                     n</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>

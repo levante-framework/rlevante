@@ -51,34 +51,39 @@ theme_set(theme_classic())
 Then, use `get_participants` to obtain child participant ids,
 approximate birthdates, and any associated caregiver or teacher ids.
 
+`get_participants` is the first rlevante function in this code. When you
+run it, you’ll be prompted to authenticate with a pop-up browser on
+Redivis (an academic database manager that we use at LEVANTE) to ensure
+that you have the right permissions to access the dataset. Subsequent
+rlevante calls to this dataset within the same session should not
+require additional authentication.
+
 ``` r
 
-participants <- get_participants("levante-data-example:d0rt", version = "current")
+# Pull participant data from Redivis and save it to a data frame called "participants"
+participants <- get_participants(data_source = "levante-data-example:d0rt", version = "current") 
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table participants
 
-participants |> count(dataset, sort = TRUE)
+# Now let's do some preliminary checks on the participants data
+participants |> count(site, sort = TRUE) # returns the number of participants from each site — the levante-data-example and private site data releases only contain data from a single site, but the public data releases contain many sites/datasets stapled together
 #> # A tibble: 1 × 2
-#>   dataset                  n
-#>   <chr>                <int>
-#> 1 pilot_mpieva_de_main    15
+#>   site                n
+#>   <chr>           <int>
+#> 1 pilot_mpieva_de    15
 ```
 
 Use `get_scores` to obtain scored cognitive task data.
 
 ``` r
 
-scores <- get_scores(data_source = "levante-data-example:d0rt")
+# Pull scored data from Redivis and save it to a data frame called "scores"
+scores <- get_scores(data_source = "levante-data-example:d0rt", version = "current") 
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table scores
 
-scores |> count(dataset, sort = TRUE)
-#> # A tibble: 1 × 2
-#>   dataset                  n
-#>   <chr>                <int>
-#> 1 pilot_mpieva_de_main    33
-
-scores |> count(task_id, sort = TRUE)
+# Now let's do some preliminary checks on the scores data
+scores |> count(task_id, sort = TRUE) # returns the number of scores for each task. for a list of item_task abbreviations, see Table 1 here: https://researcher.levante-network.org/measures/direct-child-measures
 #> # A tibble: 11 × 2
 #>    task_id                      n
 #>    <chr>                    <int>
@@ -97,6 +102,7 @@ scores |> count(task_id, sort = TRUE)
 
 ``` r
 
+# This plot returns scores by age fro each task.
 ggplot(scores, aes(x = age, y = score)) +
   facet_wrap(vars(task_id)) +
   geom_point()
@@ -108,18 +114,20 @@ Use `get_trials` to access trial-level data.
 
 ``` r
 
-trials <- get_trials("levante-data-example:d0rt")
+# Pull trial-level data from Redivis and save it to a data frame called "trials"
+trials <- get_trials(data_source = "levante-data-example:d0rt", version = "current") 
 #> Measures adapted from the Rapid Online Assessment of Reading (Language Sounds, Sentence Reading, Word Reading) are covered under a Stanford Academic License (https://github.com/yeatmanlab/roar-mp/blob/main/LICENSE).
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table trials
 
-trials |> count(dataset, sort = TRUE)
+# Now let's do some preliminary checks on the trials data
+trials |> count(site, sort = TRUE) # returns the number of trials per site
 #> # A tibble: 1 × 2
-#>   dataset                  n
-#>   <chr>                <int>
-#> 1 pilot_mpieva_de_main  1320
+#>   site                n
+#>   <chr>           <int>
+#> 1 pilot_mpieva_de  1320
 
-trials |> count(task_id, sort = TRUE)
+trials |> count(task_id, sort = TRUE) # returns the number of trials per task
 #> # A tibble: 11 × 2
 #>    task_id                      n
 #>    <chr>                    <int>
@@ -140,16 +148,17 @@ Use `get_surveys` to access item-level survey data.
 
 ``` r
 
-
-surveys <- get_surveys("levante-data-example:d0rt")
+# Pull survey data from Redivis and save it to a data frame called "surveys"
+surveys <- get_surveys(data_source = "levante-data-example:d0rt", version = "current") 
 #> Fetching data for levante-data-example:d0rt
 #> --Fetching table surveys
 
-surveys |> count(dataset, sort = TRUE)
+# Now let's do some preliminary checks on the trials data
+surveys |> count(site, sort = TRUE) # returns the number of surveys per site
 #> # A tibble: 1 × 2
-#>   dataset                  n
-#>   <chr>                <int>
-#> 1 pilot_mpieva_de_main    69
+#>   site                n
+#>   <chr>           <int>
+#> 1 pilot_mpieva_de    69
 ```
 
 Use `get_item_parameters` to access the IRT item parameters used in
@@ -157,11 +166,11 @@ LEVANTE scoring.
 
 ``` r
 
-
+# Pull up-to-date item parameters from Redivis
 item_parameters <- get_item_parameters()
 #> Fetching item parameters
 
-item_parameters |> count(item_task, sort = TRUE)
+item_parameters |> count(item_task, sort = TRUE) # returns the number of parameters per task
 #> # A tibble: 11 × 2
 #>    item_task     n
 #>    <chr>     <int>
@@ -180,15 +189,19 @@ item_parameters |> count(item_task, sort = TRUE)
 
 Finally, researchers accessing their own LEVANTE data can use
 `get_raw_data` to access additional tables within private datasets.
+`get_raw_data` is a general function that can pull any table that you
+specify, provided that the table exists. When pulling raw data, please
+note that some of the table names are different than the processed data.
+Check your dataset page to ensure that the table exists.
 
 ``` r
 
-
-administrations <- get_raw_table(table_name = "administrations", data_source =  "levante-data-example-raw:bm7r")
+# Pull data from any table within from Redivis – in this case, we're pulling the administrations table (each assignment is an administration)
+administrations <- get_raw_table(table_name = "administrations", data_source =  "levante-data-example-raw:bm7r") 
 #> Fetching data for levante-data-example-raw:bm7r
 #> --Fetching table administrations
 
-administrations |> count(public_name, sort = TRUE)
+administrations |> count(public_name, sort = TRUE) # returns the number of completions per assignment, based on that assignment's name
 #> # A tibble: 18 × 2
 #>    public_name                     n
 #>    <chr>                       <int>
