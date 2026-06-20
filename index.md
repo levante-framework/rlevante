@@ -77,3 +77,11 @@ To find and use a dataset’s reference ID, follow these steps:
     functions, this string can be used as an argument to identify this
     dataset (e.g., get_participants(data_source
     =”levante_data_pilots:68kn”)).
+
+You can optionally include “:v2_0” — this is another way to specify the
+version.
+
+Note: We have not tested any of the code visible on this page. Instead,
+we recommend using the
+[*rlevante*](https://levante-framework.github.io/rlevante/reference/index.html)
+package.
