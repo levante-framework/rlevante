@@ -54,7 +54,9 @@ add_survey_items <- function(surveys) {
   suppressWarnings(
     survey_items_coded <- survey_items |>
       mutate(values = if_else(is.na(.data$values) | .data$values == "", "[]", .data$values),
-             values = .data$values |> purrr::map(jsonlite::fromJSON) |> purrr::map(as.numeric))
+             values = .data$values |> purrr::map(jsonlite::fromJSON) |>
+               purrr::map(\(v) if (length(v) == 0) v else replace_values(v, "No" ~ "0", "Yes" ~ "1")) |>
+               purrr::map(as.numeric))
   )
 
   surveys |>
@@ -74,7 +76,8 @@ code_survey_data <- function(surveys) {
     arrange(.data$variable_order) |>
     mutate(variable = forcats::fct_inorder(.data$variable)) |>
     # reverse code values if needed
-    mutate(value = if_else(.data$reverse_coded,
+    mutate(reverse_coded = tidyr::replace_na(.data$reverse_coded, FALSE),
+           value = if_else(.data$reverse_coded,
                            purrr::map2_dbl(.data$value, .data$values, reverse_value),
                            .data$value)) |>
     select("redivis_source", "survey_id", "survey_type", "survey_part",
