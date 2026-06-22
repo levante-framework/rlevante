@@ -33,7 +33,7 @@ process_surveys <- function(dataset_spec,
   if (remove_incomplete_surveys) surveys <- surveys |> filter(.data$is_complete)
 
   surveys |>
-    select(-"survey_id_1") |>
+    select(-matches("_1")) |>
     mutate(survey_type = if_else(
       is.na(.data$survey_type) & stringr::str_detect(.data$survey_id, ":data"),
       "student",
@@ -80,11 +80,12 @@ code_survey_data <- function(surveys) {
            value = if_else(.data$reverse_coded,
                            purrr::map2_dbl(.data$value, .data$values, reverse_value),
                            .data$value)) |>
-    select("redivis_source", "survey_id", "survey_type", "survey_part",
-           "user_id", "child_id", contains("construct"), "question_type",
-           "variable", "variable_order", "value", "boolean_response",
-           "string_response", "numeric_response", "is_complete",
-           timestamp = "created_at") |>
+    # select("redivis_source", "survey_id", "survey_type", "survey_part",
+    #        "survey_schema_source", "specific_scope", "specific_scope_id",
+    #        "user_id", "child_id", contains("construct"), "question_type",
+    #        "variable", "variable_order", "value", "boolean_response",
+    #        "string_response", "numeric_response", "is_complete", "valid_survey", "validation_msg_survey",
+    #        timestamp = "created_at") |>
     arrange(.data$redivis_source, .data$survey_id, .data$variable_order)
 }
 
@@ -105,10 +106,13 @@ code_survey_data <- function(surveys) {
 #' }
 link_surveys <- function(surveys, participants) {
 
+  survey_vars <- c("survey_id", "administration_id", "user_id", "survey_part",
+                   "specific_scope", "specific_scope_id", "survey_type",
+                   "is_complete", "created_at", "updated_at",
+                   "survey_schema_source", "valid_survey", "validation_msg_survey")
   user_survey_data <- surveys |>
     mutate(survey_group = .data$survey_part) |>
-    tidyr::nest(survey_data = -c("survey_type", "survey_id",
-                                 "timestamp", "survey_group", "user_id", "child_id")) |>
+    tidyr::nest(survey_data = -all_of(c("survey_group", "child_id", survey_vars))) |>
     mutate(n_responses = purrr::map_int(.data$survey_data, nrow)) |>
     filter(.data$n_responses > 1)
 
@@ -141,7 +145,6 @@ link_surveys <- function(surveys, participants) {
   # caregiver survey, household (across children) section
   survey_household <- user_survey_data |>
     filter(.data$survey_type == "caregiver", stringr::str_detect(.data$survey_group, "general")) |>
-    # rename(survey_household = "survey_data") |>
     select(-"survey_group", -"child_id") |>
     inner_join(parents, by = c("user_id" = "parent_id"), relationship = "many-to-many") |>
     relocate("child_id", .after = "user_id")
@@ -149,30 +152,26 @@ link_surveys <- function(surveys, participants) {
   # caregiver survey, child-specific section
   survey_child <- user_survey_data |>
     filter(.data$survey_type == "caregiver", .data$survey_group == "specific") |>
-    # rename(survey_child = "survey_data") |>
+    mutate(child_id = if_else(is.na(.data$child_id) & .data$specific_scope == "child_id",
+                              .data$specific_scope_id, .data$child_id)) |>
     select(-"survey_group")
 
   # caregiver survey combined
-  survey_caregiver <- bind_rows(survey_household, survey_child) |>
-    group_by(.data$survey_id, .data$survey_type, .data$user_id,
-             .data$child_id, .data$timestamp) |>
-    summarise(survey_data = list(purrr::list_rbind(.data$survey_data)),
-              n_responses = sum(.data$n_responses)) |>
-    ungroup()
+  survey_caregiver <- bind_rows(survey_household, survey_child)
 
   # recombine separated out survey types
   children_demapped <- children |>
     select("child_id", "birth_month", "birth_year", "site", "dataset", "school_id", "class_id")
   survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |>
+    select(-c("survey_schema_source", "specific_scope", "specific_scope_id",
+              "updated_at", "n_responses")) |>
+    rename(respondent_id = "user_id", survey_timestamp = "created_at") |>
     left_join(children_demapped, by = c("child_id")) |>
-    mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$timestamp)) |>
+    mutate(age = compute_age(.data$birth_month, .data$birth_year, .data$survey_timestamp)) |>
     select(-contains("birth_")) |>
-    rename(respondent_id = "user_id", survey_timestamp = "timestamp") |>
     mutate(survey_type = .data$survey_type |> stringr::str_replace("student", "child")) |>
     relocate("survey_data", .after = everything())
 
   survey_combined |> tidyr::unnest("survey_data") |>
-    mutate(survey_part = .data$survey_part |> stringr::str_replace("student", "child")) |>
-    select(-"n_responses") |>
-    relocate("site", "dataset", "redivis_source", .before = everything())
+    relocate("redivis_source", "site", "dataset", .before = everything())
 }
