@@ -5,6 +5,16 @@
 #' @param df trial data
 #' @param slider_threshold max normalized distance from slider target
 recode_trials <- \(df, slider_threshold = 0.15) {
+  # recode_trials() is not idempotent: re-applying it double-applies item-id
+  # transforms (e.g. the Hearts & Flowers start/stay/switch suffixes), silently
+  # corrupting item_uids. It adds an `original_correct` column, so guard against
+  # being run on already-recoded data.
+  if ("original_correct" %in% names(df)) {
+    stop("recode_trials() has already been applied to this data (an ",
+         "`original_correct` column is present); apply it exactly once.",
+         call. = FALSE)
+  }
+
   item_fixes <- tribble(
     ~item_uid,             ~answer_fixed,
     "math_subtract_37_24", "13"
@@ -81,8 +91,11 @@ recode_slider <- \(df, slider_threshold) {
 #' @inheritParams recode_trials
 #' @param wrong_items tibble with columns item_uid and answer_fixed
 recode_wrong_items <- \(df, wrong_items) {
+  # inner_join (not right_join): only recode wrong-answer items that are
+  # actually present. right_join would keep unmatched wrong_items keys, adding
+  # a spurious all-NA trial row when an item bank entry isn't in the data.
   wrong_trials <- df |>
-    right_join(wrong_items) |>
+    inner_join(wrong_items) |>
     mutate(correct = !is.na(.data$response) & .data$response == .data$answer_fixed)
   df |>
     anti_join(wrong_items) |>

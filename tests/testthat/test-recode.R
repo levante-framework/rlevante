@@ -58,6 +58,23 @@ test_that("recode_wrong_items() rescores against the corrected answer key", {
   expect_false("answer_fixed" %in% names(out))
 })
 
+test_that("recode_wrong_items() adds no row when the fixed item is absent", {
+  # data contains none of the wrong-answer items; output must be unchanged and
+  # must NOT gain a spurious all-NA row for the missing item bank entry
+  df <- tibble(
+    item_uid = c("other1", "other2"),
+    response = c("a", "b"),
+    correct = c(TRUE, FALSE)
+  )
+  fixes <- tibble(item_uid = "math_subtract_37_24", answer_fixed = "13")
+
+  out <- suppressMessages(recode_wrong_items(df, fixes))
+
+  expect_equal(nrow(out), 2)
+  expect_setequal(out$item_uid, c("other1", "other2"))
+  expect_false(any(is.na(out$item_uid)))
+})
+
 test_that("recode_tom() builds item_uid from story, group, and item", {
   df <- tibble(
     item_task = "tom",
@@ -97,4 +114,26 @@ test_that("recode_trials() orchestrates recodes and backfills chance", {
   expect_true(out |> filter(item_uid == "math_subtract_37_24") |> pull(correct))
   # non-slider chance is backfilled to 0
   expect_true(all(out$chance == 0))
+})
+
+test_that("recode_trials() refuses to recode already-recoded data", {
+  df <- tibble(
+    item_task = "math",
+    item_group = "number",
+    item = c("x", "s"),
+    item_uid = c("math_add_1_1", "math_subtract_37_24"),
+    item_original = c("x", "s"),
+    correct = c(TRUE, FALSE),
+    response = c("2", "13"),
+    rt_numeric = c(1000, 1000),
+    run_id = "r1",
+    trial_number = 1:2,
+    chance = NA_real_,
+    dataset = "d",
+    timestamp = as.POSIXct(c("2025-03-01", "2025-03-01"))
+  )
+
+  once <- suppressMessages(recode_trials(df))
+  # recoding the already-recoded output (which now has original_correct) errors
+  expect_error(recode_trials(once), "already been applied")
 })
