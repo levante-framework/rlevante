@@ -1,4 +1,4 @@
 library(testthat)
-library(rlevante)
+library(levantemodels)
 
-test_check("rlevante")
+test_check("levantemodels")

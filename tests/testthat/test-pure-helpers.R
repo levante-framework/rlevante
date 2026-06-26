@@ -9,18 +9,6 @@ test_that("compute_age() returns age in years from birth month/year", {
   expect_true(is.na(compute_age(NA, 2018, as.Date("2024-06-15"))))
 })
 
-test_that("build_filter() builds SQL WHERE clauses", {
-  expect_equal(build_filter("task_id", NULL), "")
-  expect_equal(as.character(build_filter("task_id", "math")),
-               "WHERE task_id IN ('math')")
-  expect_equal(as.character(build_filter("task_id", c("math", "vocab"))),
-               "WHERE task_id IN ('math', 'vocab')")
-  expect_equal(
-    as.character(build_filter("survey_type", "caregiver", allow_null = TRUE)),
-    "WHERE survey_type IS NULL OR survey_type IN ('caregiver')"
-  )
-})
-
 test_that("reverse_value() reverses within an ordered scale", {
   scale <- 1:5
   expect_equal(reverse_value(2, scale), 4)

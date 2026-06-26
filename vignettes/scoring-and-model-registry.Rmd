@@ -17,13 +17,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-The [walkthrough vignette](rlevante_walkthrough.html) covers downloading
-*already-scored* data with `get_scores()`. This vignette is for the next step:
-understanding **how** those scores are produced, and how to reproduce or audit
-them yourself using the LEVANTE **model registry**.
+Loading LEVANTE data (the `get_*` functions used below) is handled by the
+companion [`levante`](https://github.com/levante-framework/levante-r) package;
+`levantemodels` provides the processing and modeling tooling on top of it. This
+vignette covers how scores are produced, and how to reproduce or audit them
+yourself using the LEVANTE **model registry**.
 
 ```{r setup}
-library(rlevante)
+library(levantemodels)
+library(levante)   # data loaders: get_scores(), get_trials(), ...
 library(dplyr)
 ```
 
