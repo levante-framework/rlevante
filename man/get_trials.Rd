@@ -17,6 +17,13 @@ A data frame where each row is a trial.
 \description{
 \code{get_trials()} returns information about each trial as a data frame. See the \href{https://levante-framework.github.io/rlevante/index.html}{rlevante documentation} for more information about how to access LEVANTE datasets and codebooks.
 }
+\details{
+The returned \code{correct} column is \strong{not yet scoring-ready}: LEVANTE's IRT
+models are calibrated on trials passed through \code{\link[=recode_trials]{recode_trials()}} (slider
+thresholding, Hearts & Flowers / SDS / ToM recodes, item-key fixes, and
+chance backfill). Apply \code{recode_trials()} before scoring. See
+\code{vignette("scoring-and-model-registry")} for the full pipeline.
+}
 \examples{
 \dontrun{
 trials <- get_trials(data_source = "levante_data_example:d0rt", version = "current")

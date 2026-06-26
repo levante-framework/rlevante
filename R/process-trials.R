@@ -233,10 +233,13 @@ add_item_ids <- function(trials) {
     summarise(item_uid_source = list(.data$item_uid_source)) |>
     ungroup()
 
-  # check that no trials have multiple conflicted item IDs
+  # validate that no trial maps to multiple conflicting item IDs
   conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1) |> ungroup()
-  # message(nrow(conflicts))
-  # assertthat::assert_that(nrow(conflicts) == 0)
+  if (nrow(conflicts) > 0) {
+    warning(glue::glue("{n_distinct(conflicts$trial_id)} trial(s) map to multiple ",
+                       "conflicting item IDs and may be scored incorrectly"),
+            call. = FALSE)
+  }
 
   # join mapped trials back into overall trials
   trials_prepped |>
@@ -259,25 +262,4 @@ add_item_metadata <- function(trials) {
     mutate(group = tidyr::replace_na(.data$group, ""),
            entry = tidyr::replace_na(.data$entry, "")) |>
     rename(item_original = "item", item_group = "group", item = "entry")
-}
-
-# add numeric RTs
-convert_rts <- function(trials) {
-  trials |> mutate(rt_numeric = suppressWarnings(as.numeric(.data$rt)),
-                   .after = .data$rt)
-}
-
-code_numberline <- function(trials, threshold = 0.15) {
-  slider_trials <- trials |>
-    filter(.data$item_group == "slider") |>
-    tidyr::separate_wider_delim(.data$item, "_",
-                                names = c("answer", "max_value"),
-                                cols_remove = FALSE) |>
-    mutate(answer = .data$answer |> stringr::str_replace("^0", "0."),
-           across(c(.data$answer, .data$max_value), as.numeric),
-           correct = (abs(as.numeric(.data$response) - .data$answer) / .data$max_value < threshold)) |>
-    select(-c("answer", "max_value"))
-  trials |>
-    filter(.data$item_group != "slider") |>
-    bind_rows(slider_trials)
 }
