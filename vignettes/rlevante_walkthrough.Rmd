@@ -48,22 +48,28 @@ theme_set(theme_classic())
 ```
 
 Then, use `get_participants` to obtain child participant ids, approximate birthdates, and any associated caregiver or teacher ids. 
-```{r}
-participants <- get_participants("levante-data-example:d0rt", version = "current")
 
-participants |> count(dataset, sort = TRUE)
+`get_participants` is the first rlevante function in this code. When you run it, you'll be prompted to authenticate with a pop-up browser on Redivis (an academic database manager that we use at LEVANTE) to ensure that you have the right permissions to access the dataset. Subsequent rlevante calls to this dataset within the same session should not require additional authentication.
+
+```{r}
+# Pull participant data from Redivis and save it to a data frame called "participants"
+participants <- get_participants(data_source = "levante-data-example:d0rt", version = "current") 
+
+# Now let's do some preliminary checks on the participants data
+participants |> count(site, sort = TRUE) # returns the number of participants from each site — the levante-data-example and private site data releases only contain data from a single site, but the public data releases contain many sites/datasets stapled together
 ```
 
 Use `get_scores` to obtain scored cognitive task data. 
 ```{r}
-scores <- get_scores(data_source = "levante-data-example:d0rt")
+# Pull scored data from Redivis and save it to a data frame called "scores"
+scores <- get_scores(data_source = "levante-data-example:d0rt", version = "current") 
 
-scores |> count(dataset, sort = TRUE)
-
-scores |> count(task_id, sort = TRUE)
+# Now let's do some preliminary checks on the scores data
+scores |> count(task_id, sort = TRUE) # returns the number of scores for each task. for a list of item_task abbreviations, see Table 1 here: https://researcher.levante-network.org/measures/direct-child-measures
 ```
 
 ```{r}
+# This plot returns scores by age fro each task.
 ggplot(scores, aes(x = age, y = score)) +
   facet_wrap(vars(task_id)) +
   geom_point()
@@ -72,28 +78,39 @@ ggplot(scores, aes(x = age, y = score)) +
 Use `get_trials` to access trial-level data.
 
 ```{r}
-trials <- get_trials("levante-data-example:d0rt")
+# Pull trial-level data from Redivis and save it to a data frame called "trials"
+trials <- get_trials(data_source = "levante-data-example:d0rt", version = "current") 
 
-trials |> count(dataset, sort = TRUE)
+# Now let's do some preliminary checks on the trials data
+trials |> count(site, sort = TRUE) # returns the number of trials per site
 
-trials |> count(task_id, sort = TRUE)
+trials |> count(task_id, sort = TRUE) # returns the number of trials per task
 ```
 
 Use `get_surveys` to access item-level survey data.
 ```{r}
+# Pull survey data from Redivis and save it to a data frame called "surveys"
+surveys <- get_surveys(data_source = "levante-data-example:d0rt", version = "current") 
 
-surveys <- get_surveys("levante-data-example:d0rt")
-
-surveys |> count(dataset, sort = TRUE)
+# Now let's do some preliminary checks on the trials data
+surveys |> count(site, sort = TRUE) # returns the number of surveys per site
 ```
 
-Finally, researchers accessing their own LEVANTE data can use `get_raw_data` to access additional tables within private datasets.
+Use `get_item_parameters` to access the IRT item parameters used in LEVANTE scoring.
+```{r}
+# Pull up-to-date item parameters from Redivis
+item_parameters <- get_item_parameters()
+
+item_parameters |> count(item_task, sort = TRUE) # returns the number of parameters per task
+```
+
+Finally, researchers accessing their own LEVANTE data can use `get_raw_data` to access additional tables within private datasets. `get_raw_data` is a general function that can pull any table that you specify, provided that the table exists. When pulling raw data, please note that some of the table names are different than the processed data. Check your dataset page to ensure that the table exists. 
 
 ```{r}
+# Pull data from any table within from Redivis – in this case, we're pulling the administrations table (each assignment is an administration)
+administrations <- get_raw_table(table_name = "administrations", data_source =  "levante-data-example-raw:bm7r") 
 
-administrations <- get_raw_table(table_name = "administrations", data_source =  "levante-data-example-raw:bm7r")
-
-administrations |> count(public_name, sort = TRUE)
+administrations |> count(public_name, sort = TRUE) # returns the number of completions per assignment, based on that assignment's name
 ```
 
 To go beyond loading already-scored data — understanding how LEVANTE scores are produced, and reproducing or auditing them yourself with the model registry — see the [Scoring and the model registry](scoring-and-model-registry.html) vignette.

@@ -48,7 +48,7 @@ remove_no_var_items_bygroup <- function(df) {
     group_by(.data$item_inst, .data$group) |>
     mutate(n_cat_group = n_distinct(.data$correct)) |>
     group_by(.data$item_inst) |>
-    filter(n_distinct(n_cat_group) == 1) |>
+    filter(n_distinct(.data$n_cat_group) == 1) |>
     ungroup()
 }
 

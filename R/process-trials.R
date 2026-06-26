@@ -67,14 +67,14 @@ process_trials <- function(dataset_spec,
                            participants = NULL, # all participants if null
                            max_results = NULL) {
 
-  trials <- process_trials_prelim(dataset_spec = dataset_spec,
-                                  remove_incomplete_runs = remove_incomplete_runs,
-                                  remove_invalid_runs = remove_invalid_runs,
-                                  remove_invalid_trials = remove_invalid_trials,
-                                  tasks = tasks,
-                                  participants = participants,
-                                  max_results = max_results)
-  trials |>
+  trials_prelim <- process_trials_prelim(dataset_spec = dataset_spec,
+                                         remove_incomplete_runs = remove_incomplete_runs,
+                                         remove_invalid_runs = remove_invalid_runs,
+                                         remove_invalid_trials = remove_invalid_trials,
+                                         tasks = tasks,
+                                         participants = participants,
+                                         max_results = max_results)
+  trials_prelim |>
     add_item_ids() |>
     add_item_metadata() |>
     add_trial_numbers() |>
@@ -111,16 +111,18 @@ add_trial_numbers <- function(trials) {
 
 add_item_ids <- function(trials) {
 
-  # get item IDs coded by trial
-  trial_items <- fetch_trial_items()
-  trial_map <- trial_items |>
+  # get item UIDs coded by trial
+  # trial_items <- fetch_trial_items()
+  mapping_trial <- fetch_item_mapping_trial()
+  trial_map <- mapping_trial |>
     mutate(trials = trials |> purrr::map(jsonlite::fromJSON) |> purrr::map(unlist)) |>
     tidyr::unnest(trials) |>
     select(item_uid_trial = "item_uid", trial_id = "trials")
 
-  # get item IDs coded by item (corpus_trial_type, item, answer, distractors)
-  mapping_items <- fetch_mapping_items()
-  item_map <- mapping_items |>
+  # get item UIDs coded by item (corpus_trial_type, item, answer, distractors)
+  # mapping_items <- fetch_mapping_items()
+  mapping_fields <- fetch_item_mapping_fields()
+  item_map <- mapping_fields |>
     mutate(across(c("corpus_trial_type", "item", "answer", "distractors"),
                   \(s) tidyr::replace_na(s, ""))) |>
     mutate(item_key = paste(.data$corpus_trial_type, .data$item,
@@ -128,6 +130,12 @@ add_item_ids <- function(trials) {
              stringr::str_trim()) |>
     select(item_uid_mapping = "item_uid", "item_key") |>
     distinct()
+
+  # get item UIDs coded by item_id
+  # mapping_items <- fetch_mapping_items()
+  mapping_id <- fetch_item_mapping_id()
+  id_map <- mapping_id |>
+    select(item_uid_id = "item_uid", "item_id")
 
   # fixes for wrong item UIDs in item banks
   itembank_recodes <- c(
@@ -170,7 +178,7 @@ add_item_ids <- function(trials) {
   suppressWarnings(
     trials_prepped <- trials |>
       # create item IDs for ROAR tasks (pa -> subtask + answer, sre -> item_id, swr -> answer)
-      mutate(subtask = if ("subtask" %in% colnames(trials)) subtask else "") |>
+      mutate(subtask = if ("subtask" %in% colnames(trials)) .data$subtask else "") |>
       mutate(item_uid_roar = case_when(
         stringr::str_detect(task_id, "^pa(-|$)") ~ glue::glue("pa_{stringr::str_to_lower(subtask)}_{answer}"),
         stringr::str_detect(task_id, "^sre(-|$)") ~ glue::glue("sre_{item_id}"),
@@ -201,38 +209,42 @@ add_item_ids <- function(trials) {
       mutate(item_key = paste(.data$corpus_trial_type, .data$item, .data$answer, .data$distractors) |>
                stringr::str_trim()) |>
       # remove trials with no item information
-      filter(!is.na(.data$item_uid) | !is.na(.data$item_key))
+      filter(!is.na(.data$item_uid) | .data$item_key != "")
   )
 
   trials_joined <- trials_prepped |>
-    select("trial_id", "task_id", "item_key", "item_uid", "item_uid_roar") |>
-    # join in trial item ID map
+    select("trial_id", "task_id", "item_id", "item_key", "item_uid", "item_uid_roar") |>
+    # join in trial-based item UID map
     left_join(trial_map, by = "trial_id") |>
-    # join in item mapping item ID map
-    left_join(item_map, by = "item_key")
+    # join in item-based item UID map
+    left_join(item_map, by = "item_key") |>
+    # join in item_id-based item UID map
+    left_join(id_map, by = "item_id")
 
   trials_mapped <- trials_joined |>
     # move all item ID columns to rows
     tidyr::pivot_longer(contains("item_uid"),
                         names_to = "item_uid_source", values_to = "item_uid") |>
     # filter to each trial's present item IDs
-    group_by(.data$trial_id, .data$task_id) |>
-    filter(!is.na(.data$item_uid)) |>
+    # group_by(.data$trial_id, .data$task_id) |>
+    filter(!is.na(.data$item_uid), .data$item_uid != "") |>
     # collapse item ID sources
     group_by(.data$trial_id, .data$task_id, .data$item_uid) |>
     summarise(item_uid_source = list(.data$item_uid_source)) |>
     ungroup()
 
-  # check that no trials have multiple conflicted item IDs
+  # validate that no trial maps to multiple conflicting item IDs
   conflicts <- trials_mapped |> group_by(.data$trial_id) |> filter(n() > 1) |> ungroup()
-  # message(nrow(conflicts))
-  # assertthat::assert_that(nrow(conflicts) == 0)
+  if (nrow(conflicts) > 0) {
+    warning(glue::glue("{n_distinct(conflicts$trial_id)} trial(s) map to multiple ",
+                       "conflicting item IDs and may be scored incorrectly"),
+            call. = FALSE)
+  }
 
   # join mapped trials back into overall trials
   trials_prepped |>
     select(-"item_uid") |>
-    left_join(trials_mapped, by = c("task_id", "trial_id")) |>
-    filter(!is.na(.data$item_uid) | .data$item_key != "")
+    left_join(trials_mapped, by = c("task_id", "trial_id"))
 }
 
 
@@ -250,25 +262,4 @@ add_item_metadata <- function(trials) {
     mutate(group = tidyr::replace_na(.data$group, ""),
            entry = tidyr::replace_na(.data$entry, "")) |>
     rename(item_original = "item", item_group = "group", item = "entry")
-}
-
-# add numeric RTs
-convert_rts <- function(trials) {
-  trials |> mutate(rt_numeric = suppressWarnings(as.numeric(.data$rt)),
-                   .after = .data$rt)
-}
-
-code_numberline <- function(trials, threshold = 0.15) {
-  slider_trials <- trials |>
-    filter(.data$item_group == "slider") |>
-    tidyr::separate_wider_delim(.data$item, "_",
-                                names = c("answer", "max_value"),
-                                cols_remove = FALSE) |>
-    mutate(answer = .data$answer |> stringr::str_replace("^0", "0."),
-           across(c(.data$answer, .data$max_value), as.numeric),
-           correct = (abs(as.numeric(.data$response) - .data$answer) / .data$max_value < threshold)) |>
-    select(-c("answer", "max_value"))
-  trials |>
-    filter(.data$item_group != "slider") |>
-    bind_rows(slider_trials)
 }
