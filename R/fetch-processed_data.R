@@ -47,6 +47,12 @@ get_surveys <- function(data_source, version = "current") {
 #' Get trials
 #'
 #' `get_trials()` returns information about each trial as a data frame. See the [rlevante documentation](https://levante-framework.github.io/rlevante/index.html) for more information about how to access LEVANTE datasets and codebooks.
+#'
+#' The returned `correct` column is **not yet scoring-ready**: LEVANTE's IRT
+#' models are calibrated on trials passed through [recode_trials()] (slider
+#' thresholding, Hearts & Flowers / SDS / ToM recodes, item-key fixes, and
+#' chance backfill). Apply `recode_trials()` before scoring. See
+#' `vignette("scoring-and-model-registry")` for the full pipeline.
 #' @inheritParams get_participants
 #' @returns A data frame where each row is a trial.
 #' @export

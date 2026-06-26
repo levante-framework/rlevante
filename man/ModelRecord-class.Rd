@@ -6,6 +6,9 @@
 \alias{ModelRecord}
 \title{ModelRecord class definition}
 \description{
-ModelRecord class definition
+A fitted LEVANTE IRT model and its metadata, as stored in the model
+registry. Access its contents with \code{\link[=items]{items()}}, \code{\link[=model_class]{model_class()}},
+\code{\link[=model_vals]{model_vals()}}, and \code{\link[=scores]{scores()}}; see
+\code{vignette("scoring-and-model-registry")} for details.
 }
 \keyword{internal}
