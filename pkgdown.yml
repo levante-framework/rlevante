@@ -3,7 +3,8 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   rlevante_walkthrough: rlevante_walkthrough.html
-last_built: 2026-06-26T19:25Z
+  scoring-and-model-registry: scoring-and-model-registry.html
+last_built: 2026-06-26T19:40Z
 urls:
   reference: https://levante-framework.github.io/rlevante/reference
   article: https://levante-framework.github.io/rlevante/articles

@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/rlevante_walkthrough.html">rlevante_walkthrough</a></li>
+    <li><a class="dropdown-item" href="../articles/scoring-and-model-registry.html">Scoring and the model registry</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -59,6 +60,14 @@
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame where each row is a trial.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The returned <code>correct</code> column is <strong>not yet scoring-ready</strong>: LEVANTE's IRT
+models are calibrated on trials passed through <code><a href="recode_trials.html">recode_trials()</a></code> (slider
+thresholding, Hearts &amp; Flowers / SDS / ToM recodes, item-key fixes, and
+chance backfill). Apply <code><a href="recode_trials.html">recode_trials()</a></code> before scoring. See
+<code><a href="../articles/scoring-and-model-registry.html">vignette("scoring-and-model-registry")</a></code> for the full pipeline.</p>
     </div>
 
     <div class="section level2">

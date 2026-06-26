@@ -224,3 +224,9 @@ administrations |> count(public_name, sort = TRUE) # returns the number of compl
 #> 17 Test_Group4_TP1                 1
 #> 18 Test_Survey_0825                1
 ```
+
+To go beyond loading already-scored data — understanding how LEVANTE
+scores are produced, and reproducing or auditing them yourself with the
+model registry — see the [Scoring and the model
+registry](https://levante-framework.github.io/rlevante/articles/scoring-and-model-registry.md)
+vignette.

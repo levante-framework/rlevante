@@ -25,6 +25,18 @@ get_trials(data_source, version = "current")
 
 A data frame where each row is a trial.
 
+## Details
+
+The returned `correct` column is **not yet scoring-ready**: LEVANTE's
+IRT models are calibrated on trials passed through
+[`recode_trials()`](https://levante-framework.github.io/rlevante/reference/recode_trials.md)
+(slider thresholding, Hearts & Flowers / SDS / ToM recodes, item-key
+fixes, and chance backfill). Apply
+[`recode_trials()`](https://levante-framework.github.io/rlevante/reference/recode_trials.md)
+before scoring. See
+[`vignette("scoring-and-model-registry")`](https://levante-framework.github.io/rlevante/articles/scoring-and-model-registry.md)
+for the full pipeline.
+
 ## Examples
 
 ``` r
