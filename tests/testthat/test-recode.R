@@ -115,3 +115,25 @@ test_that("recode_trials() orchestrates recodes and backfills chance", {
   # non-slider chance is backfilled to 0
   expect_true(all(out$chance == 0))
 })
+
+test_that("recode_trials() refuses to recode already-recoded data", {
+  df <- tibble(
+    item_task = "math",
+    item_group = "number",
+    item = c("x", "s"),
+    item_uid = c("math_add_1_1", "math_subtract_37_24"),
+    item_original = c("x", "s"),
+    correct = c(TRUE, FALSE),
+    response = c("2", "13"),
+    rt_numeric = c(1000, 1000),
+    run_id = "r1",
+    trial_number = 1:2,
+    chance = NA_real_,
+    dataset = "d",
+    timestamp = as.POSIXct(c("2025-03-01", "2025-03-01"))
+  )
+
+  once <- suppressMessages(recode_trials(df))
+  # recoding the already-recoded output (which now has original_correct) errors
+  expect_error(recode_trials(once), "already been applied")
+})
