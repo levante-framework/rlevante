@@ -1,16 +1,16 @@
 # Scoring and the model registry
 
-The [walkthrough
-vignette](https://levante-framework.github.io/rlevante/articles/rlevante_walkthrough.md)
-covers downloading *already-scored* data with
-[`get_scores()`](https://levante-framework.github.io/rlevante/reference/get_scores.md).
-This vignette is for the next step: understanding **how** those scores
-are produced, and how to reproduce or audit them yourself using the
-LEVANTE **model registry**.
+Loading LEVANTE data (the `get_*` functions used below) is handled by
+the companion
+[`levante`](https://github.com/levante-framework/levante-r) package;
+`levantemodels` provides the processing and modeling tooling on top of
+it. This vignette covers how scores are produced, and how to reproduce
+or audit them yourself using the LEVANTE **model registry**.
 
 ``` r
 
-library(rlevante)
+library(levantemodels)
+library(levante)   # data loaders: get_scores(), get_trials(), ...
 library(dplyr)
 ```
 
@@ -25,10 +25,10 @@ through a handful of functions:
 
 | Function | Returns |
 |----|----|
-| [`fetch_scoring_table()`](https://levante-framework.github.io/rlevante/reference/fetch_scoring_table.md) | which model specification applies to each (task, dataset) |
-| [`fetch_registry_table()`](https://levante-framework.github.io/rlevante/reference/fetch_registry_table.md) | an index mapping model files to Redivis file ids |
-| [`fetch_registry_dir()`](https://levante-framework.github.io/rlevante/reference/fetch_registry_dir.md) | a Redivis directory handle for downloading model files |
-| [`score()`](https://levante-framework.github.io/rlevante/reference/score.md) | scores one (task, dataset) using the above |
+| [`fetch_scoring_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_scoring_table.md) | which model specification applies to each (task, dataset) |
+| [`fetch_registry_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_table.md) | an index mapping model files to Redivis file ids |
+| [`fetch_registry_dir()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_dir.md) | a Redivis directory handle for downloading model files |
+| [`score()`](https://levante-framework.github.io/levantemodels/reference/score.md) | scores one (task, dataset) using the above |
 
 End to end, scoring a task flows like this:
 
@@ -68,10 +68,10 @@ copy to pin future runs.
 
 ## Trials must be recoded before scoring
 
-[`get_trials()`](https://levante-framework.github.io/rlevante/reference/get_trials.md)
+[`get_trials()`](https://rdrr.io/pkg/levante/man/get_trials.html)
 returns a `correct` column, but that column is **not yet
 scoring-ready**. The calibrated models were fit on data passed through
-[`recode_trials()`](https://levante-framework.github.io/rlevante/reference/recode_trials.md)
+[`recode_trials()`](https://levante-framework.github.io/levantemodels/reference/recode_trials.md)
 first, so you must apply it before scoring or you will get subtly wrong
 numbers.
 
@@ -81,7 +81,7 @@ trials <- get_trials("levante_data_example:d0rt") |>
   recode_trials()
 ```
 
-[`recode_trials()`](https://levante-framework.github.io/rlevante/reference/recode_trials.md)
+[`recode_trials()`](https://levante-framework.github.io/levantemodels/reference/recode_trials.md)
 performs several task-specific corrections, including:
 
 - **Slider items** (e.g. number line): marks a response correct when it
@@ -99,7 +99,7 @@ performs several task-specific corrections, including:
 
 Putting it together, here is how to reproduce the scores for one task
 and dataset and compare them against the published values. The exported
-[`score()`](https://levante-framework.github.io/rlevante/reference/score.md)
+[`score()`](https://levante-framework.github.io/levantemodels/reference/score.md)
 function is the high-level entry point — it looks up the model spec,
 downloads the fitted `ModelRecord`, shapes the data, and scores it.
 
@@ -133,7 +133,7 @@ my_scores |>
 
 ## Working with a `ModelRecord`
 
-[`score()`](https://levante-framework.github.io/rlevante/reference/score.md)
+[`score()`](https://levante-framework.github.io/levantemodels/reference/score.md)
 downloads a fitted model as a `ModelRecord` object. If you want to
 inspect a model directly — for example to look up item parameters, or to
 validate a rescore — you can download one yourself from the registry.
@@ -183,7 +183,7 @@ scores(mod_rec)
 The deployed IRT models include a **fixed guessing lower asymptote** at
 each item’s chance level (`g = chance`, held fixed rather than
 estimated).
-[`score_irt()`](https://levante-framework.github.io/rlevante/reference/score_irt.md)
+[`score_irt()`](https://levante-framework.github.io/levantemodels/reference/score_irt.md)
 rebuilds the full model from `model_vals(mod_rec)` — which includes
 these `g` rows — so the released ability scores already account for
 guessing.
@@ -191,7 +191,7 @@ guessing.
 Two things are easy to get wrong here:
 
 - The `item_parameters` table (and
-  [`get_item_parameters()`](https://levante-framework.github.io/rlevante/reference/get_item_parameters.md))
+  [`levante::get_item_parameters()`](https://rdrr.io/pkg/levante/man/get_item_parameters.html))
   exposes only `difficulty` and `discrimination`; it **omits `g`**. Its
   `itemtype` label (`rasch` / `2pl`) describes the discrimination
   structure only, not the presence of guessing.
@@ -221,6 +221,6 @@ fitted model and inflates residuals at low ability (lucky guesses on
 hard items look “impossible”), which can corrupt person-fit and
 reliability analyses even though the released scores themselves are
 correct. The trial-level `chance` field from
-[`get_trials()`](https://levante-framework.github.io/rlevante/reference/get_trials.md)
+[`get_trials()`](https://rdrr.io/pkg/levante/man/get_trials.html)
 carries the same per-item `g` values, so it is an equivalent source for
 the asymptote.

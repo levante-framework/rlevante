@@ -2,9 +2,8 @@ pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  rlevante_walkthrough: rlevante_walkthrough.html
   scoring-and-model-registry: scoring-and-model-registry.html
-last_built: 2026-06-26T19:40Z
+last_built: 2026-06-26T20:42Z
 urls:
-  reference: https://levante-framework.github.io/rlevante/reference
-  article: https://levante-framework.github.io/rlevante/articles
+  reference: https://levante-framework.github.io/levantemodels/reference
+  article: https://levante-framework.github.io/levantemodels/articles

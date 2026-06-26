@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Scoring and the model registry • rlevante</title>
+<title>Scoring and the model registry • levantemodels</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">rlevante</a>
+    <a class="navbar-brand me-2" href="../index.html">levantemodels</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -33,8 +33,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/rlevante_walkthrough.html">rlevante_walkthrough</a></li>
-    <li><a class="dropdown-item" href="../articles/scoring-and-model-registry.html">Scoring and the model registry</a></li>
+<li><a class="dropdown-item" href="../articles/scoring-and-model-registry.html">Scoring and the model registry</a></li>
   </ul>
 </li>
       </ul>
@@ -64,14 +63,15 @@
 
     
     
-<p>The <a href="rlevante_walkthrough.html">walkthrough vignette</a>
-covers downloading <em>already-scored</em> data with
-<code><a href="../reference/get_scores.html">get_scores()</a></code>. This vignette is for the next step:
-understanding <strong>how</strong> those scores are produced, and how to
-reproduce or audit them yourself using the LEVANTE <strong>model
+<p>Loading LEVANTE data (the <code>get_*</code> functions used below) is
+handled by the companion <a href="https://github.com/levante-framework/levante-r" class="external-link"><code>levante</code></a>
+package; <code>levantemodels</code> provides the processing and modeling
+tooling on top of it. This vignette covers how scores are produced, and
+how to reproduce or audit them yourself using the LEVANTE <strong>model
 registry</strong>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levante-framework.github.io/rlevante/">rlevante</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levante-framework.github.io/levantemodels/">levantemodels</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levante-framework.github.io/levante-r/" class="external-link">levante</a></span><span class="op">)</span>   <span class="co"># data loaders: get_scores(), get_trials(), ...</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="how-levante-scores-are-produced">How LEVANTE scores are produced<a class="anchor" aria-label="anchor" href="#how-levante-scores-are-produced"></a>
@@ -131,15 +131,15 @@ score(task, dataset, trials, runs,  # -&gt; downloads the ModelRecord, shapes th
 release.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># tracks whatever the latest release happens to be</span></span>
-<span><span class="va">scores_current</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_scores.html">get_scores</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span></span>
+<span><span class="va">scores_current</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/levante/man/get_scores.html" class="external-link">get_scores</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span>, version <span class="op">=</span> <span class="st">"current"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># pinned: name + persistent dataset id (hash) + dataset version</span></span>
-<span><span class="va">scores_pinned</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_scores.html">get_scores</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt:v1_0"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">scores_pinned</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/levante/man/get_scores.html" class="external-link">get_scores</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt:v1_0"</span><span class="op">)</span></span></code></pre></div>
 <p>The persistent <code>hash</code> (e.g. <code>d0rt</code>) is stable
 even if the dataset is renamed; the trailing <code>:v1_0</code> pins the
 version. You can find both on the dataset’s Redivis page under
 <strong>API Information</strong> → <strong>Qualified references</strong>
-(see the <a href="https://levante-framework.github.io/rlevante/index.html">“Reference
+(see the <a href="https://levante-framework.github.io/rlevante/index.html" class="external-link">“Reference
 identifiers” section of the README</a>). When you call a “get” function
 with <code>version = "current"</code>, rlevante emits a message
 reporting the qualified reference it resolved to, which you can copy to
@@ -148,13 +148,13 @@ pin future runs.</p>
 <div class="section level2">
 <h2 id="trials-must-be-recoded-before-scoring">Trials must be recoded before scoring<a class="anchor" aria-label="anchor" href="#trials-must-be-recoded-before-scoring"></a>
 </h2>
-<p><code><a href="../reference/get_trials.html">get_trials()</a></code> returns a <code>correct</code> column, but
+<p><code><a href="https://rdrr.io/pkg/levante/man/get_trials.html" class="external-link">get_trials()</a></code> returns a <code>correct</code> column, but
 that column is <strong>not yet scoring-ready</strong>. The calibrated
 models were fit on data passed through <code><a href="../reference/recode_trials.html">recode_trials()</a></code>
 first, so you must apply it before scoring or you will get subtly wrong
 numbers.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trials</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trials.html">get_trials</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">trials</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/levante/man/get_trials.html" class="external-link">get_trials</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/recode_trials.html">recode_trials</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/recode_trials.html">recode_trials()</a></code> performs several task-specific
 corrections, including:</p>
@@ -194,7 +194,7 @@ the data, and scores it.</p>
 <span><span class="va">dataset</span> <span class="op">&lt;-</span> <span class="st">"pilot_uniandes_co_bogota"</span></span>
 <span></span>
 <span><span class="co"># trial (and, for adaptive tasks, run) data for this task + dataset</span></span>
-<span><span class="va">trials_task</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trials.html">get_trials</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">trials_task</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/levante/man/get_trials.html" class="external-link">get_trials</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/recode_trials.html">recode_trials</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">item_task</span> <span class="op">==</span> <span class="va">task</span>, <span class="va">dataset</span> <span class="op">==</span> <span class="op">!</span><span class="op">!</span><span class="va">dataset</span><span class="op">)</span></span>
 <span></span>
@@ -205,7 +205,7 @@ the data, and scores it.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># compare to the published scores</span></span>
-<span><span class="va">published</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_scores.html">get_scores</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">published</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/levante/man/get_scores.html" class="external-link">get_scores</a></span><span class="op">(</span><span class="st">"levante_data_example:d0rt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">task_id</span> <span class="op">==</span> <span class="va">task</span>, <span class="va">dataset</span> <span class="op">==</span> <span class="op">!</span><span class="op">!</span><span class="va">dataset</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_scores</span> <span class="op">|&gt;</span></span>
@@ -312,9 +312,9 @@ guessing.</p>
 <p>Two things are easy to get wrong here:</p>
 <ul>
 <li>The <code>item_parameters</code> table (and
-<code><a href="../reference/get_item_parameters.html">get_item_parameters()</a></code>) exposes only <code>difficulty</code>
-and <code>discrimination</code>; it <strong>omits
-<code>g</code></strong>. Its <code>itemtype</code> label
+<code><a href="https://rdrr.io/pkg/levante/man/get_item_parameters.html" class="external-link">levante::get_item_parameters()</a></code>) exposes only
+<code>difficulty</code> and <code>discrimination</code>; it
+<strong>omits <code>g</code></strong>. Its <code>itemtype</code> label
 (<code>rasch</code> / <code>2pl</code>) describes the discrimination
 structure only, not the presence of guessing.</li>
 <li>The <strong>authoritative, complete</strong> parameter set is
@@ -337,7 +337,7 @@ mismatches the fitted model and inflates residuals at low ability (lucky
 guesses on hard items look “impossible”), which can corrupt person-fit
 and reliability analyses even though the released scores themselves are
 correct. The trial-level <code>chance</code> field from
-<code><a href="../reference/get_trials.html">get_trials()</a></code> carries the same per-item <code>g</code>
+<code><a href="https://rdrr.io/pkg/levante/man/get_trials.html" class="external-link">get_trials()</a></code> carries the same per-item <code>g</code>
 values, so it is an equivalent source for the asymptote.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
