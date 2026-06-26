@@ -19,8 +19,9 @@ Depends:
 Imports:
     dplyr,
     glue,
+    levante,
     methods,
-    purrr, 
+    purrr,
     redivis
 Suggests: 
     forcats,
@@ -37,6 +38,7 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Remotes:
+    levante=levante-framework/levante-r,
     redivis=redivis/redivis-r
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
