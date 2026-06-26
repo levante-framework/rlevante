@@ -1,44 +1,35 @@
-# rlevante
-R package for accessing LEVANTE data. Some useful links:  
-- [An overview of the LEVANTE project](https://researcher.levante-network.org/overview).  
-- [Details about LEVANTE’s scoring and psychometrics](https://researcher.levante-network.org/measures/scoring-and-psychometrics).  
-- [Details about the LEVANTE child tasks](https://researcher.levante-network.org/measures/direct-child-measures).  
-- [How to access the LEVANTE data.](https://researcher.levante-network.org/data) Prior to completing the steps described at this link, you only have access to an example dataset with toy data.  
-- [Data browser.](https://researcher.levante-network.org/data-overview) You can browse scored and trial level task public data using our data browser. If you are a partner with access to additional datasets on Redivis, you will also be able to load and browse those datasets on the data browser.
+# levantemodels
+
+Internal R tooling for LEVANTE data **processing and psychometric modeling**.
+This package holds the model intermediates — trial recoding, the IRT scoring
+pipeline, the model registry, and the `ModelRecord` class.
+
+For **loading** LEVANTE data into R (the user-facing `get_*` functions), see the
+companion [`levante`](https://github.com/levante-framework/levante-r) package.
+`levantemodels` is internally-facing tooling and depends on `levante` for data
+access.
+
+Some useful links:
+- [An overview of the LEVANTE project](https://researcher.levante-network.org/overview).
+- [Details about LEVANTE's scoring and psychometrics](https://researcher.levante-network.org/measures/scoring-and-psychometrics).
+- [Details about the LEVANTE child tasks](https://researcher.levante-network.org/measures/direct-child-measures).
 
 ## Installation
+```r
+# install.packages("devtools") # if you need the devtools package
+devtools::install_github("levante-framework/levantemodels")
 ```
-#install.packages(“devtools”) # if you need the devtools package, uncomment this line
-devtools::install_git(url="https://github.com/levante-framework/rlevante")
-```
 
-## Usage
-A collection of “get” functions to acquire LEVANTE data. For example, use get_scores to download scored cognitive task data. 
-```
-scores <- get_scores(data_source = "levante-data-example:d0rt", version = "current")
-```
-To understand how those scores are produced — and to reproduce or audit them yourself using the LEVANTE model registry — see the [Scoring and the model registry](https://levante-framework.github.io/rlevante/articles/scoring-and-model-registry.html) vignette.
+## What's here
+- **Trial recoding** — `recode_trials()` makes loaded trial data scoring-ready
+  (slider thresholding, Hearts & Flowers / SDS / ToM recodes, item-key fixes).
+- **The IRT scoring pipeline** — `score()` / `score_irt()`, and the model
+  registry accessors `fetch_scoring_table()`, `fetch_registry_table()`,
+  `fetch_registry_dir()`.
+- **The `ModelRecord` class** and its accessors (`items()`, `model_vals()`,
+  `model_class()`, `scores()`).
+- **Processing** — `process_trials()`, `process_runs()`, `process_surveys()`,
+  `process_participants()`.
 
-### Accessing datasets and codebooks
-Permission to access the data is granted via Redivis, a data-sharing platform used for all LEVANTE datasets. Individuals seeking to access any LEVANTE data must create an account on Redivis and sign our data use agreement. 
-
-Datasets available to the public include [levante-data-pilots](https://stanford.redivis.com/datasets/68kn-csrddrz5x) and levante-example-data. If you are a partner with access to your own data in a private repository, see [this page](https://researcher.levante-network.org/data) for information about how to set up data access. 
-
-Once you have access to a dataset on Redivis, you can use rlevante to read the data directly into R. Please see our rlevante user walkthrough for more information and examples.
-
-### Reference identifiers
-In addition to its name, each dataset has a reference ID. While not required, specifying this ID is more stable for your code than specifying dataset names, because dataset names can easily be edited. 
-
-To find and use a dataset’s reference ID, follow these steps:
-
-1. Go to your dataset’s page on Redivis. For example, the link to our publicly available pilot data release is https://stanford.redivis.com/datasets/68kn-csrddrz5x. Once there, click on “API Information” in the right navigation panel.  
-
-![](man/figures/find_refIDs_step1.png)   
-
-2. On the pop-up, check the box in the upper right hand corner for “Qualified references."   
-
-![](man/figures/find_refIDs_step2.png)   
-
-3. Record the string used to specify the dataset, including both its name ("levante_data_pilots"") and reference ID (“68kn”). In rlevante functions, this string can be used as an argument to identify this dataset (e.g., get_participants(data_source = "levante_data_pilots:68kn")).
-
-You can also pin a specific dataset *version* by appending it to the reference, giving a fully qualified `name:hash:version` string (e.g., `get_scores(data_source = "levante_data_pilots:68kn:v1_0")`). Pinning the version makes your analysis reproducible, whereas `version = "current"` (the default) tracks the latest release. When you call a "get" function with `version = "current"`, rlevante reports the qualified reference it resolved to, which you can copy to pin future runs.
+See the [Scoring and the model registry](https://levante-framework.github.io/levantemodels/articles/scoring-and-model-registry.html)
+vignette for the full trials → score pipeline.
