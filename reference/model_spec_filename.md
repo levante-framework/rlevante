@@ -7,3 +7,10 @@ convert model spec to filename
 ``` r
 model_spec_filename(spec)
 ```
+
+## Arguments
+
+- spec:
+
+  Model specification (list with names item_task, model_set, subset,
+  itemtype, nfact, invariance).

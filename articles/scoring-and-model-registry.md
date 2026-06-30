@@ -26,7 +26,7 @@ through a handful of functions:
 | Function | Returns |
 |----|----|
 | [`fetch_scoring_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_scoring_table.md) | which model specification applies to each (task, dataset) |
-| [`fetch_registry_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_table.md) | an index mapping model files to Redivis file ids |
+| `fetch_registry_table()` | an index mapping model files to Redivis file ids |
 | [`fetch_registry_dir()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_dir.md) | a Redivis directory handle for downloading model files |
 | [`score()`](https://levante-framework.github.io/levantemodels/reference/score.md) | scores one (task, dataset) using the above |
 
@@ -68,7 +68,7 @@ copy to pin future runs.
 
 ## Trials must be recoded before scoring
 
-[`get_trials()`](https://rdrr.io/pkg/levante/man/get_trials.html)
+[`get_trials()`](https://levante-framework.github.io/levante-r/reference/get_trials.html)
 returns a `correct` column, but that column is **not yet
 scoring-ready**. The calibrated models were fit on data passed through
 [`recode_trials()`](https://levante-framework.github.io/levantemodels/reference/recode_trials.md)
@@ -191,7 +191,7 @@ guessing.
 Two things are easy to get wrong here:
 
 - The `item_parameters` table (and
-  [`levante::get_item_parameters()`](https://rdrr.io/pkg/levante/man/get_item_parameters.html))
+  [`levante::get_item_parameters()`](https://levante-framework.github.io/levante-r/reference/get_item_parameters.html))
   exposes only `difficulty` and `discrimination`; it **omits `g`**. Its
   `itemtype` label (`rasch` / `2pl`) describes the discrimination
   structure only, not the presence of guessing.
@@ -221,6 +221,6 @@ fitted model and inflates residuals at low ability (lucky guesses on
 hard items look “impossible”), which can corrupt person-fit and
 reliability analyses even though the released scores themselves are
 correct. The trial-level `chance` field from
-[`get_trials()`](https://rdrr.io/pkg/levante/man/get_trials.html)
+[`get_trials()`](https://levante-framework.github.io/levante-r/reference/get_trials.html)
 carries the same per-item `g` values, so it is an equivalent source for
 the asymptote.

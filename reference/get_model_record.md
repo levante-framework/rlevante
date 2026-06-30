@@ -13,12 +13,13 @@ get_model_record(spec, registry_dir)
 
 - spec:
 
-  list with entries item_task, model_set, subset, itemtype, nfact,
-  invariance
+  Model specification (list with names item_task, model_set, subset,
+  itemtype, nfact, invariance).
 
 - registry_dir:
 
-  tibble returned by registry_dir()
+  Model registry directory as returned by
+  [`fetch_registry_dir()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_dir.md).
 
 ## Value
 

@@ -38,7 +38,7 @@ devtools::install_github("levante-framework/levantemodels")
   [`score_irt()`](https://levante-framework.github.io/levantemodels/reference/score_irt.md),
   and the model registry accessors
   [`fetch_scoring_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_scoring_table.md),
-  [`fetch_registry_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_table.md),
+  `fetch_registry_table()`,
   [`fetch_registry_dir()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_dir.md).
 - **The `ModelRecord` class** and its accessors
   ([`items()`](https://levante-framework.github.io/levantemodels/reference/ModelRecord.md),
