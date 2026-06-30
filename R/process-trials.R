@@ -1,5 +1,4 @@
 #' Process trial data
-#' @keywords internal
 #'
 #' @inheritParams process_trials
 #'
@@ -43,7 +42,6 @@ process_trials_prelim <- function(dataset_spec,
 }
 
 #' Process trial data
-#' @keywords internal
 #'
 #' @inheritParams process_runs
 #' @param remove_invalid_trials Boolean indicating whether to drop trials that

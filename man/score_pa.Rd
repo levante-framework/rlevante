@@ -14,4 +14,3 @@ score_pa(trial_data_task, dataset)
 \description{
 scores for PA -- deprecated
 }
-\keyword{internal}

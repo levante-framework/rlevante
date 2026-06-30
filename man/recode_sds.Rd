@@ -12,4 +12,3 @@ recode_sds(df)
 \description{
 recode correctness for SDS
 }
-\keyword{internal}

@@ -20,6 +20,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Mika Braginsky \email{mika.br@gmail.com} (\href{https://orcid.org/0000-0001-9039-3220}{ORCID})
   \item Michael Frank \email{mcfrank@stanford.edu} (\href{https://orcid.org/0000-0002-7551-4378}{ORCID})
 }
 

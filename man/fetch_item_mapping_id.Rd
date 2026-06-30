@@ -14,4 +14,3 @@ Get item UIDs mapped by item_id
 mapping_id <- fetch_item_mapping_id()
 }
 }
-\keyword{internal}

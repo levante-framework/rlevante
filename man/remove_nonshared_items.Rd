@@ -12,4 +12,3 @@ remove_nonshared_items(df)
 \description{
 remove items that aren't shared across all groups
 }
-\keyword{internal}

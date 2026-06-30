@@ -12,4 +12,3 @@ to_mirt_shape_grouped(df)
 \description{
 format data for mirt
 }
-\keyword{internal}

@@ -1,7 +1,7 @@
 ### functions to prep data for modeling
 
 #' add identifiers for each instance of each item
-#' @keywords internal
+#' @export
 #'
 #' @param df trial data
 #' @param item_sep string to put in between item_uid and instance index (defaults to "-")
@@ -15,7 +15,7 @@ dedupe_items <- function(df, item_sep = "-") {
 }
 
 #' remove items with no variance
-#' @keywords internal
+#' @export
 #'
 #' @param df trial data
 remove_no_var_items <- function(df) {
@@ -26,7 +26,7 @@ remove_no_var_items <- function(df) {
 }
 
 #' remove items that aren't shared across all groups
-#' @keywords internal
+#' @export
 #'
 #' @param df trial data
 remove_nonshared_items <- function(df) {
@@ -40,7 +40,7 @@ remove_nonshared_items <- function(df) {
 }
 
 #' remove items with no invariance in any single group
-#' @keywords internal
+#' @export
 #'
 #' @inheritParams remove_no_var_items
 remove_no_var_items_bygroup <- function(df) {
@@ -53,7 +53,7 @@ remove_no_var_items_bygroup <- function(df) {
 }
 
 #' format data for mirt
-#' @keywords internal
+#' @export
 #'
 #' @param df trial data
 to_mirt_shape <- function(df) {
@@ -65,7 +65,7 @@ to_mirt_shape <- function(df) {
 }
 
 #' format data for mirt
-#' @keywords internal
+#' @export
 #'
 #' @param df trial data
 to_mirt_shape_grouped <- function(df) {

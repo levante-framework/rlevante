@@ -1,10 +1,10 @@
 #' given trial data and model record, score data from corresponding model
-#' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
 #' @param mod_spec list with entries item_task, dataset, model_set, subset, itemtype, nfact, invariance
 #' @param mod_rec ModelRecord object
 #' @return tibble with scores
+#' @export
 score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   message(glue::glue('--Using IRT scoring'))
 
@@ -66,9 +66,9 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
 }
 
 #' scores from CAT
-#' @keywords internal
 #'
 #' @param runs run data from one task and one dataset
+#' @export
 score_cat <- \(runs) {
   message(glue::glue('--Using CAT scoring'))
   runs |>
@@ -78,7 +78,6 @@ score_cat <- \(runs) {
 }
 
 #' scores for PA -- deprecated
-#' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
 #' @param dataset dataset
@@ -102,10 +101,10 @@ score_pa <- \(trial_data_task, dataset)  {
 }
 
 #' scores for SRE
-#' @keywords internal
 #'
 #' @param trial_data_task trial data from one task and one dataset
 #' @param dataset dataset
+#' @export
 score_sre <- \(trial_data_task, dataset) {
   message(glue::glue('--Using SRE scoring'))
 
@@ -122,7 +121,6 @@ mod_spec_str <- \(spec) {
 }
 
 #' score
-#' @keywords internal
 #' @export
 #'
 #' @param task task

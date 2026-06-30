@@ -9,4 +9,3 @@ model_spec_filename(spec)
 \description{
 convert model spec to filename
 }
-\keyword{internal}

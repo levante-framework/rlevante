@@ -12,4 +12,3 @@ to_mirt_shape(df)
 \description{
 format data for mirt
 }
-\keyword{internal}

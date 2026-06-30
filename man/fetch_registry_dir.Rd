@@ -9,4 +9,3 @@ fetch_registry_dir(version = "current")
 \description{
 Fetch model registry file index table
 }
-\keyword{internal}

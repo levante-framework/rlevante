@@ -1,5 +1,4 @@
 #' Process participants
-#' @keywords internal
 #'
 #' @inheritParams process_runs
 #'

@@ -19,4 +19,3 @@ list with entries item_task, dataset, model_set, subset, itemtype, nfact, invari
 \description{
 get the scoring specification in scoring_table for a given task + dataset
 }
-\keyword{internal}

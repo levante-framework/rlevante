@@ -12,4 +12,3 @@ remove_no_var_items(df)
 \description{
 remove items with no variance
 }
-\keyword{internal}

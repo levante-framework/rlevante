@@ -22,4 +22,3 @@ score(task, dataset, trials, runs, scoring_table, registry_dir)
 \description{
 score
 }
-\keyword{internal}

@@ -17,4 +17,3 @@ ModelRecord object
 \description{
 get the model record indexed in registry_dir for a given scoring specification
 }
-\keyword{internal}

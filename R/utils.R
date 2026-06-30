@@ -7,7 +7,6 @@ compute_age <- function(birth_month, birth_year, test_date) {
 }
 
 #' Determine dataset of current notebook on Redivis
-#' @keywords internal
 #'
 #' @param redivis Redivis reference object.
 #' @export

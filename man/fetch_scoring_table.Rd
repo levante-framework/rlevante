@@ -9,4 +9,3 @@ fetch_scoring_table(version = "current")
 \description{
 Fetch scoring specification table
 }
-\keyword{internal}

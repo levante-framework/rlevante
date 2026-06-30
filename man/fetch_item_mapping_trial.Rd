@@ -14,4 +14,3 @@ Get item UIDs mapped by trial_id
 mapping_trial <- fetch_item_mapping_trial()
 }
 }
-\keyword{internal}

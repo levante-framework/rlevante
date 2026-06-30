@@ -9,4 +9,3 @@ get_registry_file(mod_filename, registry_dir)
 \description{
 fetch file from model registry
 }
-\keyword{internal}

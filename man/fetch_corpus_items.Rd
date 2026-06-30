@@ -14,4 +14,3 @@ Get metadata for corpus items
 corpus_items <- fetch_corpus_items()
 }
 }
-\keyword{internal}

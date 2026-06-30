@@ -12,4 +12,3 @@ remove_no_var_items_bygroup(df)
 \description{
 remove items with no invariance in any single group
 }
-\keyword{internal}

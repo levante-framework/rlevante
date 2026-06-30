@@ -14,4 +14,3 @@ Get item UIDs mapped by fields
 mapping_fields <- fetch_item_mapping_fields()
 }
 }
-\keyword{internal}

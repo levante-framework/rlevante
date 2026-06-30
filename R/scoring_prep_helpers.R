@@ -10,7 +10,6 @@
 #' recodes, known item-key fixes (e.g. `math_subtract_37_24`), and chance-level
 #' backfill. See `vignette("scoring-and-model-registry")`.
 #'
-#' @keywords internal
 #' @export
 #'
 #' @param df trial data
@@ -46,7 +45,6 @@ recode_trials <- \(df, slider_threshold = 0.15) {
 }
 
 #' recode correctness + reclassify items for HF
-#' @keywords internal
 #'
 #' @inheritParams recode_trials
 recode_hf <- \(df) {
@@ -75,7 +73,6 @@ recode_hf <- \(df) {
 }
 
 #' recode correctness for slider
-#' @keywords internal
 #'
 #' @inheritParams recode_trials
 recode_slider <- \(df, slider_threshold) {
@@ -98,7 +95,6 @@ recode_slider <- \(df, slider_threshold) {
 }
 
 #' recode correctness for items with wrong answers
-#' @keywords internal
 #'
 #' @inheritParams recode_trials
 #' @param wrong_items tibble with columns item_uid and answer_fixed
@@ -116,7 +112,6 @@ recode_wrong_items <- \(df, wrong_items) {
 }
 
 #' recode items for ToM
-#' @keywords internal
 #'
 #' @inheritParams recode_trials
 recode_tom <- \(df) {
@@ -131,7 +126,6 @@ recode_tom <- \(df) {
 }
 
 #' recode correctness for SDS
-#' @keywords internal
 #'
 #' @inheritParams recode_trials
 recode_sds <- function(df) {

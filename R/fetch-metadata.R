@@ -8,7 +8,7 @@ fetch_metadata_table <- function(table_name) {
 
 #' Get item UIDs mapped by trial_id
 #'
-#' @keywords internal
+#' @export
 #' @examples
 #' \dontrun{
 #' mapping_trial <- fetch_item_mapping_trial()
@@ -19,7 +19,7 @@ fetch_item_mapping_trial <- function() {
 
 #' Get item UIDs mapped by fields
 #'
-#' @keywords internal
+#' @export
 #' @examples
 #' \dontrun{
 #' mapping_fields <- fetch_item_mapping_fields()
@@ -30,7 +30,7 @@ fetch_item_mapping_fields <- function() {
 
 #' Get item UIDs mapped by item_id
 #'
-#' @keywords internal
+#' @export
 #' @examples
 #' \dontrun{
 #' mapping_id <- fetch_item_mapping_id()
@@ -41,7 +41,7 @@ fetch_item_mapping_id <- function() {
 
 #' Get metadata for corpus items
 #'
-#' @keywords internal
+#' @export
 #' @examples
 #' \dontrun{
 #' corpus_items <- fetch_corpus_items()
@@ -52,7 +52,7 @@ fetch_corpus_items <- function() {
 
 #' Get metadata for survey items
 #'
-#' @keywords internal
+#' @export
 #' @examples
 #' \dontrun{
 #' survey_items <- fetch_survey_items()

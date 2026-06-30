@@ -1,5 +1,4 @@
 #' Process run data
-#' @keywords internal
 #'
 #' @param dataset_spec List of dataset names and versions to retrieve.
 #' @param remove_incomplete_runs Boolean indicating whether to drop runs that

@@ -1,5 +1,4 @@
 #' Process survey data
-#' @keywords internal
 #' @export
 #'
 #' @inheritParams process_runs
@@ -91,7 +90,6 @@ code_survey_data <- function(surveys) {
 
 
 #' Link survey data to participant data
-#' @keywords internal
 #' @export
 #'
 #' @param surveys Survey data as returned by `process_surveys()`.

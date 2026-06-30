@@ -11,4 +11,3 @@ registry. Access its contents with \code{\link[=items]{items()}}, \code{\link[=m
 \code{\link[=model_vals]{model_vals()}}, and \code{\link[=scores]{scores()}}; see
 \code{vignette("scoring-and-model-registry")} for details.
 }
-\keyword{internal}

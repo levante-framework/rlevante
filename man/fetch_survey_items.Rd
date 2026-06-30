@@ -14,4 +14,3 @@ Get metadata for survey items
 survey_items <- fetch_survey_items()
 }
 }
-\keyword{internal}

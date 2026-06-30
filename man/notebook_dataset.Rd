@@ -12,4 +12,3 @@ notebook_dataset(redivis)
 \description{
 Determine dataset of current notebook on Redivis
 }
-\keyword{internal}
