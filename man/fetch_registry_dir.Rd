@@ -6,6 +6,9 @@
 \usage{
 fetch_registry_dir(version = "current")
 }
+\arguments{
+\item{version}{Version tag of the \code{levante_metadata_scoring} dataset.}
+}
 \description{
 Fetch model registry file index table
 }

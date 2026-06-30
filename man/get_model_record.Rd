@@ -7,9 +7,9 @@
 get_model_record(spec, registry_dir)
 }
 \arguments{
-\item{spec}{list with entries item_task, model_set, subset, itemtype, nfact, invariance}
+\item{spec}{Model specification (list with names item_task, model_set, subset, itemtype, nfact, invariance).}
 
-\item{registry_dir}{tibble returned by registry_dir()}
+\item{registry_dir}{Model registry directory as returned by \code{fetch_registry_dir()}.}
 }
 \value{
 ModelRecord object

@@ -6,6 +6,11 @@
 \usage{
 get_registry_file(mod_filename, registry_dir)
 }
+\arguments{
+\item{mod_filename}{Filename (string) of model record to fetch.}
+
+\item{registry_dir}{Model registry directory as returned by \code{fetch_registry_dir()}.}
+}
 \description{
 fetch file from model registry
 }

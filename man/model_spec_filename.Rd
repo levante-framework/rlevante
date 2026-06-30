@@ -6,6 +6,9 @@
 \usage{
 model_spec_filename(spec)
 }
+\arguments{
+\item{spec}{Model specification (list with names item_task, model_set, subset, itemtype, nfact, invariance).}
+}
 \description{
 convert model spec to filename
 }

@@ -6,6 +6,9 @@
 \usage{
 fetch_scoring_table(version = "current")
 }
+\arguments{
+\item{version}{Version tag of the \code{levante_metadata_scoring} dataset.}
+}
 \description{
 Fetch scoring specification table
 }
