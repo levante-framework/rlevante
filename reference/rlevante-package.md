@@ -1,13 +1,15 @@
-# rlevante: Download LEVANTE Data
+# rlevante: LEVANTE Data Processing and Modeling
 
-Download data from LEVANTE, a global project for studying child
-development.
+Internal tooling for processing LEVANTE data and fitting and serving its
+psychometric (IRT) scoring models. Holds the trial recoding, scoring
+pipeline, model registry, and ModelRecord machinery. For loading LEVANTE
+data, see the levante package.
 
 ## See also
 
 Useful links:
 
-- <https://levante-framework.github.io/rlevante/>
+- <https://levante-framework.github.io/levantemodels/>
 
 ## Author
 
@@ -15,6 +17,9 @@ Useful links:
 ([ORCID](https://orcid.org/0000-0001-9039-3220))
 
 Authors:
+
+- Mika Braginsky <mika.br@gmail.com>
+  ([ORCID](https://orcid.org/0000-0001-9039-3220))
 
 - Michael Frank <mcfrank@stanford.edu>
   ([ORCID](https://orcid.org/0000-0002-7551-4378))

@@ -88,6 +88,8 @@ vignette for the full trials → score pipeline.
   : Get item UIDs mapped by trial_id
 - [`fetch_registry_dir()`](https://levante-framework.github.io/levantemodels/reference/fetch_registry_dir.md)
   : Fetch model registry file index table
+- [`fetch_scoring_parameters()`](https://levante-framework.github.io/levantemodels/reference/fetch_scoring_parameters.md)
+  : Fetch scoring specification table
 - [`fetch_scoring_table()`](https://levante-framework.github.io/levantemodels/reference/fetch_scoring_table.md)
   : Fetch scoring specification table
 - [`fetch_survey_items()`](https://levante-framework.github.io/levantemodels/reference/fetch_survey_items.md)
