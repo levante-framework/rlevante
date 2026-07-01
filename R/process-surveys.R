@@ -110,7 +110,7 @@ link_surveys <- function(surveys, participants) {
                    "survey_schema_source", "valid_survey", "validation_msg_survey")
   user_survey_data <- surveys |>
     mutate(survey_group = .data$survey_part) |>
-    tidyr::nest(survey_data = -all_of(c("survey_group", "child_id", survey_vars))) |>
+    tidyr::nest(survey_data = -all_of(c("survey_group", survey_vars))) |>
     mutate(n_responses = purrr::map_int(.data$survey_data, nrow)) |>
     filter(.data$n_responses > 1)
 
@@ -130,7 +130,7 @@ link_surveys <- function(surveys, participants) {
 
   survey_teacher <- user_survey_data |>
     filter(.data$survey_type == "teacher") |>
-    select(-"child_id") |>
+    # select(-"child_id") |>
     left_join(teachers, by = c("user_id" = "teacher_id")) |>
     tidyr::unnest("children") |>
     select(-"survey_group", -matches("children"))
@@ -143,15 +143,15 @@ link_surveys <- function(surveys, participants) {
   # caregiver survey, household (across children) section
   survey_household <- user_survey_data |>
     filter(.data$survey_type == "caregiver", stringr::str_detect(.data$survey_group, "general")) |>
-    select(-"survey_group", -"child_id") |>
+    select(-"survey_group") |> #, -"child_id") |>
     inner_join(parents, by = c("user_id" = "parent_id"), relationship = "many-to-many") |>
     relocate("child_id", .after = "user_id")
 
   # caregiver survey, child-specific section
   survey_child <- user_survey_data |>
     filter(.data$survey_type == "caregiver", .data$survey_group == "specific") |>
-    mutate(child_id = if_else(is.na(.data$child_id) & .data$specific_scope == "child_id",
-                              .data$specific_scope_id, .data$child_id)) |>
+    mutate(child_id = if_else(.data$specific_scope == "child_id",
+                              .data$specific_scope_id, NA)) |>
     select(-"survey_group")
 
   # caregiver survey combined
@@ -159,7 +159,7 @@ link_surveys <- function(surveys, participants) {
 
   # recombine separated out survey types
   children_demapped <- children |>
-    select("child_id", "birth_month", "birth_year", "site", "dataset", "school_id", "class_id")
+    select("child_id", "birth_month", "birth_year", "team", "dataset", "school_id", "class_id")
   survey_combined <- bind_rows(survey_student, survey_teacher, survey_caregiver) |>
     select(-c("survey_schema_source", "specific_scope", "specific_scope_id",
               "updated_at", "n_responses")) |>
@@ -171,5 +171,5 @@ link_surveys <- function(surveys, participants) {
     relocate("survey_data", .after = everything())
 
   survey_combined |> tidyr::unnest("survey_data") |>
-    relocate("redivis_source", "site", "dataset", .before = everything())
+    relocate("redivis_source", "team", "dataset", .before = everything())
 }

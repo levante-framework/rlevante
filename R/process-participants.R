@@ -48,7 +48,7 @@ process_participants <- function(dataset_spec, max_results = NULL) {
   co_guest_end <- as.POSIXct("2024-06-30")
   suppressWarnings(
     participants |>
-      # recode site/dataset names
+      # recode site=dataset names
       mutate(dataset = if_else(.data$dataset %in% legacy_dataset_names,
                                forcats::fct_recode(.data$dataset, !!!legacy_dataset_names),
                                stringr::str_replace_all(.data$dataset, "-", "_"))) |>
@@ -56,8 +56,8 @@ process_participants <- function(dataset_spec, max_results = NULL) {
       mutate(dataset = if_else(is.na(.data$dataset) & .data$created_at < co_guest_end,
                                "pilot_uniandes_co_bogota", .data$dataset)) |>
       select(-"created_at") |>
-      # extract site from dataset
-      mutate(site = .data$dataset |> stringr::str_extract("^[A-z0-9]+_[A-z]+_[A-z]+(?=_)"),
+      # extract team (fka site) from dataset
+      mutate(team = .data$dataset |> stringr::str_extract("^[A-z0-9]+_[A-z]+_[A-z]+(?=_)"),
              .before = "dataset") |>
       relocate("redivis_source", .after = "dataset") |>
       arrange(.data$dataset, .data$user_id)

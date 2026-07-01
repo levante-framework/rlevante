@@ -15,8 +15,17 @@ fetch_scoring_table <- \(version = "current") {
     mutate(redivis_source = ds$get()$scoped_reference, .before = everything())
 }
 
+#' Fetch scoring specification table
+#' @export
+#' @inheritParams fetch_registry_dir
+fetch_scoring_parameters <- \(version = "current") {
+  ds <- redivis::redivis$organization("levante")$dataset("levante_metadata_scoring:e97h", version = version)
+  ds$table("item_parameters:4cvk")$to_tibble() |>
+    mutate(redivis_source = ds$get()$scoped_reference, .before = everything())
+}
+
 #' get the scoring specification in scoring_table for a given task + dataset
-#'
+#' @export
 #' @param score_task string indicating task
 #' @param score_dataset string indicating dataset
 #' @param scoring_table tibble returned by get_scoring_table()
@@ -54,7 +63,7 @@ get_registry_file <- \(mod_filename, registry_dir) {
 }
 
 #' get the model record indexed in registry_dir for a given scoring specification
-#'
+#' @export
 #' @param spec Model specification (list with names item_task, model_set, subset, itemtype, nfact, invariance).
 #' @param registry_dir Model registry directory as returned by `fetch_registry_dir()`.
 #' @return ModelRecord object

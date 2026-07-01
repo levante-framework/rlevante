@@ -51,8 +51,6 @@ process_runs <- function(dataset_spec,
      LEFT JOIN variants ON runs.variant_id = variants.variant_id
      LEFT JOIN users ON runs.user_id = users.user_id"
   )
-  # LEFT JOIN user_sites ON runs.user_id = user_sites.user_id
-  # LEFT JOIN sites ON user_sites.site_id = sites.site_id")
 
   runs <- levante:::get_datasets_data(
     dataset_spec, levante:::query_getter("runs", query_str, max_results))

@@ -50,5 +50,5 @@ multigroup_extract_groups <- \(mod) {
 multigroup_itemfit <- \(submods, fit_stats) {
   submods |>
     purrr::map(\(submod) mirt::itemfit(submod, fit_stats = fit_stats) |> as_tibble()) |>
-    purrr::list_rbind(names_to = "site")
+    purrr::list_rbind(names_to = "group")
 }

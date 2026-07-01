@@ -9,7 +9,7 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   message(glue::glue('--Using IRT scoring'))
 
   # prep new data for model
-  data_filtered <- trial_data_task |> rename(group = "site") |> dedupe_items()
+  data_filtered <- trial_data_task |> rename(group = "dataset") |> dedupe_items()
   data_wide <- data_filtered |> to_mirt_shape_grouped()
   data_prepped <- data_wide |> select(-"group")
   groups <- data_wide |> pull("group")
@@ -59,6 +59,7 @@ score_irt <- \(trial_data_task, mod_spec, mod_rec) {
   # return scores tibble with better names and run_ids added back in
   scores |>
     as_tibble() |>
+    mutate(across(everything(), as.numeric)) |>
     rename(score = "F1", score_se = "SE_F1") |>
     mutate(run_id = rownames(data_prepped), .before = everything()) |>
     mutate(score_type = "ability", scoring_model = mod_spec_str(mod_spec),
